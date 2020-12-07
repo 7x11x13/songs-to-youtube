@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 from PySide2.QtCore import Qt, QDir, QFileInfo, QDirIterator, QMimeDatabase, QMimeType, QModelIndex, QIODevice, QDataStream, QByteArray, QMetaObject
 from PySide2.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem
-from PySide2.QtWidgets import QTreeView, QTreeWidgetItem, QAbstractItemView
+from PySide2.QtWidgets import QTreeView, QTreeWidgetItem, QAbstractItemView, QAbstractScrollArea, QProxyStyle
 from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories
 from const import TreeWidgetType, CustomDataRole
 
@@ -17,16 +17,16 @@ class PlaceholderTreeWidgetItem(QStandardItem):
 
 
 class SongTreeWidgetItem(QStandardItem):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args):
+        super().__init__(*args)
         self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled
                       | Qt.ItemIsDragEnabled)
         self.setData(TreeWidgetType.SONG, CustomDataRole.ITEMTYPE)
 
 
 class AlbumTreeWidgetItem(QStandardItem):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args):
+        super().__init__(*args)
         self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled
                       | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)
         self.setData(TreeWidgetType.ALBUM, CustomDataRole.ITEMTYPE)
@@ -41,8 +41,8 @@ class AlbumTreeWidgetItem(QStandardItem):
         for i in range(self.childCount()):
             yield self.child(i)
 
-    @classmethod
-    def getChildrenFromStandardItem(cls, item):
+    @staticmethod
+    def getChildrenFromStandardItem(item: QStandardItem):
         for i in range(item.rowCount()):
             yield item.child(i)
 
@@ -82,6 +82,7 @@ class SongTreeWidget(QTreeView):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setDropIndicatorShown(True)
         self.setModel(SongTreeModel())
+        self.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
 
     def _create_album_item(self):
         return AlbumTreeWidgetItem()
@@ -139,7 +140,7 @@ class SongTreeWidget(QTreeView):
         for file_path in files_in_directory(dir_path):
             info = QFileInfo(file_path)
             if not info.isReadable():
-                logging.warning("File %s is not readable" % info.filePath())
+                logging.warning("File %s is not readable" % file_path)
                 continue
             if info.isDir():
                 self.addAlbum(file_path)
@@ -152,6 +153,7 @@ class SongTreeWidget(QTreeView):
 
     def addSong(self, path: str):
         if not file_is_audio(path):
+            logging.info("File %s is not audio" % path)
             return
         item = self._create_song_item()
         item.setText(path)

@@ -9,7 +9,8 @@ from PySide2.QtUiTools import QUiLoader
 
 # Custom widgets
 from song_tree_widget import SongTreeWidget
-CUSTOM_WIDGETS = [SongTreeWidget]
+from log_widget import LogWidget
+CUSTOM_WIDGETS = [SongTreeWidget, LogWidget]
 
 
 class MainWindow(QMainWindow):
