@@ -1,43 +1,59 @@
 # This Python file uses the following encoding: utf-8
 from PySide2 import QtCore
-from PySide2.QtWidgets import QPlainTextEdit
+from PySide2.QtWidgets import QTextEdit
+from PySide2.QtGui import QColor
 
 import logging
+import sys
+import traceback
 
+from utils import get_setting, convert_log_level
 
 class LogWidgetFormatter(logging.Formatter):
-
-    COLORS = {
-        "WARNING": "<font color='Yellow'>%s</font>",
-        "INFO": "<font color='Gray'>%s</font>",
-        "DEBUG": "<font color='Blue'>%s</font>",
-        "CRITICAL": "<font color='Yellow'>%s</font>",
-        "ERROR": "<font color='Red'>%s</font>"
-    }
-
     def __init__(self, *args):
         logging.Formatter.__init__(self, *args)
 
     def format(self, record):
-        color_format = self.COLORS[record.levelname]
-        return color_format % super().format(record)
+        return super().format(record).strip()
 
 
 class LogWidgetLogger(logging.Handler):
-    def __init__(self, parent: QPlainTextEdit):
+
+    COLORS = {
+        "WARNING": QColor("yellow"),
+        "INFO": QColor("darkGray"),
+        "DEBUG": QColor("blue"),
+        "CRITICAL": QColor("red"),
+        "ERROR": QColor("red")
+    }
+
+    def __init__(self, parent: QTextEdit):
         super().__init__()
         self.widget = parent
         self.widget.setReadOnly(True)
 
     def emit(self, record):
-        self.widget.appendHtml(self.format(record))
+        color = self.COLORS[record.levelname]
+        self.widget.setTextColor(color)
+        self.widget.append(self.format(record))
 
 
-class LogWidget(QPlainTextEdit):
+class LogWidget(QTextEdit):
+
     def __init__(self, *args):
         super().__init__(*args)
 
         log_handler = LogWidgetLogger(self)
         log_handler.setFormatter(LogWidgetFormatter("[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S"))
         logging.getLogger().addHandler(log_handler)
-        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger().setLevel(logging.INFO)
+        sys.excepthook = self.exception_handler
+
+    def exception_handler(self, type, value, trace):
+        logging.error("".join(traceback.format_tb(trace)))
+        logging.error("Uncaught exception: {0}".format(value))
+        sys.__excepthook__(type, value, trace)
+
+    def update_settings(self):
+        new_level = convert_log_level(get_setting("application/logLevel"))
+        logging.getLogger().setLevel(new_level)

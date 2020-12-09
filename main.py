@@ -1,15 +1,16 @@
 # This Python file uses the following encoding: utf-8
-import sys
-import os
-import logging
-
 from PySide2.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, QListView, QTreeView, QAbstractItemView
 from PySide2.QtCore import QFile
 from PySide2.QtUiTools import QUiLoader
 
+import sys
+import os
+import logging
+
 # Custom widgets
 from song_tree_widget import SongTreeWidget
 from log_widget import LogWidget
+from settings_window import SettingsWindow
 CUSTOM_WIDGETS = [SongTreeWidget, LogWidget]
 
 
@@ -17,7 +18,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.load_ui()
-        self.connectActions()
+        self.connect_actions()
         self.setAcceptDrops(True)
 
     def load_ui(self):
@@ -55,12 +56,18 @@ class MainWindow(QMainWindow):
         for file in file_names:
             self.ui.treeWidget.addSong(file)
 
+    def open_settings(self):
+        window = SettingsWindow(self)
+        window.settings_changed.connect(self.ui.logWindow.update_settings)
+        window.show()
+
     def show(self):
         self.ui.show()
 
-    def connectActions(self):
+    def connect_actions(self):
         self.ui.actionAlbums.triggered.connect(self.load_albums)
         self.ui.actionSongs.triggered.connect(self.load_songs)
+        self.ui.actionSettings.triggered.connect(self.open_settings)
 
 
 if __name__ == "__main__":
