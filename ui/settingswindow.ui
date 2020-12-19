@@ -32,6 +32,16 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QScrollArea" name="scrollArea">
      <property name="horizontalScrollBarPolicy">
@@ -67,7 +77,7 @@
          <x>10</x>
          <y>20</y>
          <width>529</width>
-         <height>90</height>
+         <height>129</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -85,93 +95,71 @@
        <property name="title">
         <string>Application</string>
        </property>
-       <widget class="QComboBox" name="dragAndDropBehavior">
-        <property name="geometry">
-         <rect>
-          <x>160</x>
-          <y>28</y>
-          <width>87</width>
-          <height>22</height>
-         </rect>
-        </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <property name="text">
-          <string>Album mode</string>
-         </property>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Default drag &amp; drop behavior:</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <property name="text">
-          <string>Song mode</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QLabel" name="label">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>30</y>
-          <width>144</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Default drag &amp; drop behavior:</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_2">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>60</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Log level:</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="logLevel">
-        <property name="geometry">
-         <rect>
-          <x>60</x>
-          <y>58</y>
-          <width>81</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <item>
-         <property name="text">
-          <string>DEBUG</string>
-         </property>
+         <widget class="QComboBox" name="dragAndDropBehavior">
+          <item>
+           <property name="text">
+            <string>Album mode</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Song mode</string>
+           </property>
+          </item>
+         </widget>
         </item>
         <item>
-         <property name="text">
-          <string>INFO</string>
-         </property>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Log level:</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <property name="text">
-          <string>WARNING</string>
-         </property>
+         <widget class="QComboBox" name="logLevel">
+          <item>
+           <property name="text">
+            <string>DEBUG</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>INFO</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>WARNING</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ERROR</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CRITICAL</string>
+           </property>
+          </item>
+         </widget>
         </item>
-        <item>
-         <property name="text">
-          <string>ERROR</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>CRITICAL</string>
-         </property>
-        </item>
-       </widget>
+       </layout>
       </widget>
       <widget class="QGroupBox" name="groupBox_2">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>130</y>
+         <y>150</y>
          <width>529</width>
          <height>30</height>
         </rect>
@@ -190,7 +178,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>170</y>
+         <y>190</y>
          <width>529</width>
          <height>30</height>
         </rect>
@@ -206,16 +194,6 @@
        </property>
       </widget>
      </widget>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
     </widget>
    </item>
   </layout>
