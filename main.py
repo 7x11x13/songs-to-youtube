@@ -9,8 +9,8 @@ import logging
 
 # Custom widgets
 from song_tree_widget import SongTreeWidget
-from log_widget import LogWidget
-from settings_window import SettingsWindow
+from log import LogWidget
+from settings import SettingsWindow
 CUSTOM_WIDGETS = [SongTreeWidget, LogWidget]
 
 

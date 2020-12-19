@@ -1,11 +1,23 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import Qt, QDir, QFileInfo, QDirIterator, QMimeDatabase, QMimeType, QModelIndex, QIODevice, QDataStream, QByteArray, QMetaObject
+from PySide2.QtCore import Qt, QFileInfo, QModelIndex
 from PySide2.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem
-from PySide2.QtWidgets import QTreeView, QTreeWidgetItem, QAbstractItemView, QAbstractScrollArea, QProxyStyle
-from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories, get_setting
-from const import TreeWidgetType, CustomDataRole, SETTINGS_VALUES
+from PySide2.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea
+from file_utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories
+from settings import SETTINGS_VALUES, get_setting
 
 import logging
+from enum import IntEnum
+
+
+class TreeWidgetType(IntEnum):
+    SONG = 0
+    ALBUM = 1
+    PLACEHOLDER = 2
+
+
+class CustomDataRole(IntEnum):
+    ITEMTYPE = Qt.UserRole
+    ITEMDATA = Qt.UserRole + 1
 
 
 class PlaceholderTreeWidgetItem(QStandardItem):

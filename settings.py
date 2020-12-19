@@ -5,9 +5,51 @@ from PySide2.QtUiTools import QUiLoader
 
 import os
 import logging
+from enum import IntEnum
 
-from const import SETTINGS_WIDGETS
-from utils import get_settings
+ORGANIZATION = "7x11x13"
+APPLICATION = "songs-to-youtube"
+
+SETTINGS_WIDGETS = {
+    "application/dragAndDrop": {
+        "widget_name": "dragAndDropBehavior",
+        "getter": "currentIndex",
+        "setter": "setCurrentIndex",
+        "default": 0
+    },
+    "application/logLevel": {
+        "widget_name": "logLevel",
+        "getter": "currentIndex",
+        "setter": "setCurrentIndex",
+        "default": 2
+    }
+}
+
+class SETTINGS_VALUES:
+    class DragAndDrop(IntEnum):
+        ALBUM_MODE = 0
+        SONG_MODE = 1
+
+    class LogLevel(IntEnum):
+        DEBUG = 0
+        INFO = 1
+        WARNING = 2
+        ERROR = 3
+        CRITICAL = 4
+
+
+def get_settings():
+    """Returns the QSettings for this application"""
+    return QSettings(ORGANIZATION, APPLICATION)
+
+def get_setting(setting: str):
+    """Returns the value of the given setting or None if it has no value"""
+    settings = get_settings()
+    if setting not in SETTINGS_WIDGETS:
+        logging.error("Setting {} is not recognized".format(setting))
+        return None
+    return settings.value(setting, SETTINGS_WIDGETS[setting]["default"])
+
 
 class SettingsWindow(QDialog):
 

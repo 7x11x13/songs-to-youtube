@@ -7,7 +7,12 @@ import logging
 import sys
 import traceback
 
-from utils import get_setting, convert_log_level
+from settings import get_setting
+
+
+def convert_log_level(level: int):
+    """Converts from LogLevel combobox index to Python log level value"""
+    return (level + 1) * 10
 
 class LogWidgetFormatter(logging.Formatter):
     def __init__(self, *args):
