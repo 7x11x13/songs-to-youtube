@@ -1,7 +1,9 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase, QObject
+from PySide2.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase, QObject, QFile
+from PySide2.QtUiTools import QUiLoader
 
 import logging
+import os
 
 
 # File utils
@@ -41,5 +43,15 @@ def get_all_children(obj: QObject):
         children += get_all_children(child)
     return children
 
-def load_ui(name: str):
-    pass
+def load_ui(name, custom_widgets=[]):
+    loader = QUiLoader()
+    for cw in custom_widgets:
+        loader.registerCustomWidget(cw)
+    path = os.path.join(os.path.dirname(__file__), "ui", name)
+    ui_file = QFile(path)
+    if not ui_file.open(QFile.ReadOnly):
+        print("Cannot open {}: {}".format(path, ui_file.errorString()))
+        sys.exit(-1)
+    ui = loader.load(ui_file)
+    ui_file.close()
+    return ui

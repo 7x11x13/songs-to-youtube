@@ -1,38 +1,27 @@
 # This Python file uses the following encoding: utf-8
 from PySide2.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, QListView, QTreeView, QAbstractItemView
-from PySide2.QtCore import QFile
-from PySide2.QtUiTools import QUiLoader
+
 
 import sys
 import os
 import logging
+
+from utils import load_ui
 
 # Custom widgets
 from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
 from log import LogWidget
 from settings import SettingsWindow
-CUSTOM_WIDGETS = [SongSettingsWidget, SongTreeWidget, LogWidget]
+CUSTOM_WIDGETS = (SongSettingsWidget, SongTreeWidget, LogWidget)
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.load_ui()
+        self.ui = load_ui("mainwindow.ui", CUSTOM_WIDGETS)
         self.connect_actions()
         self.setAcceptDrops(True)
-
-    def load_ui(self):
-        loader = QUiLoader()
-        for cw in CUSTOM_WIDGETS:
-            loader.registerCustomWidget(cw)
-        path = os.path.join(os.path.dirname(__file__), "ui", "mainwindow.ui")
-        ui_file = QFile(path)
-        if not ui_file.open(QFile.ReadOnly):
-            print("Cannot open {}: {}".format(path, ui_file.errorString()))
-            sys.exit(-1)
-        self.ui = loader.load(ui_file)
-        ui_file.close()
 
     def load_albums(self):
         file_dialog = QFileDialog(self, "Import Albums")

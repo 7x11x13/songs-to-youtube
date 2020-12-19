@@ -24,7 +24,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>585</width>
+    <width>16777215</width>
     <height>16777215</height>
    </size>
   </property>
@@ -45,8 +45,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>557</width>
-        <height>1080</height>
+        <width>551</width>
+        <height>816</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -57,23 +57,23 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>557</width>
-        <height>1080</height>
+        <width>0</width>
+        <height>0</height>
        </size>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
         <widget class="QGroupBox" name="applicationSettings">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>529</width>
-           <height>90</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="title">

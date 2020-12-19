@@ -7,7 +7,7 @@ import os
 import logging
 from enum import IntEnum
 
-from utils import get_all_children
+from utils import get_all_children, load_ui
 
 ORGANIZATION = "7x11x13"
 APPLICATION = "songs-to-youtube"
@@ -106,7 +106,7 @@ class SettingsWindow(QDialog):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.load_ui()
+        self.ui = load_ui("settingswindow.ui")
         self.connect_actions()
         self.load_settings()
 
@@ -130,23 +130,11 @@ class SettingsWindow(QDialog):
             if class_name in WIDGET_FUNCTIONS:
                 setting = widget.objectName()
                 value = get_setting(setting)
-                print(setting, value, type(value))
-                print("----")
                 # We have to convert from str since settings can only be stored as str
                 # unless we store in registry but then there would be a size limit
                 value = WIDGET_FUNCTIONS[class_name]["str_to_val"](value)
                 setter = getattr(widget, WIDGET_FUNCTIONS[class_name]["setter"])
                 setter(value)
-
-    def load_ui(self):
-        loader = QUiLoader()
-        path = os.path.join(os.path.dirname(__file__), "ui", "settingswindow.ui")
-        ui_file = QFile(path)
-        if not ui_file.open(QFile.ReadOnly):
-            print("Cannot open {}: {}".format(path, ui_file.errorString()))
-            sys.exit(-1)
-        self.ui = loader.load(ui_file)
-        ui_file.close()
 
     def show(self):
         self.ui.show()
