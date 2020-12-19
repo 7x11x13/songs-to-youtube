@@ -2,7 +2,7 @@
 from PySide2.QtCore import Qt, QFileInfo, QModelIndex
 from PySide2.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem
 from PySide2.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea
-from file_utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories
+from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories
 from settings import SETTINGS_VALUES, get_setting
 
 import logging

@@ -8,10 +8,11 @@ import os
 import logging
 
 # Custom widgets
+from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
 from log import LogWidget
 from settings import SettingsWindow
-CUSTOM_WIDGETS = [SongTreeWidget, LogWidget]
+CUSTOM_WIDGETS = [SongSettingsWidget, SongTreeWidget, LogWidget]
 
 
 class MainWindow(QMainWindow):

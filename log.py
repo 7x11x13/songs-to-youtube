@@ -60,5 +60,5 @@ class LogWidget(QTextEdit):
         sys.__excepthook__(type, value, trace)
 
     def update_settings(self):
-        new_level = convert_log_level(get_setting("application/logLevel"))
+        new_level = convert_log_level(int(get_setting("logLevel")))
         logging.getLogger().setLevel(new_level)

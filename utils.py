@@ -1,7 +1,10 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase
+from PySide2.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase, QObject
 
 import logging
+
+
+# File utils
 
 def files_in_directory(dir_path: str):
     """Generates all the files of the given directory"""
@@ -25,3 +28,18 @@ def file_is_audio(file_path: str):
     db = QMimeDatabase()
     mime_type = db.mimeTypeForFile(info)
     return mime_type.name().startswith("audio")
+
+
+
+# Qt utils
+
+def get_all_children(obj: QObject):
+    """Returns all the children (recursive) of the given object"""
+    children = []
+    for child in obj.children():
+        children.append(child)
+        children += get_all_children(child)
+    return children
+
+def load_ui(name: str):
+    pass

@@ -74,13 +74,13 @@
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
-        <widget class="QWidget" name="scrollAreaWidgetContents">
+        <widget class="SongSettingsWidget" name="scrollAreaWidgetContents">
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
+           <y>-283</y>
            <width>344</width>
-           <height>619</height>
+           <height>681</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -96,6 +96,19 @@
           </size>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QCheckBox" name="uploadYouTube">
+            <property name="text">
+             <string>Upload to YouTube?</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="tristate">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
           <item alignment="Qt::AlignTop">
            <widget class="QGroupBox" name="youtubeSettings">
             <property name="title">
@@ -118,16 +131,22 @@
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QCheckBox" name="uploadYouTube">
+             <item alignment="Qt::AlignRight">
+              <widget class="QPushButton" name="coverArtButton">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>25</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>150</width>
+                 <height>50</height>
+                </size>
+               </property>
                <property name="text">
-                <string>Upload to YouTube?</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-               <property name="tristate">
-                <bool>false</bool>
+                <string>Choose cover art...</string>
                </property>
               </widget>
              </item>
@@ -166,6 +185,25 @@
              </item>
              <item>
               <widget class="QComboBox" name="userSelect"/>
+             </item>
+             <item alignment="Qt::AlignRight">
+              <widget class="QPushButton" name="addUser">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>25</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>150</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Add new user...</string>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_2">
@@ -225,7 +263,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="comboBox">
+              <widget class="QComboBox" name="videoVisibility">
                <item>
                 <property name="text">
                  <string>Public</string>
@@ -267,6 +305,9 @@
                  <width>100</width>
                  <height>24</height>
                 </size>
+               </property>
+               <property name="lineWrapMode">
+                <enum>QPlainTextEdit::WidgetWidth</enum>
                </property>
               </widget>
              </item>
@@ -402,6 +443,12 @@
    <class>LogWidget</class>
    <extends>QPlainTextEdit</extends>
    <header>log_widget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SongSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>song_settings_widget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
