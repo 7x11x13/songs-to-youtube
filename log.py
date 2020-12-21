@@ -10,9 +10,9 @@ import traceback
 from settings import get_setting
 
 
-def convert_log_level(level: int):
-    """Converts from LogLevel combobox index to Python log level value"""
-    return (level + 1) * 10
+def convert_log_level(level: str):
+    """Converts from LogLevel combobox text to Python log level value"""
+    return getattr(logging, level)
 
 class LogWidgetFormatter(logging.Formatter):
     def __init__(self, *args):
@@ -60,5 +60,5 @@ class LogWidget(QTextEdit):
         sys.__excepthook__(type, value, trace)
 
     def update_settings(self):
-        new_level = convert_log_level(int(get_setting("logLevel")))
+        new_level = convert_log_level(get_setting("logLevel"))
         logging.getLogger().setLevel(new_level)
