@@ -2,11 +2,13 @@
 from PySide2.QtCore import Qt, QFileInfo, QModelIndex
 from PySide2.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem
 from PySide2.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea
-from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories
-from settings import SETTINGS_VALUES, get_setting
 
 import logging
 from enum import IntEnum
+from dataclasses import dataclass
+
+from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories
+from settings import SETTINGS_VALUES, get_setting
 
 
 class TreeWidgetType(IntEnum):
@@ -20,20 +22,47 @@ class CustomDataRole(IntEnum):
     ITEMDATA = Qt.UserRole + 1
 
 
+class TreeWidgetItemData:
+    FIELDS = ('audioBitrate', 'videoHeight', 'videoWidth',
+              'uploadYouTube', 'albumPlaylist', 'coverArt', 'userSelect',
+              'videoDescription', 'videoTags', 'videoTitle', 'videoVisibility')
+    def __init__(self, **kwargs):
+        self.dict = {}
+        for field in set(kwargs.keys()) | set(TreeWidgetItemData.FIELDS):
+            if field in kwargs:
+                self.dict[field] = kwargs[field]
+            else:
+                self.dict[field] = get_setting(field)
+
+    def to_dict(self):
+        return self.dict
+
+    def get_value(self, field):
+        return self.dict[field]
+
+    def set_value(self, field, value):
+        self.dict[field] = value
+
+    def __repr__(self):
+        return str(self.dict)
+
+
 class PlaceholderTreeWidgetItem(QStandardItem):
     def __init__(self, *args):
         super().__init__(*args)
         self.setFlags(Qt.NoItemFlags)
         self.setText("<placeholder>")
         self.setData(TreeWidgetType.PLACEHOLDER, CustomDataRole.ITEMTYPE)
+        self.setData(TreeWidgetItemData(), CustomDataRole.ITEMDATA)
 
 
 class SongTreeWidgetItem(QStandardItem):
-    def __init__(self, *args):
+    def __init__(self, file_path, *args):
         super().__init__(*args)
         self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled
                       | Qt.ItemIsDragEnabled)
         self.setData(TreeWidgetType.SONG, CustomDataRole.ITEMTYPE)
+        self.setData(TreeWidgetItemData(file_path=file_path), CustomDataRole.ITEMDATA)
 
 
 class AlbumTreeWidgetItem(QStandardItem):
@@ -42,6 +71,7 @@ class AlbumTreeWidgetItem(QStandardItem):
         self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled
                       | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)
         self.setData(TreeWidgetType.ALBUM, CustomDataRole.ITEMTYPE)
+        self.setData(TreeWidgetItemData(), CustomDataRole.ITEMDATA)
 
     def addChild(self, item):
         self.appendRow(item)
@@ -100,8 +130,8 @@ class SongTreeWidget(QTreeView):
     def _create_album_item(self):
         return AlbumTreeWidgetItem()
 
-    def _create_song_item(self):
-        return SongTreeWidgetItem()
+    def _create_song_item(self, file_path):
+        return SongTreeWidgetItem(file_path)
 
     def addTopLevelItem(self, item):
         self.model().appendRow(item)
@@ -133,7 +163,7 @@ class SongTreeWidget(QTreeView):
                     logging.warning("File {} is not readable".format(info.filePath()))
                     continue
                 if info.isDir():
-                    if get_setting("application/dragAndDrop") == SETTINGS_VALUES.DragAndDrop.ALBUM_MODE:
+                    if int(get_setting("dragAndDropBehavior")) == SETTINGS_VALUES.DragAndDrop.ALBUM_MODE:
                         self.addAlbum(url.toLocalFile())
                     else:
                         for file_path in files_in_directory_and_subdirectories(info.filePath()):
@@ -152,7 +182,7 @@ class SongTreeWidget(QTreeView):
             if info.isDir():
                 self.addAlbum(file_path)
             elif file_is_audio(file_path):
-                item = self._create_song_item()
+                item = self._create_song_item(file_path)
                 item.setText(file_path)
                 album_item.addChild(item)
         if album_item.childCount() > 0:
@@ -162,6 +192,6 @@ class SongTreeWidget(QTreeView):
         if not file_is_audio(path):
             logging.info("File {} is not audio".format(path))
             return
-        item = self._create_song_item()
+        item = self._create_song_item(path)
         item.setText(path)
         self.addTopLevelItem(item)
