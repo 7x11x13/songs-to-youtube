@@ -37,13 +37,19 @@ def file_is_audio(file_path: str):
 
 def get_all_children(obj: QObject):
     """Returns all the children (recursive) of the given object"""
-    children = []
     for child in obj.children():
-        children.append(child)
-        children += get_all_children(child)
-    return children
+        yield child
+        yield from get_all_children(child)
 
-def load_ui(name, custom_widgets=[]):
+def find_ancestor(obj: QObject, type: str="", name: str=""):
+    """Returns the closest ancestor of obj with type and name given"""
+    if (name == "" or obj.objectName() == name) and (type == "" or obj.metaObject().className() == str(type)):
+        return obj
+    if not obj.parent():
+        return None
+    return find_ancestor(obj.parent(), type, name)
+
+def load_ui(name, custom_widgets=[], parent=None):
     loader = QUiLoader()
     for cw in custom_widgets:
         loader.registerCustomWidget(cw)
@@ -52,6 +58,6 @@ def load_ui(name, custom_widgets=[]):
     if not ui_file.open(QFile.ReadOnly):
         print("Cannot open {}: {}".format(path, ui_file.errorString()))
         sys.exit(-1)
-    ui = loader.load(ui_file)
+    ui = loader.load(ui_file, parent)
     ui_file.close()
     return ui

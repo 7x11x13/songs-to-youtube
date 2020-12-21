@@ -9,7 +9,7 @@ import logging
 from utils import load_ui
 
 # Custom widgets
-from song_settings_widget import SongSettingsWidget
+from song_settings_widget import SongSettingsWidget, SettingCheckBox
 from song_tree_widget import SongTreeWidget
 from log import LogWidget
 from settings import SettingsWindow
@@ -58,6 +58,7 @@ class MainWindow(QMainWindow):
         self.ui.actionAlbums.triggered.connect(self.load_albums)
         self.ui.actionSongs.triggered.connect(self.load_songs)
         self.ui.actionSettings.triggered.connect(self.open_settings)
+        self.ui.treeWidget.selectionModel().selectionChanged.connect(self.ui.songSettingsWindow.song_tree_selection_changed)
 
 
 if __name__ == "__main__":
