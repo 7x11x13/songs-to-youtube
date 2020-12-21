@@ -79,7 +79,7 @@ WIDGET_FUNCTIONS = {
         "getter": lambda x: x.currentText(),
         "setter": lambda x, v: x.setCurrentText(v)
     },
-    "QCheckBox": {
+    "SettingCheckBox": {
         "getter": lambda x: str(x.checkState()),
         "setter": lambda x, v: x.setCheckState(str_to_checkstate(v))
     }

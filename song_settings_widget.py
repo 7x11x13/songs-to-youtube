@@ -14,7 +14,10 @@ class SettingCheckBox(QCheckBox):
 
     def nextCheckState(self):
         # don't let user select inbetween state
-        self.setChecked(not self.isChecked())
+        if self.checkState() == Qt.PartiallyChecked:
+            self.setCheckState(Qt.Checked)
+        else:
+            self.setChecked(not self.isChecked())
 
 
 class SongSettingsWidget(QWidget):

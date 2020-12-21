@@ -57,6 +57,19 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
+        <widget class="SettingCheckBox" name="uploadYouTube">
+         <property name="text">
+          <string>Upload to YouTube?</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="tristate">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="youtubeSettings">
          <property name="title">
           <string>YouTube settings</string>
@@ -305,19 +318,6 @@
            </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="SettingCheckBox" name="uploadYouTube">
-         <property name="text">
-          <string>Upload to YouTube?</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-         <property name="tristate">
-          <bool>false</bool>
-         </property>
         </widget>
        </item>
       </layout>
