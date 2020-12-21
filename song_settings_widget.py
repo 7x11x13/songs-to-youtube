@@ -18,14 +18,22 @@ class SettingCheckBox(QCheckBox):
             self.setCheckState(Qt.Checked)
         else:
             self.setChecked(not self.isChecked())
+        self.stateChanged.emit(self.checkState())
 
 
 class SongSettingsWidget(QWidget):
     def __init__(self, *args):
+        # which items are currently selected by the song tree widget
         self.tree_indexes = set()
+
+        # which fields have been updated since we loaded data
+        # this gets reset when we save the field data
+        # and every time we load new data
+        self.fields_updated = set()
+
         super().__init__(*args)
-        self.setVisible(False)
         load_ui("songsettingswindow.ui", [SettingCheckBox], self)
+        self.setVisible(False)
         self.connect_actions()
 
     def resizeEvent(self, event):
@@ -37,7 +45,19 @@ class SongSettingsWidget(QWidget):
         button_box.accepted.connect(self.save_settings)
         button_box.rejected.connect(self.load_settings)
 
+    def on_field_updated(self, field, original_value, current_value):
+        if original_value == current_value:
+            self.fields_updated.discard(field)
+        else:
+            self.fields_updated.add(field)
+        if len(self.fields_updated) == 0:
+            self.findChild(QDialogButtonBox).setEnabled(False)
+        else:
+            self.findChild(QDialogButtonBox).setEnabled(True)
+
     def save_settings(self):
+        self.fields_updated = set()
+        self.findChild(QDialogButtonBox).setEnabled(False)
         for data in {i.data(CustomDataRole.ITEMDATA) for i in self.tree_indexes}:
             for widget in get_all_children(self):
                 class_name = widget.metaObject().className()
@@ -48,6 +68,8 @@ class SongSettingsWidget(QWidget):
                         data.set_value(setting, value)
 
     def load_settings(self):
+        self.fields_updated = set()
+        self.findChild(QDialogButtonBox).setEnabled(False)
         items = [i.data(CustomDataRole.ITEMDATA).to_dict() for i in self.tree_indexes]
         # set settings based on selected items
         for widget in get_all_children(self):
@@ -67,6 +89,12 @@ class SongSettingsWidget(QWidget):
                     if has_multiple_values and multiple_values_index == -1:
                         widget.addItem("<<Multiple values>>")
                 WIDGET_FUNCTIONS[class_name]["setter"](widget, value)
+
+                # call on_field_updated whenever a field is changed by the user
+                widget.disconnect(self)
+                WIDGET_FUNCTIONS[class_name]["on_update"](widget,
+                    lambda text, field=field, og_value=value: self.on_field_updated(field, og_value, text))
+
 
     def song_tree_selection_changed(self, selected, deselected):
         self.tree_indexes |= set(selected.indexes())   # add new selected indexes

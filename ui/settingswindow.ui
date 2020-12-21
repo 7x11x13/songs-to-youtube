@@ -141,7 +141,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="uploadYouTube">
+        <widget class="SettingCheckBox" name="uploadYouTube">
          <property name="text">
           <string>Default upload to YouTube?</string>
          </property>
@@ -420,6 +420,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SettingCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>setting_check_box.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

@@ -51,37 +51,53 @@ SETTINGS_DEFAULTS = {
 }
 
 
-STR_TO_CHECK = {
-    "PySide2.QtCore.Qt.CheckState.Unchecked": Qt.Unchecked,
-    "PySide2.QtCore.Qt.CheckState.PartiallyChecked": Qt.PartiallyChecked,
-    "PySide2.QtCore.Qt.CheckState.Checked": Qt.Checked,
-    "<<Multiple values>>": Qt.PartiallyChecked
-}
-
-
 def str_to_checkstate(s):
     """Have to do this since QCheckBox.setCheckState does not work with ints in PySide2"""
-    if s not in STR_TO_CHECK:
+
+    STR_TO_CHECKSTATE = {
+        "PySide2.QtCore.Qt.CheckState.Unchecked": Qt.Unchecked,
+        "PySide2.QtCore.Qt.CheckState.PartiallyChecked": Qt.PartiallyChecked,
+        "PySide2.QtCore.Qt.CheckState.Checked": Qt.Checked,
+        "<<Multiple values>>": Qt.PartiallyChecked
+    }
+
+    if s not in STR_TO_CHECKSTATE:
         logging.error("String {} is not a valid CheckState".format(s))
         return None
-    return STR_TO_CHECK[s]
+    return STR_TO_CHECKSTATE[s]
+
+def checkstate_to_str(state):
+    CHECKSTATE_TO_STR = {
+        Qt.Unchecked: "PySide2.QtCore.Qt.CheckState.Unchecked",
+        Qt.PartiallyChecked: "<<Multiple values>>",
+        Qt.Checked: "PySide2.QtCore.Qt.CheckState.Checked"
+    }
+
+    if state not in CHECKSTATE_TO_STR:
+        logging.error("State {} is not a valid CheckState".format(state))
+        return None
+    return CHECKSTATE_TO_STR[state]
 
 
-# getter and setter methods for various QWidgets
+# methods for various QWidgets
 # all getters return values as strings
 # all setters take in values as strings
+# all on_update callbacks take in values as strings
 WIDGET_FUNCTIONS = {
     "QPlainTextEdit": {
         "getter": lambda x: x.toPlainText(),
-        "setter": lambda x, v: x.setPlainText(v)
+        "setter": lambda x, v: x.setPlainText(v),
+        "on_update": lambda x, f: x.textChanged.connect(lambda: f(x.toPlainText()))
     },
     "QComboBox": {
         "getter": lambda x: x.currentText(),
-        "setter": lambda x, v: x.setCurrentText(v)
+        "setter": lambda x, v: x.setCurrentText(v),
+        "on_update": lambda x, f: x.currentTextChanged.connect(f)
     },
     "SettingCheckBox": {
-        "getter": lambda x: str(x.checkState()),
-        "setter": lambda x, v: x.setCheckState(str_to_checkstate(v))
+        "getter": lambda x: checkstate_to_str(x.checkState()),
+        "setter": lambda x, v: x.setCheckState(str_to_checkstate(v)),
+        "on_update": lambda x, f: x.stateChanged.connect(lambda state: f(checkstate_to_str(state)))
     }
 }
 
