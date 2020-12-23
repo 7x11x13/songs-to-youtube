@@ -2,8 +2,11 @@
 from PySide2.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase, QObject, QFile, Qt
 from PySide2.QtUiTools import QUiLoader
 
+from const import SETTINGS_VALUES
+
 import logging
 import os
+import sys
 
 
 # File utils
@@ -38,14 +41,12 @@ def file_is_audio(file_path: str):
 
 def str_to_checkstate(s):
     """Have to do this since QCheckBox.setCheckState does not work with ints in PySide2"""
-
     STR_TO_CHECKSTATE = {
-        "PySide2.QtCore.Qt.CheckState.Unchecked": Qt.Unchecked,
-        "PySide2.QtCore.Qt.CheckState.PartiallyChecked": Qt.PartiallyChecked,
-        "PySide2.QtCore.Qt.CheckState.Checked": Qt.Checked,
-        "<<Multiple values>>": Qt.PartiallyChecked
+        SETTINGS_VALUES.CheckBox.UNCHECKED: Qt.Unchecked,
+        SETTINGS_VALUES.CheckBox.PARTIALLY_CHECKED: Qt.PartiallyChecked,
+        SETTINGS_VALUES.CheckBox.CHECKED: Qt.Checked,
+        SETTINGS_VALUES.MULTIPLE_VALUES: Qt.PartiallyChecked
     }
-
     if s not in STR_TO_CHECKSTATE:
         logging.error("String {} is not a valid CheckState".format(s))
         return None
@@ -53,11 +54,10 @@ def str_to_checkstate(s):
 
 def checkstate_to_str(state):
     CHECKSTATE_TO_STR = {
-        Qt.Unchecked: "PySide2.QtCore.Qt.CheckState.Unchecked",
-        Qt.PartiallyChecked: "<<Multiple values>>",
-        Qt.Checked: "PySide2.QtCore.Qt.CheckState.Checked"
+        Qt.Unchecked: SETTINGS_VALUES.CheckBox.UNCHECKED,
+        Qt.PartiallyChecked: SETTINGS_VALUES.MULTIPLE_VALUES,
+        Qt.Checked: SETTINGS_VALUES.CheckBox.CHECKED
     }
-
     if state not in CHECKSTATE_TO_STR:
         logging.error("State {} is not a valid CheckState".format(state))
         return None
@@ -85,6 +85,7 @@ WIDGET_FUNCTIONS = {
     }
 }
 
+
 class InputField:
     def __init__(self, widget):
         self.widget = widget
@@ -100,12 +101,12 @@ class InputField:
     def on_update(self, function):
         WIDGET_FUNCTIONS[self.class_name]["on_update"](self.widget, function)
 
+
 def get_all_children(obj: QObject):
     """Returns all the children (recursive) of the given object"""
     for child in obj.children():
         yield child
         yield from get_all_children(child)
-
 
 def get_all_fields(obj: QObject):
     """Returns all the input widget children of the given object as InputFields"""
@@ -129,7 +130,7 @@ def load_ui(name, custom_widgets=[], parent=None):
     path = os.path.join(os.path.dirname(__file__), "ui", name)
     ui_file = QFile(path)
     if not ui_file.open(QFile.ReadOnly):
-        print("Cannot open {}: {}".format(path, ui_file.errorString()))
+        logging.critical("Cannot open {}: {}".format(path, ui_file.errorString()))
         sys.exit(-1)
     ui = loader.load(ui_file, parent)
     ui_file.close()

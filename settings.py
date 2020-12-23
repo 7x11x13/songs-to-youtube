@@ -1,38 +1,11 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import Signal, QSettings, Qt
+from PySide2.QtCore import Signal, QSettings
 from PySide2.QtWidgets import QDialog
 
 import logging
-from enum import Enum
 
-from utils import get_all_children, load_ui, get_all_fields, InputField
-
-ORGANIZATION = "7x11x13"
-APPLICATION = "songs-to-youtube"
-
-class SETTINGS_VALUES:
-
-    MULTIPLE_VALUES = "<<Multiple values>>"
-
-    class DragAndDrop(str, Enum):
-        ALBUM_MODE = "Album mode"
-        SONG_MODE = "Song mode"
-
-    class LogLevel(str, Enum):
-        DEBUG = "DEBUG"
-        INFO = "INFO"
-        WARNING = "WARNING"
-        ERROR = "ERROR"
-        CRITICAL = "CRITICAL"
-
-    class AlbumPlaylist(str, Enum):
-        MULTIPLE = "Multiple videos"
-        SINGLE = "Single video"
-        MULTIPLE_PLAYLIST = "Multiple videos (playlist)"
-
-    class VideoVisibility(str, Enum):
-        PUBLIC = "Public"
-        UNLISTED = "Unlisted"
+from utils import load_ui, get_all_fields
+from const import SETTINGS_VALUES, ORGANIZATION, APPLICATION
 
 
 SETTINGS_DEFAULTS = {
@@ -41,7 +14,7 @@ SETTINGS_DEFAULTS = {
     "audioBitrate": "384k",
     "videoHeight": "720",
     "videoWidth": "1280",
-    "uploadYouTube": "PySide2.QtCore.Qt.CheckState.Checked",
+    "uploadYouTube": SETTINGS_VALUES.CheckBox.CHECKED,
     "albumPlaylist": SETTINGS_VALUES.AlbumPlaylist.MULTIPLE,
     "userSelect": 0,
     "videoDescription": "Uploaded with https://github.com/7x11x13/songs-to-youtube",

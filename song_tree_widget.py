@@ -135,7 +135,6 @@ class SongTreeSelectionModel(QItemSelectionModel):
         # properties also change
         indexes = []
         if isinstance(selected, QModelIndex):
-            print("selected is single")
             # turn single selected index into a QItemSelection
             # so we can add more selected indexes if we want
             selected = QItemSelection(selected, selected)

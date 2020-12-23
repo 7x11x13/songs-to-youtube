@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QWidget, QCheckBox, QDialogButtonBox
+from PySide2.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox
 
 from song_tree_widget import CustomDataRole
 from settings import SETTINGS_VALUES
@@ -49,6 +49,12 @@ class SongSettingsWidget(QWidget):
         button_box.rejected.connect(self.load_settings)
         for field in get_all_fields(self):
             field.on_update(lambda text, field_name=field.name: self.on_field_updated(field_name, text))
+            if field.name == "uploadYouTube":
+                # disable youtube settings whenever 'upload to youtube' is unchecked
+                field.on_update(lambda text: self.set_youtube_enabled(text != SETTINGS_VALUES.CheckBox.UNCHECKED))
+
+    def set_youtube_enabled(self, enabled):
+        self.findChild(QGroupBox, "youtubeSettings").setEnabled(enabled)
 
     def set_button_box_enabled(self, enabled):
         self.findChild(QDialogButtonBox).setEnabled(enabled)
@@ -58,11 +64,13 @@ class SongSettingsWidget(QWidget):
             # just loaded field, set original value to loaded value
             self.field_original_values[field] = current_value
             return
+
         original_value = self.field_original_values[field]
         if original_value == current_value:
             self.fields_updated.discard(field)
         else:
             self.fields_updated.add(field)
+
         if len(self.fields_updated) == 0:
             self.set_button_box_enabled(False)
         else:
@@ -77,6 +85,7 @@ class SongSettingsWidget(QWidget):
                 value = field.get()
                 if value != SETTINGS_VALUES.MULTIPLE_VALUES:
                     data.set_value(field.name, value)
+                self.field_original_values[field.name] = value
 
     def load_settings(self):
         self.fields_updated = set()
@@ -98,6 +107,7 @@ class SongSettingsWidget(QWidget):
                 if has_multiple_values and multiple_values_index == -1:
                     field.widget.addItem(SETTINGS_VALUES.MULTIPLE_VALUES)
             field.set(value)
+            self.field_original_values[field.name] = value
 
     def song_tree_selection_changed(self, selected, deselected):
         self.tree_indexes |= set(selected.indexes())   # add new selected indexes
