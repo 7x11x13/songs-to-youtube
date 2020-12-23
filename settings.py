@@ -1,11 +1,8 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import QFile, Signal, QSettings, Qt
-from PySide2.QtWidgets import QDialog, QWidget, QComboBox
-from PySide2.QtUiTools import QUiLoader
+from PySide2.QtCore import Signal, QSettings, Qt
+from PySide2.QtWidgets import QDialog
 
-import os
 import logging
-import dataclasses
 from enum import Enum
 
 from utils import get_all_children, load_ui, get_all_fields, InputField

@@ -1,10 +1,10 @@
 # This Python file uses the following encoding: utf-8
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QWidget, QGroupBox, QCheckBox, QDialogButtonBox
+from PySide2.QtWidgets import QWidget, QCheckBox, QDialogButtonBox
 
-from song_tree_widget import CustomDataRole, TreeWidgetItemData
+from song_tree_widget import CustomDataRole
 from settings import SETTINGS_VALUES
-from utils import find_ancestor, load_ui, get_all_fields, InputField
+from utils import load_ui, get_all_fields
 
 
 class SettingCheckBox(QCheckBox):
@@ -57,7 +57,6 @@ class SongSettingsWidget(QWidget):
         if field not in self.field_original_values:
             return
         original_value = self.field_original_values[field]
-        print(field, original_value, current_value)
         if original_value == current_value:
             self.fields_updated.discard(field)
         else:
