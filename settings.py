@@ -8,29 +8,32 @@ import logging
 import dataclasses
 from enum import Enum
 
-from utils import get_all_children, load_ui
+from utils import get_all_children, load_ui, get_all_fields, InputField
 
 ORGANIZATION = "7x11x13"
 APPLICATION = "songs-to-youtube"
 
 class SETTINGS_VALUES:
-    class DragAndDrop(Enum):
+
+    MULTIPLE_VALUES = "<<Multiple values>>"
+
+    class DragAndDrop(str, Enum):
         ALBUM_MODE = "Album mode"
         SONG_MODE = "Song mode"
 
-    class LogLevel(Enum):
+    class LogLevel(str, Enum):
         DEBUG = "DEBUG"
         INFO = "INFO"
         WARNING = "WARNING"
         ERROR = "ERROR"
         CRITICAL = "CRITICAL"
 
-    class AlbumPlaylist(Enum):
+    class AlbumPlaylist(str, Enum):
         MULTIPLE = "Multiple videos"
         SINGLE = "Single video"
         MULTIPLE_PLAYLIST = "Multiple videos (playlist)"
 
-    class VideoVisibility(Enum):
+    class VideoVisibility(str, Enum):
         PUBLIC = "Public"
         UNLISTED = "Unlisted"
 
@@ -49,58 +52,6 @@ SETTINGS_DEFAULTS = {
     "videoTitle": "%filename%",
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC
 }
-
-
-def str_to_checkstate(s):
-    """Have to do this since QCheckBox.setCheckState does not work with ints in PySide2"""
-
-    STR_TO_CHECKSTATE = {
-        "PySide2.QtCore.Qt.CheckState.Unchecked": Qt.Unchecked,
-        "PySide2.QtCore.Qt.CheckState.PartiallyChecked": Qt.PartiallyChecked,
-        "PySide2.QtCore.Qt.CheckState.Checked": Qt.Checked,
-        "<<Multiple values>>": Qt.PartiallyChecked
-    }
-
-    if s not in STR_TO_CHECKSTATE:
-        logging.error("String {} is not a valid CheckState".format(s))
-        return None
-    return STR_TO_CHECKSTATE[s]
-
-def checkstate_to_str(state):
-    CHECKSTATE_TO_STR = {
-        Qt.Unchecked: "PySide2.QtCore.Qt.CheckState.Unchecked",
-        Qt.PartiallyChecked: "<<Multiple values>>",
-        Qt.Checked: "PySide2.QtCore.Qt.CheckState.Checked"
-    }
-
-    if state not in CHECKSTATE_TO_STR:
-        logging.error("State {} is not a valid CheckState".format(state))
-        return None
-    return CHECKSTATE_TO_STR[state]
-
-
-# methods for various QWidgets
-# all getters return values as strings
-# all setters take in values as strings
-# all on_update callbacks take in values as strings
-WIDGET_FUNCTIONS = {
-    "QPlainTextEdit": {
-        "getter": lambda x: x.toPlainText(),
-        "setter": lambda x, v: x.setPlainText(v),
-        "on_update": lambda x, f: x.textChanged.connect(lambda: f(x.toPlainText()))
-    },
-    "QComboBox": {
-        "getter": lambda x: x.currentText(),
-        "setter": lambda x, v: x.setCurrentText(v),
-        "on_update": lambda x, f: x.currentTextChanged.connect(f)
-    },
-    "SettingCheckBox": {
-        "getter": lambda x: checkstate_to_str(x.checkState()),
-        "setter": lambda x, v: x.setCheckState(str_to_checkstate(v)),
-        "on_update": lambda x, f: x.stateChanged.connect(lambda state: f(checkstate_to_str(state)))
-    }
-}
-
 
 def get_settings():
     """Returns the QSettings for this application"""
@@ -127,22 +78,14 @@ class SettingsWindow(QDialog):
 
     def save_settings(self):
         settings = get_settings()
-        for widget in get_all_children(self.ui):
-            class_name = widget.metaObject().className()
-            if class_name in WIDGET_FUNCTIONS:
-                setting = widget.objectName()
-                value = WIDGET_FUNCTIONS[class_name]["getter"](widget)
-                settings.setValue(setting, value)
+        for field in get_all_fields(self.ui):
+            settings.setValue(field.name, field.get())
         self.settings_changed.emit()
 
     def load_settings(self):
         settings = get_settings()
-        for widget in get_all_children(self.ui):
-            class_name = widget.metaObject().className()
-            if class_name in WIDGET_FUNCTIONS:
-                setting = widget.objectName()
-                value = get_setting(setting)
-                WIDGET_FUNCTIONS[class_name]["setter"](widget, value)
+        for field in get_all_fields(self.ui):
+            field.set(get_setting(field.name))
 
     def show(self):
         self.ui.show()

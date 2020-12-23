@@ -5,7 +5,6 @@ from PySide2.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea
 
 import logging
 from enum import IntEnum
-from dataclasses import dataclass
 
 from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories
 from settings import SETTINGS_VALUES, get_setting
@@ -29,9 +28,13 @@ class TreeWidgetItemData:
     def __init__(self, **kwargs):
         self.dict = {}
         for field in set(kwargs.keys()) | set(TreeWidgetItemData.FIELDS):
+            # set all mandatory settings to their defaults if not
+            # specified in the parameters
+            # and any extra settings specified in the parameters
             if field in kwargs:
                 self.dict[field] = kwargs[field]
             else:
+                #set to default setting
                 self.dict[field] = get_setting(field)
 
     def to_dict(self):
@@ -63,6 +66,7 @@ class SongTreeWidgetItem(QStandardItem):
                       | Qt.ItemIsDragEnabled)
         self.setData(TreeWidgetType.SONG, CustomDataRole.ITEMTYPE)
         self.setData(TreeWidgetItemData(file_path=file_path), CustomDataRole.ITEMDATA)
+        # TODO: inherit data from album
 
 
 class AlbumTreeWidgetItem(QStandardItem):
@@ -163,7 +167,7 @@ class SongTreeWidget(QTreeView):
                     logging.warning("File {} is not readable".format(info.filePath()))
                     continue
                 if info.isDir():
-                    if int(get_setting("dragAndDropBehavior")) == SETTINGS_VALUES.DragAndDrop.ALBUM_MODE:
+                    if get_setting("dragAndDropBehavior") == SETTINGS_VALUES.DragAndDrop.ALBUM_MODE:
                         self.addAlbum(url.toLocalFile())
                     else:
                         for file_path in files_in_directory_and_subdirectories(info.filePath()):

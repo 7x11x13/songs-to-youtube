@@ -3,8 +3,8 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QWidget, QGroupBox, QCheckBox, QDialogButtonBox
 
 from song_tree_widget import CustomDataRole, TreeWidgetItemData
-from settings import WIDGET_FUNCTIONS
-from utils import find_ancestor, get_all_children, load_ui
+from settings import SETTINGS_VALUES
+from utils import find_ancestor, load_ui, get_all_fields, InputField
 
 
 class SettingCheckBox(QCheckBox):
@@ -31,6 +31,9 @@ class SongSettingsWidget(QWidget):
         # and every time we load new data
         self.fields_updated = set()
 
+        # values of each field when the window is loaded
+        self.field_original_values = {}
+
         super().__init__(*args)
         load_ui("songsettingswindow.ui", [SettingCheckBox], self)
         self.setVisible(False)
@@ -44,57 +47,57 @@ class SongSettingsWidget(QWidget):
         button_box = self.findChild(QDialogButtonBox)
         button_box.accepted.connect(self.save_settings)
         button_box.rejected.connect(self.load_settings)
+        for field in get_all_fields(self):
+            field.on_update(lambda text, field_name=field.name: self.on_field_updated(field_name, text))
 
-    def on_field_updated(self, field, original_value, current_value):
+    def set_button_box_enabled(self, enabled):
+        self.findChild(QDialogButtonBox).setEnabled(enabled)
+
+    def on_field_updated(self, field, current_value):
+        if field not in self.field_original_values:
+            return
+        original_value = self.field_original_values[field]
+        print(field, original_value, current_value)
         if original_value == current_value:
             self.fields_updated.discard(field)
         else:
             self.fields_updated.add(field)
         if len(self.fields_updated) == 0:
-            self.findChild(QDialogButtonBox).setEnabled(False)
+            self.set_button_box_enabled(False)
         else:
-            self.findChild(QDialogButtonBox).setEnabled(True)
+            self.set_button_box_enabled(True)
 
     def save_settings(self):
         self.fields_updated = set()
-        self.findChild(QDialogButtonBox).setEnabled(False)
-        for data in {i.data(CustomDataRole.ITEMDATA) for i in self.tree_indexes}:
-            for widget in get_all_children(self):
-                class_name = widget.metaObject().className()
-                if class_name in WIDGET_FUNCTIONS:
-                    setting = widget.objectName()
-                    value = WIDGET_FUNCTIONS[class_name]["getter"](widget)
-                    if value != "<<Multiple values>>":
-                        data.set_value(setting, value)
+        self.set_button_box_enabled(False)
+        for data in {i.data(CustomDataRole.ITEMDATA) for i in self.tree_indexes}:  
+            for field in get_all_fields(self):
+                value = field.get()
+                self.field_original_values[field.name] = value
+                if value != SETTINGS_VALUES.MULTIPLE_VALUES:
+                    data.set_value(field.name, value)
 
     def load_settings(self):
         self.fields_updated = set()
-        self.findChild(QDialogButtonBox).setEnabled(False)
+        self.field_original_values = {}
+        self.set_button_box_enabled(False)
         items = [i.data(CustomDataRole.ITEMDATA).to_dict() for i in self.tree_indexes]
         # set settings based on selected items
-        for widget in get_all_children(self):
-            class_name = widget.metaObject().className()
-            if class_name in WIDGET_FUNCTIONS:
-                field = widget.objectName()
-                values = {dict(i)[field] for i in items if field in dict(i)}
-                if len(values) == 0:
-                    continue
-                has_multiple_values = (len(values) > 1)
-                value = values.pop() if not has_multiple_values else "<<Multiple values>>"
-                if class_name == "QComboBox":
-                    # add <<Multiple values>> to combobox as necessary
-                    multiple_values_index = widget.findText("<<Multiple values>>")
-                    if not has_multiple_values and multiple_values_index != -1:
-                        widget.removeItem(multiple_values_index)
-                    if has_multiple_values and multiple_values_index == -1:
-                        widget.addItem("<<Multiple values>>")
-                WIDGET_FUNCTIONS[class_name]["setter"](widget, value)
-
-                # call on_field_updated whenever a field is changed by the user
-                widget.disconnect(self)
-                WIDGET_FUNCTIONS[class_name]["on_update"](widget,
-                    lambda text, field=field, og_value=value: self.on_field_updated(field, og_value, text))
-
+        for field in get_all_fields(self):
+            values = {dict(i)[field.name] for i in items if field.name in i}
+            if len(values) == 0:
+                continue
+            has_multiple_values = (len(values) > 1)
+            value = values.pop() if not has_multiple_values else SETTINGS_VALUES.MULTIPLE_VALUES
+            if field.class_name == "QComboBox":
+                # add <<Multiple values>> to combobox as necessary
+                multiple_values_index = field.widget.findText(SETTINGS_VALUES.MULTIPLE_VALUES)
+                if not has_multiple_values and multiple_values_index != -1:
+                    field.widget.removeItem(multiple_values_index)
+                if has_multiple_values and multiple_values_index == -1:
+                    field.widget.addItem(SETTINGS_VALUES.MULTIPLE_VALUES)
+            field.set(value)
+            self.field_original_values[field.name] = value # store original value when loaded
 
     def song_tree_selection_changed(self, selected, deselected):
         self.tree_indexes |= set(selected.indexes())   # add new selected indexes
