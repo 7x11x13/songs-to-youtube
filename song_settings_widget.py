@@ -55,6 +55,8 @@ class SongSettingsWidget(QWidget):
 
     def on_field_updated(self, field, current_value):
         if field not in self.field_original_values:
+            # just loaded field, set original value to loaded value
+            self.field_original_values[field] = current_value
             return
         original_value = self.field_original_values[field]
         if original_value == current_value:
@@ -68,11 +70,11 @@ class SongSettingsWidget(QWidget):
 
     def save_settings(self):
         self.fields_updated = set()
+        self.field_original_values = {}
         self.set_button_box_enabled(False)
         for data in {i.data(CustomDataRole.ITEMDATA) for i in self.tree_indexes}:  
             for field in get_all_fields(self):
                 value = field.get()
-                self.field_original_values[field.name] = value
                 if value != SETTINGS_VALUES.MULTIPLE_VALUES:
                     data.set_value(field.name, value)
 
@@ -96,7 +98,6 @@ class SongSettingsWidget(QWidget):
                 if has_multiple_values and multiple_values_index == -1:
                     field.widget.addItem(SETTINGS_VALUES.MULTIPLE_VALUES)
             field.set(value)
-            self.field_original_values[field.name] = value # store original value when loaded
 
     def song_tree_selection_changed(self, selected, deselected):
         self.tree_indexes |= set(selected.indexes())   # add new selected indexes
