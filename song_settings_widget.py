@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox
 
 from song_tree_widget import CustomDataRole
 from settings import SETTINGS_VALUES

@@ -1,5 +1,5 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, QListView, QTreeView, QAbstractItemView
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, QListView, QTreeView, QAbstractItemView
 
 
 import sys

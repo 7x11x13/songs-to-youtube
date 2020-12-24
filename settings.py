@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import Signal, QSettings
-from PySide2.QtWidgets import QDialog
+from PySide6.QtCore import Signal, QSettings
+from PySide6.QtWidgets import QDialog
 
 import logging
 

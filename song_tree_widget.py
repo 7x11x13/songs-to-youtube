@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import Qt, QFileInfo, QModelIndex, QItemSelection, QItemSelectionModel
-from PySide2.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem
-from PySide2.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea
+from PySide6.QtCore import Qt, QFileInfo, QModelIndex, QItemSelection, QItemSelectionModel
+from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem
+from PySide6.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea
 
 import logging
 from enum import IntEnum

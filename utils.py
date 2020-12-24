@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase, QObject, QFile, Qt
-from PySide2.QtUiTools import QUiLoader
+from PySide6.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase, QObject, QFile, Qt
+from PySide6.QtUiTools import QUiLoader
 
 from const import SETTINGS_VALUES
 
@@ -40,7 +40,6 @@ def file_is_audio(file_path: str):
 
 
 def str_to_checkstate(s):
-    """Have to do this since QCheckBox.setCheckState does not work with ints in PySide2"""
     STR_TO_CHECKSTATE = {
         SETTINGS_VALUES.CheckBox.UNCHECKED: Qt.Unchecked,
         SETTINGS_VALUES.CheckBox.PARTIALLY_CHECKED: Qt.PartiallyChecked,
@@ -49,7 +48,7 @@ def str_to_checkstate(s):
     }
     if s not in STR_TO_CHECKSTATE:
         logging.error("String {} is not a valid CheckState".format(s))
-        return None
+        return Qt.Checked
     return STR_TO_CHECKSTATE[s]
 
 def checkstate_to_str(state):
@@ -58,9 +57,6 @@ def checkstate_to_str(state):
         Qt.PartiallyChecked: SETTINGS_VALUES.MULTIPLE_VALUES,
         Qt.Checked: SETTINGS_VALUES.CheckBox.CHECKED
     }
-    if state not in CHECKSTATE_TO_STR:
-        logging.error("State {} is not a valid CheckState".format(state))
-        return None
     return CHECKSTATE_TO_STR[state]
 
 # methods for various QWidgets
