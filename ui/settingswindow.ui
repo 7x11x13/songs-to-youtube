@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>585</width>
-    <height>512</height>
+    <width>467</width>
+    <height>496</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,7 +18,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>585</width>
+    <width>300</width>
     <height>300</height>
    </size>
   </property>
@@ -29,11 +29,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QScrollArea" name="scrollArea">
+    <widget class="SettingsScrollArea" name="scrollArea">
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
@@ -45,7 +45,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>551</width>
+        <width>433</width>
         <height>816</height>
        </rect>
       </property>
@@ -160,7 +160,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QLabel" name="coverArt">
+           <widget class="CoverArtDisplay" name="coverArt">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -425,6 +425,17 @@
    <class>SettingCheckBox</class>
    <extends>QCheckBox</extends>
    <header>setting_check_box.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CoverArtDisplay</class>
+   <extends>QLabel</extends>
+   <header>cover_art_display.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SettingsScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>settings_scroll_area.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

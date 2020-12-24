@@ -1,6 +1,7 @@
 # This Python file uses the following encoding: utf-8
-from PySide6.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase, QObject, QFile, Qt
+from PySide6.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase, QObject, QFile, Qt, QByteArray, QBuffer, QIODevice
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtGui import QPixmap
 
 from const import SETTINGS_VALUES
 
@@ -59,25 +60,44 @@ def checkstate_to_str(state):
     }
     return CHECKSTATE_TO_STR[state]
 
+def pixmap_to_base64_str(pixmap):
+    buffer = QBuffer()
+    if pixmap.isNull() or not (QBuffer().open(QIODevice.WriteOnly) and pixmap.save(buffer, "PNG")):
+        logging.error("Unable to convert image to base64 string")
+        return False
+    return buffer.data().toBase64().data().decode()
+
+def base64_str_to_pixmap(s):
+    pixmap = QPixmap()
+    if not pixmap.loadFromData(QByteArray.fromBase64(QByteArray(s))) or pixmap.isNull():
+        logging.error("Unable to convert base64 string to image")
+        return False
+    return pixmap
+
 # methods for various QWidgets
 # all getters return values as strings
 # all setters take in values as strings
 # all on_update callbacks take in values as strings
 WIDGET_FUNCTIONS = {
     "QPlainTextEdit": {
-        "getter": lambda x: x.toPlainText(),
-        "setter": lambda x, v: x.setPlainText(v),
-        "on_update": lambda x, f: x.textChanged.connect(lambda: f(x.toPlainText()))
+        "getter": lambda widget: widget.toPlainText(),
+        "setter": lambda widget, text: widget.setPlainText(text),
+        "on_update": lambda widget, cb: widget.textChanged.connect(lambda: cb(widget.toPlainText()))
     },
     "QComboBox": {
-        "getter": lambda x: x.currentText(),
-        "setter": lambda x, v: x.setCurrentText(v),
-        "on_update": lambda x, f: x.currentTextChanged.connect(f)
+        "getter": lambda widget: widget.currentText(),
+        "setter": lambda widget, text: widget.setCurrentText(text),
+        "on_update": lambda widget, cb: widget.currentTextChanged.connect(cb)
     },
     "SettingCheckBox": {
-        "getter": lambda x: checkstate_to_str(x.checkState()),
-        "setter": lambda x, v: x.setCheckState(str_to_checkstate(v)),
-        "on_update": lambda x, f: x.stateChanged.connect(lambda state: f(checkstate_to_str(state)))
+        "getter": lambda widget: checkstate_to_str(widget.checkState()),
+        "setter": lambda widget, text: widget.setCheckState(str_to_checkstate(text)),
+        "on_update": lambda widget, cb: widget.stateChanged.connect(lambda state: cb(checkstate_to_str(state)))
+    },
+    "CoverArtDisplay": {
+        "getter": lambda widget: widget.get(),
+        "setter": lambda widget, text: widget.set(text),
+        "on_update": lambda widget, cb: widget.imageChanged.connect(cb)
     }
 }
 
@@ -113,11 +133,12 @@ def get_all_fields(obj: QObject):
 
 def find_ancestor(obj: QObject, type: str="", name: str=""):
     """Returns the closest ancestor of obj with type and name given"""
-    if (name == "" or obj.objectName() == name) and (type == "" or obj.metaObject().className() == str(type)):
-        return obj
-    if not obj.parent():
+    obj = obj.parent()
+    if not obj:
         return None
-    return find_ancestor(obj.parent(), type, name)
+    while not ((name == "" or obj.objectName() == name) and (type == "" or obj.metaObject().className() == str(type))):
+        obj = obj.parent()
+    return obj
 
 def load_ui(name, custom_widgets=[], parent=None):
     loader = QUiLoader()

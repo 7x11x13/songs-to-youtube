@@ -1,24 +1,12 @@
 # This Python file uses the following encoding: utf-8
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox
+from PySide6.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox, QPushButton, QFileDialog
+from PySide6.QtGui import QPixmap
 
 from song_tree_widget import CustomDataRole
-from settings import SETTINGS_VALUES
+from settings import SETTINGS_VALUES, SettingCheckBox, CoverArtDisplay, SettingsScrollArea
 from utils import load_ui, get_all_fields
-
-
-class SettingCheckBox(QCheckBox):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.setTristate()
-
-    def nextCheckState(self):
-        # don't let user select inbetween state
-        if self.checkState() == Qt.PartiallyChecked:
-            self.setCheckState(Qt.Checked)
-        else:
-            self.setChecked(not self.isChecked())
-        self.stateChanged.emit(self.checkState())
+from const import SUPPORTED_IMAGE_FILTER
 
 
 class SongSettingsWidget(QWidget):
@@ -35,7 +23,7 @@ class SongSettingsWidget(QWidget):
         self.field_original_values = {}
 
         super().__init__(*args)
-        load_ui("songsettingswindow.ui", [SettingCheckBox], self)
+        load_ui("songsettingswindow.ui", [SettingCheckBox, CoverArtDisplay, SettingsScrollArea], self)
         self.setVisible(False)
         self.connect_actions()
 
@@ -44,6 +32,8 @@ class SongSettingsWidget(QWidget):
         self.findChild(QWidget, "songSettingsWindow").resize(event.size())
 
     def connect_actions(self):
+        cover_art_button = self.findChild(QPushButton, "coverArtButton")
+        cover_art_button.clicked.connect(self.change_cover_art)
         button_box = self.findChild(QDialogButtonBox)
         button_box.accepted.connect(self.save_settings)
         button_box.rejected.connect(self.load_settings)
@@ -52,6 +42,11 @@ class SongSettingsWidget(QWidget):
             if field.name == "uploadYouTube":
                 # disable youtube settings whenever 'upload to youtube' is unchecked
                 field.on_update(lambda text: self.set_youtube_enabled(text != SETTINGS_VALUES.CheckBox.UNCHECKED))
+
+    def change_cover_art(self):
+        file = QFileDialog.getOpenFileName(self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER)[0]
+        pixmap = QPixmap(file)
+        self.findChild(CoverArtDisplay).setPixmap(pixmap)
 
     def set_youtube_enabled(self, enabled):
         self.findChild(QGroupBox, "youtubeSettings").setEnabled(enabled)

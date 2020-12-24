@@ -9,7 +9,7 @@ import logging
 from utils import load_ui
 
 # Custom widgets
-from song_settings_widget import SongSettingsWidget, SettingCheckBox
+from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
 from log import LogWidget
 from settings import SettingsWindow
