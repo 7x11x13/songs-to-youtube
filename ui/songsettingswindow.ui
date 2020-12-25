@@ -57,24 +57,11 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="SettingCheckBox" name="uploadYouTube">
-         <property name="text">
-          <string>Upload to YouTube?</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-         <property name="tristate">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="youtubeSettings">
+        <widget class="QGroupBox" name="ffmpegSettings">
          <property name="title">
-          <string>YouTube settings</string>
+          <string>FFmpeg settings</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
+         <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
            <widget class="CoverArtDisplay" name="coverArt">
             <property name="sizePolicy">
@@ -120,9 +107,81 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Video width:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="videoWidth">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="lineWrapMode">
+             <enum>QPlainTextEdit::WidgetWidth</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>Video height:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="videoHeight">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Audio bitrate:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="audioBitrate">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLabel" name="albumPlaylistLabel">
             <property name="text">
-             <string>Upload album as:</string>
+             <string>Render album as:</string>
             </property>
            </widget>
           </item>
@@ -138,13 +197,30 @@
               <string>Single video</string>
              </property>
             </item>
-            <item>
-             <property name="text">
-              <string>Multiple videos (playlist)</string>
-             </property>
-            </item>
            </widget>
           </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="SettingCheckBox" name="uploadYouTube">
+         <property name="text">
+          <string>Upload to YouTube?</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="tristate">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="youtubeSettings">
+         <property name="title">
+          <string>YouTube settings</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
            <widget class="QLabel" name="label_9">
             <property name="text">
@@ -243,87 +319,6 @@
               <string>Unlisted</string>
              </property>
             </item>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="ffmpegSettings">
-         <property name="title">
-          <string>FFmpeg settings</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
-          <item>
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>Video width:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPlainTextEdit" name="videoWidth">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="lineWrapMode">
-             <enum>QPlainTextEdit::WidgetWidth</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Video height:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPlainTextEdit" name="videoHeight">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>24</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>Audio bitrate:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPlainTextEdit" name="audioBitrate">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>24</height>
-             </size>
-            </property>
            </widget>
           </item>
          </layout>

@@ -5,7 +5,7 @@ from PySide6.QtGui import QPixmap
 
 import logging
 
-from utils import load_ui, get_all_fields, pixmap_to_base64_str, base64_str_to_pixmap, find_ancestor
+from utils import load_ui, get_all_fields, pixmap_to_base64_str, base64_str_to_pixmap, find_ancestor, mimedata_has_image, get_image_from_mimedata
 from const import SETTINGS_DEFAULTS, SETTINGS_VALUES, ORGANIZATION, APPLICATION, SUPPORTED_IMAGE_FILTER
 
 def get_settings():
@@ -40,9 +40,15 @@ class CoverArtDisplay(QLabel):
     imageChanged = Signal(str)
 
     def __init__(self, *args):
+        # Whether or not multiple different artworks are selected
         self.multiple_values = False
+
+        # The full artwork pixmap, so we can scale down
+        # as the scroll area gets resized
         self.full_pixmap = None
+
         super().__init__(*args)
+        self.setAcceptDrops(True)
 
     def get(self):
         if self.multiple_values:
@@ -63,15 +69,31 @@ class CoverArtDisplay(QLabel):
         if pixmap.isNull():
             return
         self.full_pixmap = pixmap
-        width = min(self._get_scroll_area_width() * 3/4, pixmap.size().width())
+        width = min(self._get_scroll_area_width() * 1/2, pixmap.size().width())
         super().setPixmap(pixmap.scaledToWidth(width))
         self.imageChanged.emit(pixmap_to_base64_str(pixmap))
 
     def scroll_area_width_resized(self, width):
         if self.full_pixmap and not self.full_pixmap.isNull():
-            width = min(width * 3/4, self.full_pixmap.size().width())
+            width = min(width * 1/2, self.full_pixmap.size().width())
             scaled = self.full_pixmap.scaledToWidth(width)
-            super().setPixmap(scaled)
+            super().setPixmap(scaled)         
+
+    def dragEnterEvent(self, event):
+        if event.source() is None and mimedata_has_image(event.mimeData()):
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.source() is None and mimedata_has_image(event.mimeData()):
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        pixmap = get_image_from_mimedata(event.mimeData())
+        self.setPixmap(pixmap)
 
 
 class SettingsScrollArea(QScrollArea):

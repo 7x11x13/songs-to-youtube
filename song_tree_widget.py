@@ -142,93 +142,93 @@ class SongTreeSelectionModel(QItemSelectionModel):
         for index in selected.indexes():
             # only add child indexes if we are selecting an album
             if self._going_to_select_item(index, command):
-               r, c = index.row(), index.column()
-               item = self.model().item(r, c)
-               if index.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM and item.child(0) is not None:
-                   first_child = item.child(0).index()
-                   last_child = item.child(item.rowCount() - 1).index()
-                   selected.append(QItemSelection(first_child, last_child))
+                r, c = index.row(), index.column()
+                item = self.model().item(r, c)
+                if index.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM and item.child(0) is not None:
+                    first_child = item.child(0).index()
+                    last_child = item.child(item.rowCount() - 1).index()
+                    selected.append(QItemSelection(first_child, last_child))
         super().select(selected, command)
 
 
 class SongTreeWidget(QTreeView):
 
-   def __init__(self, *args):
-       super().__init__(*args)
-       self.setAcceptDrops(True)
-       self.setDragEnabled(True)
-       self.setDragDropMode(QAbstractItemView.InternalMove)
-       self.setDropIndicatorShown(True)
-       self.setModel(SongTreeModel())
-       self.setSelectionModel(SongTreeSelectionModel(self.model()))
-       self.setSelectionMode(QAbstractItemView.ExtendedSelection)
-       self.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setAcceptDrops(True)
+        self.setDragEnabled(True)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setDropIndicatorShown(True)
+        self.setModel(SongTreeModel())
+        self.setSelectionModel(SongTreeSelectionModel(self.model()))
+        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
 
-   def _create_album_item(self):
-       return AlbumTreeWidgetItem()
+    def _create_album_item(self):
+        return AlbumTreeWidgetItem()
 
-   def _create_song_item(self, file_path):
-       return SongTreeWidgetItem(file_path)
+    def _create_song_item(self, file_path):
+        return SongTreeWidgetItem(file_path)
 
-   def addTopLevelItem(self, item):
-       self.model().appendRow(item)
+    def addTopLevelItem(self, item):
+        self.model().appendRow(item)
 
-   def dragEnterEvent(self, event: QDragEnterEvent):
-       if event.source() is self:
-           event.acceptProposedAction()
-       elif event.mimeData().hasUrls():
-           event.acceptProposedAction()
-       else:
-           event.ignore()
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        if event.source() is self:
+            event.acceptProposedAction()
+        elif event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            event.ignore()
 
-   def dragMoveEvent(self, event: QDragMoveEvent):
-       if event.source() is self:
-           event.acceptProposedAction()
-       elif event.mimeData().hasUrls():
-           event.accept()
-       else:
-           event.ignore()
+    def dragMoveEvent(self, event: QDragMoveEvent):
+        if event.source() is self:
+            event.acceptProposedAction()
+        elif event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
 
-   def dropEvent(self, event: QDropEvent):
-       if event.source():
-           super().dropEvent(event)
-       else:
-           for url in event.mimeData().urls():
+    def dropEvent(self, event: QDropEvent):
+        if event.source():
+            super().dropEvent(event)
+        else:
+            for url in event.mimeData().urls():
 
-               info = QFileInfo(url.toLocalFile())
-               if not info.isReadable():
-                   logging.warning("File {} is not readable".format(info.filePath()))
-                   continue
-               if info.isDir():
-                   if get_setting("dragAndDropBehavior") == SETTINGS_VALUES.DragAndDrop.ALBUM_MODE:
-                       self.addAlbum(url.toLocalFile())
-                   else:
-                       for file_path in files_in_directory_and_subdirectories(info.filePath()):
-                           self.addSong(file_path)
-               else:
-                   self.addSong(info.filePath())
+                info = QFileInfo(url.toLocalFile())
+                if not info.isReadable():
+                    logging.warning("File {} is not readable".format(info.filePath()))
+                    continue
+                if info.isDir():
+                    if get_setting("dragAndDropBehavior") == SETTINGS_VALUES.DragAndDrop.ALBUM_MODE:
+                        self.addAlbum(url.toLocalFile())
+                    else:
+                        for file_path in files_in_directory_and_subdirectories(info.filePath()):
+                            self.addSong(file_path)
+                else:
+                    self.addSong(info.filePath())
 
-   def addAlbum(self, dir_path: str):
-       album_item = self._create_album_item()
-       album_item.setText(dir_path)
-       for file_path in files_in_directory(dir_path):
-           info = QFileInfo(file_path)
-           if not info.isReadable():
-               logging.warning("File {} is not readable".format(file_path))
-               continue
-           if info.isDir():
-               self.addAlbum(file_path)
-           elif file_is_audio(file_path):
-               item = self._create_song_item(file_path)
-               item.setText(file_path)
-               album_item.addChild(item)
-       if album_item.childCount() > 0:
-           self.addTopLevelItem(album_item)
+    def addAlbum(self, dir_path: str):
+        album_item = self._create_album_item()
+        album_item.setText(dir_path)
+        for file_path in files_in_directory(dir_path):
+            info = QFileInfo(file_path)
+            if not info.isReadable():
+                logging.warning("File {} is not readable".format(file_path))
+                continue
+            if info.isDir():
+                self.addAlbum(file_path)
+            elif file_is_audio(file_path):
+                item = self._create_song_item(file_path)
+                item.setText(file_path)
+                album_item.addChild(item)
+        if album_item.childCount() > 0:
+            self.addTopLevelItem(album_item)
 
-   def addSong(self, path: str):
-       if not file_is_audio(path):
-           logging.info("File {} is not audio".format(path))
-           return
-       item = self._create_song_item(path)
-       item.setText(path)
-       self.addTopLevelItem(item)
+    def addSong(self, path: str):
+        if not file_is_audio(path):
+            logging.info("File {} is not audio".format(path))
+            return
+        item = self._create_song_item(path)
+        item.setText(path)
+        self.addTopLevelItem(item)

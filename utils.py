@@ -25,20 +25,26 @@ def files_in_directory_and_subdirectories(dir_path: str):
     while file.hasNext():
         yield file.next()
 
-def file_is_audio(file_path: str):
-    """Returns true if the given file is a readable audio file"""
+def file_is_x(file_path: str, mime_prefix: str):
     info = QFileInfo(file_path)
     if not info.isReadable():
         logging.warning("File {} is not readable".format(info.filePath()))
         return False
     db = QMimeDatabase()
     mime_type = db.mimeTypeForFile(info)
-    return mime_type.name().startswith("audio")
+    return mime_type.name().startswith(mime_prefix)
+
+def file_is_audio(file_path: str):
+    """Returns true if the given file is a readable audio file"""
+    return file_is_x(file_path, "audio")
+
+def file_is_image(file_path: str):
+    """Returns true if the given file is a readable image file"""
+    return file_is_x(file_path, "image")
 
 
 
 # Qt utils
-
 
 def str_to_checkstate(s):
     STR_TO_CHECKSTATE = {
@@ -136,6 +142,8 @@ def find_ancestor(obj: QObject, type: str="", name: str=""):
     obj = obj.parent()
     if not obj:
         return None
+    # used recursion here before but pyside
+    # deleted the object before returning
     while not ((name == "" or obj.objectName() == name) and (type == "" or obj.metaObject().className() == str(type))):
         obj = obj.parent()
     return obj
@@ -152,3 +160,13 @@ def load_ui(name, custom_widgets=[], parent=None):
     ui = loader.load(ui_file, parent)
     ui_file.close()
     return ui
+
+def mimedata_has_image(data):
+    """Returns True if the given mimedata contains a valid image file"""
+    return any(file_is_image(url.toLocalFile()) for url in data.urls())
+
+def get_image_from_mimedata(data):
+    """Returns a valid QPixmap from the given mimedata if possible, otherwise returns None"""
+    for url in data.urls():
+        if file_is_image(url.toLocalFile()):
+            return QPixmap(url.toLocalFile())
