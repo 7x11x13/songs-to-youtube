@@ -6,13 +6,51 @@ import subprocess
 import logging
 import time
 import traceback
+from threading import Thread
+from queue import Queue
 
 from song_tree_widget_item import *
 from const import QRC_TO_FILE_PATH
 
+
+class FFmpeg_Handler(QObject):
+
+    progress = Signal(str)
+    error = Signal(str)
+
+    def __init__(self):
+        super().__init__()
+
+    def read_pipe(self, pipe, queue):
+        try:
+            with pipe:
+                for line in iter(pipe.readline, b''):
+                    queue.put((pipe, line.decode()))
+        finally:
+            queue.put((None, None))
+
+    def run_ffmpeg(self, command):
+        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        q = Queue()
+        Thread(target=self.read_pipe, args=[p.stdout, q]).start()
+        Thread(target=self.read_pipe, args=[p.stderr, q]).start()
+        errors = False
+        while True:
+            while q.empty() or (item := q.get_nowait()) is None:
+                time.sleep(0.01)
+            pipe, line = item
+            if pipe is None:
+                break
+            if pipe == p.stdout:
+                self.progress.emit(line)
+            else:
+                errors = True
+                self.error(line)
+        return errors
+
 class RenderSongWorker(QObject):
     finished = Signal(bool)
-    progress = Signal(int)
+    progress = Signal(str)
 
     def __init__(self, song: SongTreeWidgetItem):
         super().__init__()
@@ -26,7 +64,7 @@ class RenderSongWorker(QObject):
             cover_art = self.song.get('coverArt')
             if cover_art in QRC_TO_FILE_PATH:
                 cover_art = QRC_TO_FILE_PATH[cover_art]
-            command_str = ('ffmpeg -loglevel error -y -loop 1 -i "{cover_art}" -i "{audio_path}" '
+            command_str = ('ffmpeg -loglevel error -progress pipe:1 -y -loop 1 -i "{cover_art}" -i "{audio_path}" '
             '-vf "pad=width={videoWidth}:height={videoHeight}:x=(out_w-in_w)/2:y=(out_h-in_h)/2:color=black" '
             '-c:a aac -ab {audioBitrate} -c:v libx264 -pix_fmt yuv420p -shortest -strict -2 "{out_path}"').format(
                 cover_art = cover_art,
@@ -36,18 +74,10 @@ class RenderSongWorker(QObject):
                 videoHeight = self.song.get('videoHeight'),
                 out_path = self.song.get('file_path') + '.mp4')
             logging.debug(command_str)
-
-            # ffmpeg only outputs to stderr
-            p = subprocess.Popen(command_str, stderr=subprocess.PIPE)
-            errors = False
-            while True:
-                time.sleep(0.01)
-                line = p.stderr.readline()
-                if line.decode() == '' and p.poll() is not None:
-                    break
-                if line.decode() != '':
-                    logging.error(line.decode())
-                    errors = True
+            handler = FFmpeg_Handler()
+            handler.error.connect(logging.error)
+            handler.progress.connect(logging.info)
+            errors = handler.run_ffmpeg(command_str)
             self.finished.emit(not errors)
         except Exception as e:
             logging.error(traceback.format_exc())
