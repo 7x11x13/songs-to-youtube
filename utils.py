@@ -28,7 +28,7 @@ def files_in_directory_and_subdirectories(dir_path: str):
 def file_is_x(file_path: str, mime_prefix: str):
     info = QFileInfo(file_path)
     if not info.isReadable():
-        logging.warning("File {} is not readable".format(info.filePath()))
+        logging.info("File {} is not readable".format(info.filePath()))
         return False
     db = QMimeDatabase()
     mime_type = db.mimeTypeForFile(info)
@@ -41,7 +41,6 @@ def file_is_audio(file_path: str):
 def file_is_image(file_path: str):
     """Returns true if the given file is a readable image file"""
     return file_is_x(file_path, "image")
-
 
 
 # Qt utils
@@ -65,20 +64,6 @@ def checkstate_to_str(state):
         Qt.Checked: SETTINGS_VALUES.CheckBox.CHECKED
     }
     return CHECKSTATE_TO_STR[state]
-
-def pixmap_to_base64_str(pixmap):
-    buffer = QBuffer()
-    if pixmap.isNull() or not (QBuffer().open(QIODevice.WriteOnly) and pixmap.save(buffer, "PNG")):
-        logging.error("Unable to convert image to base64 string")
-        return False
-    return buffer.data().toBase64().data().decode()
-
-def base64_str_to_pixmap(s):
-    pixmap = QPixmap()
-    if not pixmap.loadFromData(QByteArray.fromBase64(QByteArray(s))) or pixmap.isNull():
-        logging.error("Unable to convert base64 string to image")
-        return False
-    return pixmap
 
 # methods for various QWidgets
 # all getters return values as strings
@@ -166,7 +151,8 @@ def mimedata_has_image(data):
     return any(file_is_image(url.toLocalFile()) for url in data.urls())
 
 def get_image_from_mimedata(data):
-    """Returns a valid QPixmap from the given mimedata if possible, otherwise returns None"""
+    """Returns a valid image path from the given mimedata if possible, otherwise returns None"""
     for url in data.urls():
         if file_is_image(url.toLocalFile()):
-            return QPixmap(url.toLocalFile())
+            return url.toLocalFile()
+    return None

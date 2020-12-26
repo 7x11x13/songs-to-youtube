@@ -1,3 +1,3 @@
 {
-    "files": ["log.py","ui/songsettingswindow.ui","test/test_song_tree_widget.py","ui/mainwindow.ui","song_tree_widget.py","song_settings_widget.py","main.py","settings.py","ui/settingswindow.ui","utils.py","const.py"]
+    "files": ["const.py","ui/mainwindow.ui","render.py","settings.py","song_settings_widget.py","utils.py","test/test_song_tree_widget.py","ui/songsettingswindow.ui","log.py","main.py","resource.qrc","ui/settingswindow.ui","song_tree_widget_item.py","song_tree_widget.py","resource.py"]
 }

@@ -3,10 +3,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox, QPushButton, QFileDialog
 from PySide6.QtGui import QPixmap
 
-from song_tree_widget import CustomDataRole
 from settings import SETTINGS_VALUES, SettingCheckBox, CoverArtDisplay, SettingsScrollArea
 from utils import load_ui, get_all_fields
-from const import SUPPORTED_IMAGE_FILTER
+from const import SUPPORTED_IMAGE_FILTER, CustomDataRole
 
 
 class SongSettingsWidget(QWidget):
@@ -23,7 +22,7 @@ class SongSettingsWidget(QWidget):
         self.field_original_values = {}
 
         super().__init__(*args)
-        load_ui("songsettingswindow.ui", [SettingCheckBox, CoverArtDisplay, SettingsScrollArea], self)
+        load_ui("songsettingswindow.ui", (SettingCheckBox, CoverArtDisplay, SettingsScrollArea), self)
         self.setVisible(False)
         self.connect_actions()
 
@@ -45,8 +44,7 @@ class SongSettingsWidget(QWidget):
 
     def change_cover_art(self):
         file = QFileDialog.getOpenFileName(self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER)[0]
-        pixmap = QPixmap(file)
-        self.findChild(CoverArtDisplay).setPixmap(pixmap)
+        self.findChild(CoverArtDisplay).set(file)
 
     def set_youtube_enabled(self, enabled):
         self.findChild(QGroupBox, "youtubeSettings").setEnabled(enabled)

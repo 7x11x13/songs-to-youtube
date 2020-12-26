@@ -13,13 +13,12 @@ from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
 from log import LogWidget
 from settings import SettingsWindow
-CUSTOM_WIDGETS = (SongSettingsWidget, SongTreeWidget, LogWidget)
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.ui = load_ui("mainwindow.ui", CUSTOM_WIDGETS)
+        self.ui = load_ui("mainwindow.ui", (SongSettingsWidget, SongTreeWidget, LogWidget))
         self.connect_actions()
         self.setAcceptDrops(True)
 
@@ -41,6 +40,15 @@ class MainWindow(QMainWindow):
             for album in paths:
                 self.ui.treeWidget.addAlbum(album)
 
+    def on_render_finished(self, success):
+        logging.info("Render success: {}".format(success))
+        self.ui.splitter.setEnabled(True)
+
+    def render(self):
+        self.ui.splitter.setEnabled(False)
+        renderer = self.ui.treeWidget.render()
+        renderer.finished.connect(self.on_render_finished)
+
     def load_songs(self):
         file_names = QFileDialog.getOpenFileNames(self, "Import Songs")[0]
         for file in file_names:
@@ -59,6 +67,7 @@ class MainWindow(QMainWindow):
         self.ui.actionSongs.triggered.connect(self.load_songs)
         self.ui.actionSettings.triggered.connect(self.open_settings)
         self.ui.treeWidget.selectionModel().selectionChanged.connect(self.ui.songSettingsWindow.song_tree_selection_changed)
+        self.ui.renderButton.clicked.connect(self.render)
 
 
 if __name__ == "__main__":

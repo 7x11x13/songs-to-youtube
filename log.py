@@ -26,7 +26,7 @@ class LogWidgetLogger(logging.Handler):
 
     COLORS = {
         "WARNING": QColor("yellow"),
-        "INFO": QColor("darkGray"),
+        "INFO": QColor("black"),
         "DEBUG": QColor("blue"),
         "CRITICAL": QColor("red"),
         "ERROR": QColor("red")
@@ -41,6 +41,7 @@ class LogWidgetLogger(logging.Handler):
         color = self.COLORS[record.levelname]
         self.widget.setTextColor(color)
         self.widget.append(self.format(record))
+        self.widget.ensureCursorVisible()
 
 
 class LogWidget(QTextEdit):
@@ -53,6 +54,7 @@ class LogWidget(QTextEdit):
         logging.getLogger().addHandler(log_handler)
         logging.getLogger().setLevel(logging.INFO)
         sys.excepthook = self.exception_handler
+        self.update_settings()
 
     def exception_handler(self, type, value, trace):
         logging.error("".join(traceback.format_tb(trace)))

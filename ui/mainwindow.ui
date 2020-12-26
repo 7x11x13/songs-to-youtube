@@ -30,7 +30,7 @@
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <widget class="SongTreeWidget" name="treeWidget">
@@ -51,9 +51,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QDialogButtonBox" name="treeButtonBox">
-           <property name="standardButtons">
-            <set>QDialogButtonBox::Ok</set>
+          <widget class="QPushButton" name="renderButton">
+           <property name="text">
+            <string>Render and upload</string>
            </property>
           </widget>
          </item>

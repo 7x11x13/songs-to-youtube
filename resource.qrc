@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/default.jpg</file>
+        <file>image/multiple-values.png</file>
+    </qresource>
+</RCC>
