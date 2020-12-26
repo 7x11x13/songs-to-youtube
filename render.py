@@ -52,9 +52,10 @@ class RenderSongWorker(QObject):
     finished = Signal(bool)
     progress = Signal(str)
 
-    def __init__(self, song: SongTreeWidgetItem):
+    def __init__(self, song: SongTreeWidgetItem, logger):
         super().__init__()
         self.song = song
+        self.logger = logger
 
     def __str__(self):
         return "RenderSongWorker<{}>".format(self.song.get('file_path'))
@@ -73,14 +74,14 @@ class RenderSongWorker(QObject):
                 videoWidth = self.song.get('videoWidth'),
                 videoHeight = self.song.get('videoHeight'),
                 out_path = self.song.get('file_path') + '.mp4')
-            logging.debug(command_str)
+            self.logger.debug(command_str)
             handler = FFmpeg_Handler()
-            handler.error.connect(logging.error)
-            handler.progress.connect(logging.info)
+            handler.error.connect(self.logger.error)
+            handler.progress.connect(self.logger.info)
             errors = handler.run_ffmpeg(command_str)
             self.finished.emit(not errors)
         except Exception as e:
-            logging.error(traceback.format_exc())
+            self.logger.error(traceback.format_exc())
             self.finished.emit(False)
 
 
@@ -106,19 +107,19 @@ class Renderer(QObject):
         if len(self.threads) == 0:
             self.finished.emit(self.success)
 
-    def render_album(self, album: AlbumTreeWidgetItem):
+    def render_album(self, album: AlbumTreeWidgetItem, logger):
         if album.childCount() == 0:
             return
         if album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.SINGLE:
             pass
         elif album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.MULTIPLE:
             for song in album.getChildren():
-                self.render_song(song)
+                self.render_song(song, logger)
 
-    def render_song(self, song: SongTreeWidgetItem):
+    def render_song(self, song: SongTreeWidgetItem, logger):
         thread = QThread()
         self.threads.append(thread)
-        worker = RenderSongWorker(song)
+        worker = RenderSongWorker(song, logger)
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.finished.connect(lambda success, worker=worker, thread=thread: self.worker_finished(worker, thread, success))

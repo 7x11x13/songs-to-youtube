@@ -158,7 +158,7 @@ class SongTreeWidget(QTreeView):
         for row in range(self.model().rowCount()):
             item = self.model().item(row)
             if item.item_type() == TreeWidgetType.ALBUM:
-                renderer.render_album(item)
+                renderer.render_album(item, logging.getLogger())
             elif item.item_type() == TreeWidgetType.SONG:
-                renderer.render_song(item)
+                renderer.render_song(item, logging.getLogger())
         return renderer
