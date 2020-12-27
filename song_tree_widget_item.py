@@ -13,7 +13,7 @@ from utils import flatten_metadata
 
 
 class TreeWidgetItemData:
-    FIELDS = ('audioBitrate', 'videoHeight', 'videoWidth',
+    FIELDS = ('audioBitrate', 'backgroundColor', 'videoHeight', 'videoWidth',
               'uploadYouTube', 'albumPlaylist', 'coverArt', 'userSelect',
               'videoDescription', 'videoTags', 'videoTitle', 'videoVisibility')
     def __init__(self, **kwargs):
@@ -40,7 +40,7 @@ class TreeWidgetItemData:
 
                 if get_setting('extractCoverArt') == SETTINGS_VALUES.CheckBox.CHECKED:
                     # extract cover art if it exists
-                    if len(metadata.pictures) > 0:
+                    if metadata.pictures and len(metadata.pictures) > 0:
                         bytes = QByteArray(metadata.pictures[0].data)
                         cover = QTemporaryFile(os.path.join(QDir().tempPath(), APPLICATION, "XXXXXX.cover"))
                         cover.setAutoRemove(False)

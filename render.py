@@ -75,7 +75,7 @@ class RenderSongWorker(QObject):
         try:
             command_str = ("ffmpeg -loglevel error -progress pipe:1 -y -loop 1 -i \"{coverArt}\" -i \"{file_path}\" "
             "-vf \"scale='min({videoWidth}, iw)':'min({videoHeight}, ih)':force_original_aspect_ratio=decrease,"
-            "pad={videoWidth}:{videoHeight}:-1:-1:color=black\" "
+            "pad={videoWidth}:{videoHeight}:-1:-1:color={backgroundColor}\" "
             '-c:a aac -ab {audioBitrate} -c:v libx264 -pix_fmt yuv420p -shortest -strict -2 "{file_path}.mp4"').format(**self.song.to_dict())
             handler = FFmpeg_Handler()
             handler.error.connect(self.error.emit)

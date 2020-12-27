@@ -55,6 +55,7 @@ class SETTINGS_VALUES:
 SETTINGS_DEFAULTS = {
     "coverArt": ":/image/default.jpg",
     "extractCoverArt": SETTINGS_VALUES.CheckBox.CHECKED,
+    "backgroundColor": "black",
     "dragAndDropBehavior": SETTINGS_VALUES.DragAndDrop.ALBUM_MODE,
     "maxProcesses": "8",
     "logLevel": SETTINGS_VALUES.LogLevel.DEBUG,

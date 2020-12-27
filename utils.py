@@ -95,6 +95,11 @@ WIDGET_FUNCTIONS = {
         "getter": lambda widget: "{}{}{}".format(widget.prefix(), widget.value(), widget.suffix()),
         "setter": lambda widget, text: widget.setValue(int(text[len(widget.prefix()):len(text)-len(widget.suffix())])),
         "on_update": lambda widget, cb: widget.textChanged.connect(cb)
+    },
+    "QLineEdit": {
+        "getter": lambda widget: widget.text(),
+        "setter": lambda widget, text: widget.setText(text),
+        "on_update": lambda widget, cb: widget.textChanged.connect(cb)
     }
 }
 

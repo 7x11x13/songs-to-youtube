@@ -44,9 +44,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-111</y>
         <width>433</width>
-        <height>886</height>
+        <height>933</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -210,6 +210,16 @@
              <string>Choose cover art...</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Background color:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="backgroundColor"/>
           </item>
           <item>
            <widget class="QLabel" name="label_24">
