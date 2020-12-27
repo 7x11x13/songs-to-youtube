@@ -95,8 +95,8 @@ class Renderer(QObject):
     # emit true on success, false on failure
     finished = Signal(bool)
 
-    # worker name, worker progress
-    worker_progress = Signal(str, str)
+    # worker name, worker progress (percentage)
+    worker_progress = Signal(str, int)
 
     # worker name, worker error
     worker_error = Signal(str, str)
@@ -108,6 +108,15 @@ class Renderer(QObject):
         self.success = True
         self.threads = []
         super().__init__()
+
+    def _worker_progress(self, worker, progress):
+        key, value = progress.strip().split("=")
+        if key == "out_time_us":
+            current_time_ms = int(value) // 1000
+            total_time_ms = worker.song.get_duration_ms()
+            progress = min(int((current_time_ms / total_time_ms) * 100), 100)
+            self.worker_progress.emit(str(worker), progress)
+
 
     def worker_finished(self, worker, thread, success):
         self.worker_done.emit(str(worker))
@@ -146,7 +155,7 @@ class Renderer(QObject):
         worker.finished.connect(lambda success, worker=worker, thread=thread: self.worker_finished(worker, thread, success))
         thread.finished.connect(lambda thread=thread: self.thread_finished(thread))
         worker.error.connect(lambda error, worker=worker: self.worker_error.emit(str(worker), error))
-        worker.progress.connect(lambda progress, worker=worker: self.worker_progress.emit(str(worker), progress))
+        worker.progress.connect(lambda progress, worker=worker: self._worker_progress(worker, progress))
 
     def render(self):
         if len(self.threads) == 0:

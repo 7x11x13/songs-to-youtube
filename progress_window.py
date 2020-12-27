@@ -18,13 +18,7 @@ class WorkerProgress(QWidget):
         self.progress = QProgressBar(self)
         self.layout().addWidget(self.label)
         self.layout().addWidget(self.progress)
-        self.progress.setMaximum(100000)
-
-    def set_progress(self, us):
-        ms = us // 1000
-        ms = min(ms, self.progress.maximum())
-        if 0 < ms < 0xffffffff:
-            self.progress.setValue(ms)
+        self.progress.setValue(0)
 
 
 class ProgressWindow(QWidget):
@@ -46,11 +40,9 @@ class ProgressWindow(QWidget):
     def worker_progress(self, worker_name, progress):
         if worker_name not in self.workers:
             self.init_worker_progress(worker_name)
-        key, value = progress.strip().split("=")
-        if key == "out_time_us":
-            worker = self.workers[worker_name]
-            worker.set_progress(int(value))
-            logging.debug("{} - {}".format(worker_name, progress))
+        worker = self.workers[worker_name]
+        logging.debug("{} - {}% done".format(worker_name, progress))
+        worker.progress.setValue(progress)
 
     def worker_error(self, worker_name, error):
         if worker_name not in self.workers:

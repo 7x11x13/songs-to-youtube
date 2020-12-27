@@ -1,10 +1,15 @@
 # This Python file uses the following encoding: utf-8
+from PySide6.QtCore import QByteArray, QTemporaryFile, QIODevice
 from PySide6.QtGui import QStandardItem
 
 from enum import IntEnum
+import audio_metadata
+import logging
+import os
 
 from const import *
 from settings import get_setting
+from utils import flatten_metadata
 
 
 class TreeWidgetItemData:
@@ -12,6 +17,7 @@ class TreeWidgetItemData:
               'uploadYouTube', 'albumPlaylist', 'coverArt', 'userSelect',
               'videoDescription', 'videoTags', 'videoTitle', 'videoVisibility')
     def __init__(self, **kwargs):
+        self.metadata = {}
         self.dict = {}
         for field in set(kwargs.keys()) | set(TreeWidgetItemData.FIELDS):
             # set all mandatory settings to their defaults if not
@@ -27,6 +33,31 @@ class TreeWidgetItemData:
                 # convert resource path to real file path for ffmpeg
                 self.dict[field] = QRC_TO_FILE_PATH[get_setting(field)]
 
+        if 'file_path' in self.dict:
+            # add metadata
+            try:
+                metadata = audio_metadata.load(self.dict['file_path'])
+
+                if get_setting('extractCoverArt') == SETTINGS_VALUES.CheckBox.CHECKED:
+                    # extract cover art if it exists
+                    if len(metadata.pictures) > 0:
+                        bytes = QByteArray(metadata.pictures[0].data)
+                        cover = QTemporaryFile(os.path.join(QDir().tempPath(), APPLICATION, "XXXXXX.cover"))
+                        cover.setAutoRemove(False)
+                        cover.open(QIODevice.WriteOnly)
+                        cover.write(bytes)
+                        cover.close()
+                        self.set_value('coverArt', cover.fileName())
+
+
+                self.metadata = flatten_metadata(metadata)
+
+
+            except Exception as e:
+                logging.warning(e)
+                logging.warning(self.dict['file_path'])
+
+
     def to_dict(self):
         return self.dict
 
@@ -35,6 +66,14 @@ class TreeWidgetItemData:
 
     def set_value(self, field, value):
         self.dict[field] = value
+
+    def get_duration_ms(self):
+        if 'streaminfo.duration' in self.metadata:
+            return self.metadata['streaminfo.duration'] * 1000
+        else:
+            logging.warning("Could not find duration of file {}".format(self.dict['file_path']))
+            logging.debug(self.metadata)
+            return 180 * 1000
 
     def __repr__(self):
         return str(self.dict)
@@ -65,6 +104,9 @@ class SongTreeWidgetItem(QStandardItem):
 
     def item_type(self):
         return self.data(CustomDataRole.ITEMTYPE)
+
+    def get_duration_ms(self):
+        return self.data(CustomDataRole.ITEMDATA).get_duration_ms()
 
 
 class AlbumTreeWidgetItem(QStandardItem):

@@ -46,7 +46,7 @@
         <x>0</x>
         <y>0</y>
         <width>433</width>
-        <height>861</height>
+        <height>886</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -154,6 +154,16 @@
             </property>
             <property name="maximum">
              <number>256</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="SettingCheckBox" name="extractCoverArt">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Extract cover art from metadata?</string>
             </property>
            </widget>
           </item>

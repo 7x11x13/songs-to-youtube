@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt, QFile, QDir
 from enum import Enum, IntEnum
 
 import resource
+import atexit
 
 class TreeWidgetType(IntEnum):
     SONG = 0
@@ -53,6 +54,7 @@ class SETTINGS_VALUES:
 
 SETTINGS_DEFAULTS = {
     "coverArt": ":/image/default.jpg",
+    "extractCoverArt": SETTINGS_VALUES.CheckBox.CHECKED,
     "dragAndDropBehavior": SETTINGS_VALUES.DragAndDrop.ALBUM_MODE,
     "maxProcesses": "8",
     "logLevel": SETTINGS_VALUES.LogLevel.DEBUG,
@@ -68,10 +70,21 @@ SETTINGS_DEFAULTS = {
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC
 }
 
+
+QDir.temp().mkdir(APPLICATION)
 QRC_TO_FILE_PATH = {
-    ":/image/default.jpg": QDir.temp().absoluteFilePath("qrc_default.jpg")
+    ":/image/default.jpg": QDir.temp().absoluteFilePath("./{}/qrc_default.jpg".format(APPLICATION))
 }
 
 for qrc, file in QRC_TO_FILE_PATH.items():
     # unpack resources so ffmpeg can use them
     QFile.copy(qrc, file)
+
+# clear temp dir on exit
+def clean_up_images():
+    temp_dir = QDir("{}/{}".format(QDir().tempPath(), APPLICATION))
+    temp_dir.setNameFilters(["*.cover"])
+    for file in temp_dir.entryList():
+        temp_dir.remove(file)
+
+atexit.register(clean_up_images)

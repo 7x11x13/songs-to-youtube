@@ -162,3 +162,28 @@ def get_image_from_mimedata(data):
         if file_is_image(url.toLocalFile()):
             return url.toLocalFile()
     return None
+
+
+# Other utils
+
+def flatten_metadata(d, old_key="", sep="."):
+    items = []
+    for k, v in d.items():
+        new_key = old_key + sep + k if old_key else k
+        if isinstance(v, list):
+            # tags such as artist, track name
+            # can be stored as arrays
+            # use only the first value for simplicity
+            if len(v) == 0:
+                continue
+            else:
+                v = v[0]
+        try:
+            items.extend(flatten_metadata(v, new_key, sep).items())
+        except:
+            if isinstance(v, (str, int, float)):
+                # Qt doesn't like storing non standard types
+                # in widget items, we don't need them anyways
+                # so just ignore them
+                items.append((new_key, v))
+    return dict(items)

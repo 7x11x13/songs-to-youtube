@@ -64,7 +64,7 @@ class SongTreeSelectionModel(QItemSelectionModel):
             if self._going_to_select_item(index, command):
                 r, c = index.row(), index.column()
                 item = index.model().item(r, c)
-                if not index.parent().isValid() and item.item_type() == TreeWidgetType.ALBUM and item.child(0) is not None:
+                if not index.parent().isValid() and item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM and item.child(0) is not None:
                     first_child = item.child(0).index()
                     last_child = item.child(item.rowCount() - 1).index()
                     selected.append(QItemSelection(first_child, last_child))
