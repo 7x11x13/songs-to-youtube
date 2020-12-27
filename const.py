@@ -54,6 +54,7 @@ class SETTINGS_VALUES:
 SETTINGS_DEFAULTS = {
     "coverArt": ":/image/default.jpg",
     "dragAndDropBehavior": SETTINGS_VALUES.DragAndDrop.ALBUM_MODE,
+    "maxProcesses": "8",
     "logLevel": SETTINGS_VALUES.LogLevel.DEBUG,
     "audioBitrate": "384k",
     "videoHeight": "720",

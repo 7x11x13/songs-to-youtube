@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, Q
 import sys
 import os
 import logging
+import pdb
 
 from utils import load_ui
 
@@ -13,12 +14,13 @@ from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
 from log import LogWidget
 from settings import SettingsWindow
+from progress_window import ProgressWindow
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.ui = load_ui("mainwindow.ui", (SongSettingsWidget, SongTreeWidget, LogWidget))
+        self.ui = load_ui("mainwindow.ui", (SongSettingsWidget, SongTreeWidget, LogWidget, ProgressWindow))
         self.connect_actions()
         self.setAcceptDrops(True)
 
@@ -46,8 +48,10 @@ class MainWindow(QMainWindow):
 
     def render(self):
         self.ui.splitter.setEnabled(False)
-        renderer = self.ui.treeWidget.render()
-        renderer.finished.connect(self.on_render_finished)
+        self.renderer = self.ui.treeWidget.get_renderer()
+        self.renderer.finished.connect(self.on_render_finished)
+        self.ui.progressWindow.on_render_start(self.renderer)
+        self.renderer.render()
 
     def load_songs(self):
         file_names = QFileDialog.getOpenFileNames(self, "Import Songs")[0]

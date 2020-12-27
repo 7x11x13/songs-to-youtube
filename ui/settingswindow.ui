@@ -46,7 +46,7 @@
         <x>0</x>
         <y>0</y>
         <width>433</width>
-        <height>816</height>
+        <height>861</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -137,6 +137,26 @@
             </item>
            </widget>
           </item>
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Maximum simultaneous processes:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="maxProcesses">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximum">
+             <number>256</number>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -189,21 +209,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="videoWidth">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="lineWrapMode">
-             <enum>QPlainTextEdit::WidgetWidth</enum>
+           <widget class="QSpinBox" name="videoWidth">
+            <property name="maximum">
+             <number>99999</number>
             </property>
            </widget>
           </item>
@@ -215,18 +223,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="videoHeight">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>24</height>
-             </size>
+           <widget class="QSpinBox" name="videoHeight">
+            <property name="maximum">
+             <number>99999</number>
             </property>
            </widget>
           </item>
@@ -238,18 +237,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="audioBitrate">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <widget class="QSpinBox" name="audioBitrate">
+            <property name="suffix">
+             <string>k</string>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>24</height>
-             </size>
+            <property name="maximum">
+             <number>99999</number>
             </property>
            </widget>
           </item>

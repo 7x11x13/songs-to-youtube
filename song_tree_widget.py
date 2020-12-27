@@ -63,8 +63,8 @@ class SongTreeSelectionModel(QItemSelectionModel):
             # only add child indexes if we are selecting an album
             if self._going_to_select_item(index, command):
                 r, c = index.row(), index.column()
-                item = self.model().item(r, c)
-                if item.item_type() == TreeWidgetType.ALBUM and item.child(0) is not None:
+                item = index.model().item(r, c)
+                if not index.parent().isValid() and item.item_type() == TreeWidgetType.ALBUM and item.child(0) is not None:
                     first_child = item.child(0).index()
                     last_child = item.child(item.rowCount() - 1).index()
                     selected.append(QItemSelection(first_child, last_child))
@@ -153,12 +153,12 @@ class SongTreeWidget(QTreeView):
         item.setText(QFileInfo(path).fileName())
         self.addTopLevelItem(item)
 
-    def render(self):
+    def get_renderer(self):
         renderer = Renderer()
         for row in range(self.model().rowCount()):
             item = self.model().item(row)
             if item.item_type() == TreeWidgetType.ALBUM:
-                renderer.render_album(item, logging.getLogger())
+                renderer.add_render_album_job(item)
             elif item.item_type() == TreeWidgetType.SONG:
-                renderer.render_song(item, logging.getLogger())
+                renderer.add_render_song_job(item)
         return renderer

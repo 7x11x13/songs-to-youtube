@@ -65,6 +65,7 @@ def checkstate_to_str(state):
     }
     return CHECKSTATE_TO_STR[state]
 
+
 # methods for various QWidgets
 # all getters return values as strings
 # all setters take in values as strings
@@ -89,6 +90,11 @@ WIDGET_FUNCTIONS = {
         "getter": lambda widget: widget.get(),
         "setter": lambda widget, text: widget.set(text),
         "on_update": lambda widget, cb: widget.imageChanged.connect(cb)
+    },
+    "QSpinBox": {
+        "getter": lambda widget: "{}{}{}".format(widget.prefix(), widget.value(), widget.suffix()),
+        "setter": lambda widget, text: widget.setValue(int(text[len(widget.prefix()):len(text)-len(widget.suffix())])),
+        "on_update": lambda widget, cb: widget.textChanged.connect(cb)
     }
 }
 
