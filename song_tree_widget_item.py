@@ -20,8 +20,12 @@ class TreeWidgetItemData:
             if field in kwargs:
                 self.dict[field] = kwargs[field]
             else:
-                #set to default setting
+                # set to default setting
                 self.dict[field] = get_setting(field)
+
+            if field == 'coverArt' and self.dict[field] in QRC_TO_FILE_PATH:
+                # convert resource path to real file path for ffmpeg
+                self.dict[field] = QRC_TO_FILE_PATH[get_setting(field)]
 
     def to_dict(self):
         return self.dict
@@ -55,6 +59,9 @@ class SongTreeWidgetItem(QStandardItem):
 
     def get(self, field):
         return self.data(CustomDataRole.ITEMDATA).get_value(field)
+
+    def to_dict(self):
+        return self.data(CustomDataRole.ITEMDATA).to_dict()
 
     def item_type(self):
         return self.data(CustomDataRole.ITEMTYPE)

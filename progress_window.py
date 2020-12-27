@@ -23,7 +23,8 @@ class WorkerProgress(QWidget):
     def set_progress(self, us):
         ms = us // 1000
         ms = min(ms, self.progress.maximum())
-        self.progress.setValue(ms)
+        if 0 < ms < 0xffffffff:
+            self.progress.setValue(ms)
 
 
 class ProgressWindow(QWidget):

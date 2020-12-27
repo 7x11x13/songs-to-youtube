@@ -73,18 +73,10 @@ class RenderSongWorker(QObject):
 
     def run(self):
         try:
-            cover_art = self.song.get('coverArt')
-            if cover_art in QRC_TO_FILE_PATH:
-                cover_art = QRC_TO_FILE_PATH[cover_art]
-            command_str = ('ffmpeg -loglevel error -progress pipe:1 -y -loop 1 -i "{cover_art}" -i "{audio_path}" '
-            '-vf "pad=width={videoWidth}:height={videoHeight}:x=(out_w-in_w)/2:y=(out_h-in_h)/2:color=black" '
-            '-c:a aac -ab {audioBitrate} -c:v libx264 -pix_fmt yuv420p -shortest -strict -2 "{out_path}"').format(
-                cover_art = cover_art,
-                audio_path = self.song.get('file_path'),
-                audioBitrate = self.song.get('audioBitrate'),
-                videoWidth = self.song.get('videoWidth'),
-                videoHeight = self.song.get('videoHeight'),
-                out_path = self.song.get('file_path') + '.mp4')
+            command_str = ("ffmpeg -loglevel error -progress pipe:1 -y -loop 1 -i \"{coverArt}\" -i \"{file_path}\" "
+            "-vf \"scale='min({videoWidth}, iw)':'min({videoHeight}, ih)':force_original_aspect_ratio=decrease,"
+            "pad={videoWidth}:{videoHeight}:-1:-1:color=black\" "
+            '-c:a aac -ab {audioBitrate} -c:v libx264 -pix_fmt yuv420p -shortest -strict -2 "{file_path}.mp4"').format(**self.song.to_dict())
             handler = FFmpeg_Handler()
             handler.error.connect(self.error.emit)
             handler.progress.connect(self.progress.emit)
