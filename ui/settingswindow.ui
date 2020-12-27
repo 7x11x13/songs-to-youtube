@@ -44,9 +44,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-111</y>
+        <y>-575</y>
         <width>433</width>
-        <height>933</height>
+        <height>1024</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -267,6 +267,16 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Output file:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="fileOutput"/>
+          </item>
+          <item>
            <widget class="QLabel" name="albumPlaylistLabel">
             <property name="text">
              <string>Render album as:</string>
@@ -346,20 +356,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="videoTitle">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>24</height>
-             </size>
-            </property>
-           </widget>
+           <widget class="QLineEdit" name="videoTitle"/>
           </item>
           <item>
            <widget class="QLabel" name="label_21">
@@ -383,7 +380,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>24</height>
+              <height>16777215</height>
              </size>
             </property>
            </widget>

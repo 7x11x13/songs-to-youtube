@@ -53,6 +53,7 @@ class SETTINGS_VALUES:
 
 
 SETTINGS_DEFAULTS = {
+    "fileOutput": "~{song_path}.mp4",
     "coverArt": ":/image/default.jpg",
     "extractCoverArt": SETTINGS_VALUES.CheckBox.CHECKED,
     "backgroundColor": "black",
@@ -67,7 +68,7 @@ SETTINGS_DEFAULTS = {
     "userSelect": "",
     "videoDescription": "Uploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTags": "",
-    "videoTitle": "%filename%",
+    "videoTitle": "~{tags.artist} - ~{tags.title}",
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC
 }
 

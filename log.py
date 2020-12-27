@@ -25,7 +25,7 @@ class LogWidgetFormatter(logging.Formatter):
 class LogWidgetLogger(logging.Handler):
 
     COLORS = {
-        "WARNING": QColor("yellow"),
+        "WARNING": QColor("orange"),
         "INFO": QColor("black"),
         "DEBUG": QColor("blue"),
         "CRITICAL": QColor("red"),

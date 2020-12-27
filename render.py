@@ -68,15 +68,12 @@ class RenderSongWorker(QObject):
         super().__init__()
         self.song = song
 
-    def __str__(self):
-        return "RenderSongWorker<{}>".format(self.song.get('file_path'))
-
     def run(self):
         try:
-            command_str = ("ffmpeg -loglevel error -progress pipe:1 -y -loop 1 -i \"{coverArt}\" -i \"{file_path}\" "
+            command_str = ("ffmpeg -loglevel error -progress pipe:1 -y -loop 1 -i \"{coverArt}\" -i \"{song_path}\" "
             "-vf \"scale='min({videoWidth}, iw)':'min({videoHeight}, ih)':force_original_aspect_ratio=decrease,"
             "pad={videoWidth}:{videoHeight}:-1:-1:color={backgroundColor}\" "
-            '-c:a aac -ab {audioBitrate} -c:v libx264 -pix_fmt yuv420p -shortest -strict -2 "{file_path}.mp4"').format(**self.song.to_dict())
+            '-c:a aac -ab {audioBitrate} -c:v libx264 -pix_fmt yuv420p -shortest -strict -2 "{fileOutput}.mp4"').format(**self.song.to_dict())
             handler = FFmpeg_Handler()
             handler.error.connect(self.error.emit)
             handler.progress.connect(self.progress.emit)
@@ -87,7 +84,7 @@ class RenderSongWorker(QObject):
             self.finished.emit(False)
 
     def __str__(self):
-        return self.song.get('file_path') + '.mp4'
+        return self.song.get('fileOutput')
 
 
 class Renderer(QObject):

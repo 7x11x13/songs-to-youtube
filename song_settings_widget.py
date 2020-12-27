@@ -79,6 +79,8 @@ class SongSettingsWidget(QWidget):
                 if value != SETTINGS_VALUES.MULTIPLE_VALUES:
                     data.set_value(field.name, value)
                 self.field_original_values[field.name] = value
+        self.load_settings()
+
 
     def load_settings(self):
         self.fields_updated = set()

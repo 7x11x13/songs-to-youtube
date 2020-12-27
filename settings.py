@@ -16,7 +16,7 @@ def get_setting(setting: str):
     """Returns the value of the given setting (as a string) or None if it has no value"""
     settings = get_settings()
     if setting not in SETTINGS_DEFAULTS:
-        logging.error("Setting {} is not recognized".format(setting))
+        raise KeyError("Setting {} is not recognized".format(setting))
         return None
     return settings.value(setting, SETTINGS_DEFAULTS[setting])
 

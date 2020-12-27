@@ -6,16 +6,29 @@ from enum import IntEnum
 import audio_metadata
 import logging
 import os
+from string import Template
 
 from const import *
 from settings import get_setting
 from utils import flatten_metadata
 
+class SettingTemplate(Template):
+    # template placeholders are of the form
+    # ~{key}
+    # can be escaped by writing ~~{key}
+    delimiter = "~"
+
+    # placeholder must be surrounded by braces
+    idpattern = None
+
+    # key can be anything
+    braceidpattern = r"[^{}]*"
 
 class TreeWidgetItemData:
     FIELDS = ('audioBitrate', 'backgroundColor', 'videoHeight', 'videoWidth',
               'uploadYouTube', 'albumPlaylist', 'coverArt', 'userSelect',
-              'videoDescription', 'videoTags', 'videoTitle', 'videoVisibility')
+              'videoDescription', 'videoTags', 'videoTitle', 'videoVisibility',
+              'fileOutput')
     def __init__(self, **kwargs):
         self.metadata = {}
         self.dict = {}
@@ -33,10 +46,10 @@ class TreeWidgetItemData:
                 # convert resource path to real file path for ffmpeg
                 self.dict[field] = QRC_TO_FILE_PATH[get_setting(field)]
 
-        if 'file_path' in self.dict:
+        if 'song_path' in self.dict:
             # add metadata
             try:
-                metadata = audio_metadata.load(self.dict['file_path'])
+                metadata = audio_metadata.load(self.dict['song_path'])
 
                 if get_setting('extractCoverArt') == SETTINGS_VALUES.CheckBox.CHECKED:
                     # extract cover art if it exists
@@ -55,7 +68,10 @@ class TreeWidgetItemData:
 
             except Exception as e:
                 logging.warning(e)
-                logging.warning(self.dict['file_path'])
+                logging.warning(self.dict['song_path'])
+
+        for field, value in self.dict.items():
+            self.set_value(field, value)
 
 
     def to_dict(self):
@@ -65,13 +81,18 @@ class TreeWidgetItemData:
         return self.dict[field]
 
     def set_value(self, field, value):
+        # replace {variable} with value from metadata
+        try:
+            value = SettingTemplate(value).substitute(**{**self.dict, **self.metadata})
+        except Exception as e:
+            logging.info("Invalid key: {}".format(e))
         self.dict[field] = value
 
     def get_duration_ms(self):
         if 'streaminfo.duration' in self.metadata:
             return self.metadata['streaminfo.duration'] * 1000
         else:
-            logging.warning("Could not find duration of file {}".format(self.dict['file_path']))
+            logging.warning("Could not find duration of file {}".format(self.dict['song_path']))
             logging.debug(self.metadata)
             return 180 * 1000
 
@@ -94,7 +115,7 @@ class SongTreeWidgetItem(QStandardItem):
         self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled
                       | Qt.ItemIsDragEnabled)
         self.setData(TreeWidgetType.SONG, CustomDataRole.ITEMTYPE)
-        self.setData(TreeWidgetItemData(file_path=file_path), CustomDataRole.ITEMDATA)
+        self.setData(TreeWidgetItemData(song_path=file_path), CustomDataRole.ITEMDATA)
 
     def get(self, field):
         return self.data(CustomDataRole.ITEMDATA).get_value(field)
