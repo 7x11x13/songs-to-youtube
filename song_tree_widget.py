@@ -50,25 +50,38 @@ class SongTreeSelectionModel(QItemSelectionModel):
         return False
 
     def select(self, selected, command):
-        # When an album is selected, also select all its songs
-        # so when we change an album's properties all its songs
-        # properties also change
+        # If one of the selected items is an album,
+        # deselect all song items to make sure
+        # we only edit items of the same type
+        # at the same time
         indexes = []
         if isinstance(selected, QModelIndex):
             # turn single selected index into a QItemSelection
-            # so we can add more selected indexes if we want
+            # so we only have to deal with one type
             selected = QItemSelection(selected, selected)
 
-        for index in selected.indexes():
-            # only add child indexes if we are selecting an album
-            if self._going_to_select_item(index, command):
-                r, c = index.row(), index.column()
-                item = index.model().item(r, c)
-                if not index.parent().isValid() and item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM and item.child(0) is not None:
-                    first_child = item.child(0).index()
-                    last_child = item.child(item.rowCount() - 1).index()
-                    selected.append(QItemSelection(first_child, last_child))
+        # check if after this selection action
+        # we would have an album selected
+        # this will emit selectionChanged
         super().select(selected, command)
+        album_selected = False
+        for index in self.selection().indexes():
+            if index.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM:
+                album_selected = True
+                break
+
+        if album_selected:
+            deselect = None
+            if album_selected:
+                # deselect all song items
+                for index in self.selection().indexes():
+                    if index.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
+                        if deselect:
+                            deselect.append(QItemSelection(index, index))
+                        else:
+                            deselect = QItemSelection(index, index)
+            if deselect:
+                super().select(deselect, QItemSelectionModel.Deselect)
 
 
 class SongTreeWidget(QTreeView):
@@ -84,8 +97,8 @@ class SongTreeWidget(QTreeView):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
 
-    def _create_album_item(self):
-        return AlbumTreeWidgetItem()
+    def _create_album_item(self, dir_path, songs):
+        return AlbumTreeWidgetItem(dir_path, songs)
 
     def _create_song_item(self, file_path):
         return SongTreeWidgetItem(file_path)
@@ -129,8 +142,7 @@ class SongTreeWidget(QTreeView):
                     self.addSong(info.filePath())
 
     def addAlbum(self, dir_path: str):
-        album_item = self._create_album_item()
-        album_item.setText(dir_path)
+        songs = []
         for file_path in files_in_directory(dir_path):
             info = QFileInfo(file_path)
             if not info.isReadable():
@@ -141,8 +153,10 @@ class SongTreeWidget(QTreeView):
             elif file_is_audio(file_path):
                 item = self._create_song_item(file_path)
                 item.setText(info.fileName())
-                album_item.addChild(item)
-        if album_item.childCount() > 0:
+                songs.append(item)
+        if len(songs) > 0:
+            album_item = self._create_album_item(dir_path, songs)
+            album_item.setText(dir_path)
             self.addTopLevelItem(album_item)
 
     def addSong(self, path: str):

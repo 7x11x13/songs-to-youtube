@@ -32,6 +32,16 @@
    <string>Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="SettingsScrollArea" name="scrollArea">
      <property name="horizontalScrollBarPolicy">
@@ -44,9 +54,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-575</y>
+        <y>-1035</y>
         <width>433</width>
-        <height>1024</height>
+        <height>1484</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -173,7 +183,7 @@
        <item>
         <widget class="QGroupBox" name="ffmpegSettings">
          <property name="title">
-          <string>FFmpeg defaults</string>
+          <string>FFmpeg defaults (song)</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
@@ -267,15 +277,34 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_5">
+           <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Output file:</string>
+             <string>Output file directory:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="fileOutput"/>
+           <widget class="QLineEdit" name="fileOutputDir"/>
           </item>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Output file name:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="fileOutputName"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="ffmpegSettingsAlbum">
+         <property name="title">
+          <string>FFmpeg defaults (album)</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
            <widget class="QLabel" name="albumPlaylistLabel">
             <property name="text">
@@ -297,6 +326,26 @@
             </item>
            </widget>
           </item>
+          <item>
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Output file directory:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="fileOutputDirAlbum"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Output file name:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="fileOutputNameAlbum"/>
+          </item>
          </layout>
         </widget>
        </item>
@@ -316,7 +365,7 @@
        <item>
         <widget class="QGroupBox" name="youtubeSettings">
          <property name="title">
-          <string>YouTube defaults</string>
+          <string>YouTube defaults (song)</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
@@ -409,18 +458,54 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <widget class="QGroupBox" name="youtubeSettingsAlbum">
+         <property name="title">
+          <string>YouTube defaults (album)</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_60">
+          <item>
+           <widget class="QLabel" name="label_200">
+            <property name="text">
+             <string>Video title:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="videoTitleAlbum"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_210">
+            <property name="text">
+             <string>Video description:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="videoDescriptionAlbum"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_220">
+            <property name="text">
+             <string>Video tags:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="videoTagsAlbum">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
     </widget>
    </item>
   </layout>

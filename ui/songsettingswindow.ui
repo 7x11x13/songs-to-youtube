@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-261</y>
+        <y>-384</y>
         <width>405</width>
-        <height>816</height>
+        <height>1276</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -59,28 +59,19 @@
        <item>
         <widget class="QGroupBox" name="ffmpegSettings">
          <property name="title">
-          <string>FFmpeg settings</string>
+          <string>FFmpeg settings (song)</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
            <widget class="CoverArtDisplay" name="coverArt">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
             <property name="text">
              <string>Cover art</string>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -107,7 +98,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Background color:</string>
             </property>
@@ -117,7 +108,7 @@
            <widget class="QLineEdit" name="backgroundColor"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_14">
+           <widget class="QLabel" name="label_24">
             <property name="text">
              <string>Video width:</string>
             </property>
@@ -131,7 +122,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_15">
+           <widget class="QLabel" name="label_25">
             <property name="text">
              <string>Video height:</string>
             </property>
@@ -145,7 +136,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_16">
+           <widget class="QLabel" name="label_26">
             <property name="text">
              <string>Audio bitrate:</string>
             </property>
@@ -162,35 +153,77 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Output file:</string>
+             <string>Output file directory:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="fileOutput"/>
+           <widget class="QLineEdit" name="fileOutputDir"/>
           </item>
           <item>
-           <widget class="QLabel" name="albumPlaylistLabel">
+           <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>Render album as:</string>
+             <string>Output file name:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="albumPlaylist">
-            <item>
-             <property name="text">
-              <string>Multiple videos</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Single video</string>
-             </property>
-            </item>
+           <widget class="QLineEdit" name="fileOutputName"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="albumPlaylistLabel">
+         <property name="text">
+          <string>Render album as:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="albumPlaylist">
+         <item>
+          <property name="text">
+           <string>Multiple videos</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Single video</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="ffmpegSettingsAlbum">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="title">
+          <string>FFmpeg settings (album)</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Output file directory:</string>
+            </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="fileOutputDirAlbum"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Output file name:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="fileOutputNameAlbum"/>
           </item>
          </layout>
         </widget>
@@ -211,11 +244,11 @@
        <item>
         <widget class="QGroupBox" name="youtubeSettings">
          <property name="title">
-          <string>YouTube settings</string>
+          <string>YouTube settings (song)</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QLabel" name="label_9">
+           <widget class="QLabel" name="label_19">
             <property name="text">
              <string>Upload as user:</string>
             </property>
@@ -244,7 +277,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_10">
+           <widget class="QLabel" name="label_20">
             <property name="text">
              <string>Video title:</string>
             </property>
@@ -254,7 +287,7 @@
            <widget class="QLineEdit" name="videoTitle"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_11">
+           <widget class="QLabel" name="label_21">
             <property name="text">
              <string>Video description:</string>
             </property>
@@ -264,7 +297,7 @@
            <widget class="QPlainTextEdit" name="videoDescription"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_12">
+           <widget class="QLabel" name="label_22">
             <property name="text">
              <string>Video tags:</string>
             </property>
@@ -281,7 +314,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_13">
+           <widget class="QLabel" name="label_23">
             <property name="text">
              <string>Visibility:</string>
             </property>
@@ -299,6 +332,55 @@
               <string>Unlisted</string>
              </property>
             </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="youtubeSettingsAlbum">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="title">
+          <string>YouTube settings (album)</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_60">
+          <item>
+           <widget class="QLabel" name="label_200">
+            <property name="text">
+             <string>Video title:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="videoTitleAlbum"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_210">
+            <property name="text">
+             <string>Video description:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="videoDescriptionAlbum"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_220">
+            <property name="text">
+             <string>Video tags:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="videoTagsAlbum">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
            </widget>
           </item>
          </layout>

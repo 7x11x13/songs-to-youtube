@@ -1,14 +1,19 @@
 # This Python file uses the following encoding: utf-8
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox, QPushButton, QFileDialog
+from PySide6.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox, QPushButton, QFileDialog, QComboBox, QLabel
 from PySide6.QtGui import QPixmap
 
 from settings import SETTINGS_VALUES, SettingCheckBox, CoverArtDisplay, SettingsScrollArea
-from utils import load_ui, get_all_fields
+from utils import load_ui, get_all_fields, get_field
 from const import SUPPORTED_IMAGE_FILTER, CustomDataRole
+from song_tree_widget_item import *
 
 
 class SongSettingsWidget(QWidget):
+
+    SONG_ONLY_WIDGETS = ((QGroupBox, "ffmpegSettings"), (QGroupBox, "youtubeSettings"))
+    ALBUM_ONLY_WIDGETS = ((QComboBox, "albumPlaylist"), (QLabel, "albumPlaylistLabel"), (QGroupBox, "ffmpegSettingsAlbum"), (QGroupBox, "youtubeSettingsAlbum"))
+
     def __init__(self, *args):
         # which items are currently selected by the song tree widget
         self.tree_indexes = set()
@@ -20,6 +25,8 @@ class SongSettingsWidget(QWidget):
 
         # values of each field when the window is loaded
         self.field_original_values = {}
+
+        self.item_type = TreeWidgetType.ALBUM
 
         super().__init__(*args)
         load_ui("songsettingswindow.ui", (SettingCheckBox, CoverArtDisplay, SettingsScrollArea), self)
@@ -38,7 +45,10 @@ class SongSettingsWidget(QWidget):
         button_box.rejected.connect(self.load_settings)
         for field in get_all_fields(self):
             field.on_update(lambda text, field_name=field.name: self.on_field_updated(field_name, text))
-            if field.name == "uploadYouTube":
+            if field.name == "albumPlaylist":
+                # disable album settings whenever album mode is set to multiple values
+                field.on_update(lambda text: self.set_album_enabled(text != SETTINGS_VALUES.AlbumPlaylist.MULTIPLE))
+            elif field.name == "uploadYouTube":
                 # disable youtube settings whenever 'upload to youtube' is unchecked
                 field.on_update(lambda text: self.set_youtube_enabled(text != SETTINGS_VALUES.CheckBox.UNCHECKED))
 
@@ -47,10 +57,21 @@ class SongSettingsWidget(QWidget):
         self.findChild(CoverArtDisplay).set(file)
 
     def set_youtube_enabled(self, enabled):
-        self.findChild(QGroupBox, "youtubeSettings").setEnabled(enabled)
+        if self.item_type == TreeWidgetType.SONG:
+            self.findChild(QGroupBox, "youtubeSettings").setEnabled(enabled)
+        else:
+            # if album settings are disabled, we can't enable youtube settings
+            enabled = enabled and self.findChild(QGroupBox, "ffmpegSettingsAlbum").isEnabled()
+            self.findChild(QGroupBox, "youtubeSettingsAlbum").setEnabled(enabled)
 
     def set_button_box_enabled(self, enabled):
         self.findChild(QDialogButtonBox).setEnabled(enabled)
+
+    def set_album_enabled(self, enabled):
+        self.findChild(QGroupBox, "ffmpegSettingsAlbum").setEnabled(enabled)
+        # if youtube settings are disabled, we can't enable them
+        enabled = enabled and (get_field(self, "uploadYouTube").get() != SETTINGS_VALUES.CheckBox.UNCHECKED)
+        self.findChild(QGroupBox, "youtubeSettingsAlbum").setEnabled(enabled)
 
     def on_field_updated(self, field, current_value):
         if field not in self.field_original_values:
@@ -83,6 +104,13 @@ class SongSettingsWidget(QWidget):
 
 
     def load_settings(self):
+        # update UI to show/hide appropriate elements
+        # based on the type of items we are editing
+        for widget in self.SONG_ONLY_WIDGETS:
+            self.findChild(*widget).setVisible(self.item_type == TreeWidgetType.SONG)
+        for widget in self.ALBUM_ONLY_WIDGETS:
+            self.findChild(*widget).setVisible(self.item_type == TreeWidgetType.ALBUM)
+
         self.fields_updated = set()
         self.field_original_values = {}
         self.set_button_box_enabled(False)
@@ -108,4 +136,10 @@ class SongSettingsWidget(QWidget):
         self.tree_indexes |= set(selected.indexes())   # add new selected indexes
         self.tree_indexes -= set(deselected.indexes()) # remove deselected indexes
         self.setVisible(len(self.tree_indexes) > 0) # hide window if nothing is selected
-        self.load_settings()
+        if len(self.tree_indexes) > 0:
+            for index in self.tree_indexes:
+                # all indexes will have the same item type
+                # guaranteed by our selection model
+                self.item_type = index.data(CustomDataRole.ITEMTYPE)
+                break
+            self.load_settings()

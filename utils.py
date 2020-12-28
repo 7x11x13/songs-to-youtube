@@ -126,6 +126,15 @@ def get_all_children(obj: QObject):
         yield child
         yield from get_all_children(child)
 
+def get_field(obj: QObject, field):
+    for widget in get_all_children(obj):
+        class_name = widget.metaObject().className()
+        obj_name = widget.objectName()
+        if field == obj_name and class_name in WIDGET_FUNCTIONS:
+            return InputField(widget)
+    logging.warning("Could not find field {}".format(field))
+    return None
+
 def get_all_fields(obj: QObject):
     """Returns all the input widget children of the given object as InputFields"""
     for widget in get_all_children(obj):

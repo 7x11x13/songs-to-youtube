@@ -10,7 +10,6 @@ import atexit
 class TreeWidgetType(IntEnum):
     SONG = 0
     ALBUM = 1
-    PLACEHOLDER = 2
 
 
 class CustomDataRole(IntEnum):
@@ -53,7 +52,10 @@ class SETTINGS_VALUES:
 
 
 SETTINGS_DEFAULTS = {
-    "fileOutput": "~{song_path}.mp4",
+    "fileOutputDir": "~{song_dir}",
+    "fileOutputName": "~{song_file}.mp4",
+    "fileOutputDirAlbum": "~{album_dir}",
+    "fileOutputNameAlbum": "~{song.tags.album}.mp4",
     "coverArt": ":/image/default.jpg",
     "extractCoverArt": SETTINGS_VALUES.CheckBox.CHECKED,
     "backgroundColor": "black",
@@ -69,6 +71,9 @@ SETTINGS_DEFAULTS = {
     "videoDescription": "Uploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTags": "",
     "videoTitle": "~{tags.artist} - ~{tags.title}",
+    "videoDescriptionAlbum": "Uploaded with https://github.com/7x11x13/songs-to-youtube",
+    "videoTagsAlbum": "",
+    "videoTitleAlbum": "~{song.tags.artist} - ~{song.tags.album}",
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC
 }
 
