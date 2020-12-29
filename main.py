@@ -5,7 +5,6 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, Q
 import sys
 import os
 import logging
-import pdb
 import pathlib
 
 from utils import load_ui

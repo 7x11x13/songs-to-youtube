@@ -285,6 +285,6 @@ class Renderer(QObject):
         self.working = True
         if len(self.workers) == 0:
             self.working = False
-            self.finished.emit(results)
+            self.finished.emit(self.results)
         for i in range(min(int(get_setting("maxProcesses")), len(self.threads))):
             self.threads[i].start()
