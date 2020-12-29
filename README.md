@@ -20,7 +20,7 @@ Convert audio files to videos and upload them to YouTube automatically.
 Download the source code and run `py main.py`
 
 ## Notes
-This is far from finished; there are probably a lot of bugs, and many features to be implemented. This application works best when all your songs have been properly tagged.
+You must login once on the first upload. This is far from finished; there are probably a lot of bugs, and many features to be implemented. This application works best when all your songs have been properly tagged.
 
 ### Template strings
 Write `~{key}` in any text field and it will be replaced with an appropriate value. For now there is no way to see what keys are available for each item, but here are some useful ones:
