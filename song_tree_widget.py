@@ -168,6 +168,10 @@ class SongTreeWidget(QTreeView):
         item.setText(QFileInfo(path).fileName())
         self.addTopLevelItem(item)
 
+    def remove_all(self):
+        if self.model().hasChildren():
+            self.model().removeRows(0, self.model().rowCount())
+
     def get_renderer(self):
         renderer = Renderer()
         for row in range(self.model().rowCount()):

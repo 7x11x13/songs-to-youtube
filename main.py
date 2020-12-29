@@ -47,6 +47,7 @@ class MainWindow(QMainWindow):
         logging.info("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
         self.ui.splitter.setEnabled(True)
         del self.uploader
+        self.ui.treeWidget.remove_all()
 
 
     def on_render_finished(self, results):
@@ -54,6 +55,9 @@ class MainWindow(QMainWindow):
         # upload to youtube
         self.uploader = self.ui.treeWidget.get_uploader(results)
         self.uploader.finished.connect(self.on_upload_finished)
+        if not self.uploader.is_uploading():
+            # no upload jobs, we are finished
+            self.on_upload_finished({})
         del self.renderer
 
     def render(self):

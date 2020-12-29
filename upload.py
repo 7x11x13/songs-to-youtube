@@ -59,8 +59,8 @@ class Uploader(QObject):
         thread = UploadThread(file_path, metadata, self.on_done_uploading)
         self.threads.append(thread)
         if not self.uploading:
-            thread.start()
             self.uploading = True
+            thread.start()
 
     def add_upload_album_job(self, album: AlbumTreeWidgetItem):
         if album.childCount() == 0:
@@ -81,3 +81,6 @@ class Uploader(QObject):
             if self.render_results[file]:
                 metadata = {'title': song.get('videoTitle'), 'description': song.get('videoDescription')}
                 self._upload(file, metadata)
+
+    def is_uploading(self):
+        return self.uploading
