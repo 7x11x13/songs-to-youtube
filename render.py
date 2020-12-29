@@ -170,7 +170,7 @@ class AlbumRenderHelper:
 class Renderer(QObject):
 
     # emit true on success, false on failure
-    finished = Signal(bool)
+    finished = Signal(dict)
 
     # worker name, worker progress (percentage)
     worker_progress = Signal(str, int)
@@ -182,14 +182,18 @@ class Renderer(QObject):
     worker_done = Signal(str)
 
     def __init__(self):
-        self.success = True
         # threads to be worked on
         self.threads = []
 
         # workers -> threads dict
         self.workers = {}
 
+        # array of album helpers so they
+        # don't get garbage collected
         self.helpers = []
+
+        # output file -> success
+        self.results = {}
 
         self.working = False
         super().__init__()
@@ -205,9 +209,9 @@ class Renderer(QObject):
 
     def worker_finished(self, worker, thread, success):
         self.worker_done.emit(str(worker))
+        self.results[str(worker)] = success
         thread.quit()
         worker.deleteLater()
-        self.success = self.success and success
         logging.debug("{} finished, success: {}".format(str(worker), success))
 
     def thread_finished(self, thread):
@@ -220,7 +224,7 @@ class Renderer(QObject):
         if len(self.threads) == 0:
             self.working = False
         if len(self.workers) == 0:
-            self.finished.emit(self.success)
+            self.finished.emit(self.results)
         # find first unstarted thread and start it
         for thread in self.threads:
             if not thread.isRunning():
@@ -281,6 +285,6 @@ class Renderer(QObject):
         self.working = True
         if len(self.workers) == 0:
             self.working = False
-            self.finished.emit(True)
+            self.finished.emit(results)
         for i in range(min(int(get_setting("maxProcesses")), len(self.threads))):
             self.threads[i].start()

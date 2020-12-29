@@ -54,9 +54,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-1035</y>
+        <y>-598</y>
         <width>433</width>
-        <height>1484</height>
+        <height>1406</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -368,35 +368,6 @@
           <string>YouTube defaults (song)</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <widget class="QLabel" name="label_19">
-            <property name="text">
-             <string>Upload as user:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="userSelect"/>
-          </item>
-          <item alignment="Qt::AlignRight">
-           <widget class="QPushButton" name="addUser">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>150</width>
-              <height>50</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Add new user...</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QLabel" name="label_20">
             <property name="text">

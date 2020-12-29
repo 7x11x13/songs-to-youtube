@@ -26,9 +26,8 @@ class SettingTemplate(Template):
 
 class TreeWidgetItemData:
     SONG_FIELDS = set(('audioBitrate', 'backgroundColor', 'videoHeight', 'videoWidth',
-                       'uploadYouTube', 'coverArt', 'userSelect',
-                       'videoDescription', 'videoTags', 'videoTitle', 'videoVisibility',
-                       'fileOutputDir', 'fileOutputName'))
+                       'uploadYouTube', 'coverArt', 'videoDescription', 'videoTags',
+                       'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName'))
     ALBUM_FIELDS = set(('albumPlaylist', 'fileOutputDirAlbum', 'fileOutputNameAlbum',
                         'uploadYouTube', 'videoDescriptionAlbum', 'videoTagsAlbum', 'videoTitleAlbum'))
     def __init__(self, item_type, songs=None, **kwargs):

@@ -9,7 +9,8 @@ from enum import IntEnum
 from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories
 from settings import SETTINGS_VALUES, get_setting
 from song_tree_widget_item import *
-from render import *
+from render import Renderer
+from upload import Uploader
 
 
 class SongTreeModel(QStandardItemModel):
@@ -171,8 +172,18 @@ class SongTreeWidget(QTreeView):
         renderer = Renderer()
         for row in range(self.model().rowCount()):
             item = self.model().item(row)
-            if item.item_type() == TreeWidgetType.ALBUM:
+            if item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM:
                 renderer.add_render_album_job(item)
-            elif item.item_type() == TreeWidgetType.SONG:
+            elif item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
                 renderer.add_render_song_job(item)
         return renderer
+
+    def get_uploader(self, render_results):
+        uploader = Uploader(render_results)
+        for row in range(self.model().rowCount()):
+            item = self.model().item(row)
+            if item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM:
+                uploader.add_upload_album_job(item)
+            elif item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
+                uploader.add_upload_song_job(item)
+        return uploader

@@ -67,7 +67,6 @@ SETTINGS_DEFAULTS = {
     "videoWidth": "1280",
     "uploadYouTube": SETTINGS_VALUES.CheckBox.UNCHECKED,
     "albumPlaylist": SETTINGS_VALUES.AlbumPlaylist.MULTIPLE,
-    "userSelect": "",
     "videoDescription": "Uploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTags": "",
     "videoTitle": "~{tags.artist} - ~{tags.title}",

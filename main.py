@@ -1,11 +1,12 @@
 # This Python file uses the following encoding: utf-8
-from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, QListView, QTreeView, QAbstractItemView
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, QListView, QTreeView, QAbstractItemView, QMessageBox
 
 
 import sys
 import os
 import logging
 import pdb
+import pathlib
 
 from utils import load_ui
 
@@ -42,9 +43,18 @@ class MainWindow(QMainWindow):
             for album in paths:
                 self.ui.treeWidget.addAlbum(album)
 
-    def on_render_finished(self, success):
-        logging.info("Render success: {}".format(success))
+    def on_upload_finished(self, results):
+        logging.info("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
         self.ui.splitter.setEnabled(True)
+        del self.uploader
+
+
+    def on_render_finished(self, results):
+        logging.info("{}/{} renders successful".format(sum(int(s) for s in results.values()),len(results)))
+        # upload to youtube
+        self.uploader = self.ui.treeWidget.get_uploader(results)
+        self.uploader.finished.connect(self.on_upload_finished)
+        del self.renderer
 
     def render(self):
         self.ui.splitter.setEnabled(False)

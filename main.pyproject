@@ -1,3 +1,3 @@
 {
-    "files": ["ui/songsettingswindow.ui","utils.py","progress_window.py","const.py","render.py","settings.py","song_settings_widget.py","resource.py","test/test_song_tree_widget.py","resource.qrc","ui/settingswindow.ui","main.py","song_tree_widget.py","ui/mainwindow.ui","log.py","song_tree_widget_item.py"]
+    "files": ["settings.py","main.py","youtube_uploader_selenium/Constant.py","progress_window.py","resource.qrc","song_settings_widget.py","ui/settingswindow.ui","utils.py","test/test_song_tree_widget.py","youtube_uploader_selenium/__init__.py","log.py","ui/mainwindow.ui","resource.py","song_tree_widget.py","song_tree_widget_item.py","ui/songsettingswindow.ui","const.py","render.py","upload.py"]
 }
