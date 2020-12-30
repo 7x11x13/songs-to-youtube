@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-577</y>
         <width>423</width>
-        <height>1198</height>
+        <height>1245</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -283,6 +283,16 @@
              </size>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Playlist name:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="playlistName"/>
           </item>
           <item>
            <widget class="QLabel" name="label_23">

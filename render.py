@@ -276,6 +276,7 @@ class Renderer(QObject):
             self.helpers.append(AlbumRenderHelper(album).render(self))
         elif album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.MULTIPLE:
             for song in album.getChildren():
+                song.before_render()
                 self.add_render_song_job(song)
 
     def add_render_song_job(self, song: SongTreeWidgetItem):

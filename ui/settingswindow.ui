@@ -54,9 +54,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-221</y>
+        <y>-798</y>
         <width>433</width>
-        <height>1431</height>
+        <height>1478</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -414,6 +414,16 @@
              </size>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Playlist name:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="playlistName"/>
           </item>
           <item>
            <widget class="QLabel" name="label_23">

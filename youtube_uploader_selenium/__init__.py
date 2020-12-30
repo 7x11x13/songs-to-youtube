@@ -80,6 +80,8 @@ class YouTubeUploader:
         self.logger.debug('The video title was set to \"{}\"'.format(self.metadata_dict[Constant.VIDEO_TITLE]))
 
         video_description = self.metadata_dict[Constant.VIDEO_DESCRIPTION]
+        tags = self.metadata_dict[Constant.TAGS]
+        playlist = self.metadata_dict[Constant.PLAYLIST]
         if video_description:
             description_container = self.browser.find(By.XPATH,
                                                       Constant.DESCRIPTION_CONTAINER)
@@ -88,9 +90,45 @@ class YouTubeUploader:
             time.sleep(Constant.USER_WAITING_TIME)
             description_field.clear()
             time.sleep(Constant.USER_WAITING_TIME)
-            description_field.send_keys(self.metadata_dict[Constant.VIDEO_DESCRIPTION])
+            description_field.send_keys(video_description)
             self.logger.debug(
-                'The video description was set to \"{}\"'.format(self.metadata_dict[Constant.VIDEO_DESCRIPTION]))
+                'The video description was set to \"{}\"'.format(video_description))
+        if playlist:
+            self.browser.find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
+            time.sleep(Constant.USER_WAITING_TIME)
+            checkbox = self.browser.find(
+                By.XPATH, "//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][contains(text(), '{}')]]/ytcp-checkbox-lit".format(playlist)
+            )
+            if checkbox is None:
+                self.logger.info("Could not find playlist checkbox, attempting to create new playlist")
+                self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON).click()
+                time.sleep(Constant.USER_WAITING_TIME)
+                playlist_title = self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_TITLE)
+                if playlist_title is None:
+                    logging.error("Could not find playlist title field")
+                    return False, None
+                playlist_title.click()
+                time.sleep(Constant.USER_WAITING_TIME)
+                playlist_title.send_keys(playlist)
+                time.sleep(Constant.USER_WAITING_TIME)
+                self.browser.find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
+                time.sleep(Constant.USER_WAITING_TIME)
+                checkbox = self.browser.find(
+                    By.XPATH, "//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][contains(text(), '{}')]]/ytcp-checkbox-lit".format(playlist)
+                )
+            if checkbox is None:
+                logging.error("Could not find playlist: {}".format(playlist))
+            else:
+                checkbox.click()
+                time.sleep(Constant.USER_WAITING_TIME)
+                self.browser.find(By.XPATH, Constant.PLAYLIST_DONE_BUTTON).click()
+                time.sleep(Constant.USER_WAITING_TIME)
+
+        if tags:
+            self.browser.find(By.XPATH, Constant.MORE_OPTIONS_CONTAINER).click()
+            time.sleep(Constant.USER_WAITING_TIME)
+            self.browser.find(By.XPATH, Constant.TAGS_TEXT_INPUT).send_keys(tags)
+            time.sleep(Constant.USER_WAITING_TIME)
 
         kids_section = self.browser.find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
         self.browser.find(By.ID, Constant.RADIO_LABEL, kids_section).click()

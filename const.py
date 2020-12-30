@@ -65,10 +65,11 @@ SETTINGS_DEFAULTS = {
     "logLevel": SETTINGS_VALUES.LogLevel.DEBUG,
     "videoHeight": "720",
     "videoWidth": "1280",
-    "uploadYouTube": SETTINGS_VALUES.CheckBox.UNCHECKED,
+    "uploadYouTube": SETTINGS_VALUES.CheckBox.CHECKED,
     "albumPlaylist": SETTINGS_VALUES.AlbumPlaylist.MULTIPLE,
     "videoDescription": "Uploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTags": "",
+    "playlistName": "~{tags.artist} - ~{tags.album}",
     "videoTitle": "~{tags.artist} - ~{tags.title}",
     "videoDescriptionAlbum": "~{timestamps}\nUploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTagsAlbum": "",
@@ -76,6 +77,13 @@ SETTINGS_DEFAULTS = {
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC,
     "inputFrameRate": "5"
 }
+
+SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',
+                   'uploadYouTube', 'coverArt', 'videoDescription', 'videoTags',
+                   'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName',
+                   'playlistName'))
+ALBUM_FIELDS = set(('albumPlaylist', 'fileOutputDirAlbum', 'fileOutputNameAlbum',
+                    'uploadYouTube', 'videoDescriptionAlbum', 'videoTagsAlbum', 'videoTitleAlbum'))
 
 
 QDir.temp().mkdir(APPLICATION)

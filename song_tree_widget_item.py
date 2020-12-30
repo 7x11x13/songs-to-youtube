@@ -26,15 +26,10 @@ class SettingTemplate(Template):
     braceidpattern = r"[^{}]*"
 
 class TreeWidgetItemData:
-    SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',
-                       'uploadYouTube', 'coverArt', 'videoDescription', 'videoTags',
-                       'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName'))
-    ALBUM_FIELDS = set(('albumPlaylist', 'fileOutputDirAlbum', 'fileOutputNameAlbum',
-                        'uploadYouTube', 'videoDescriptionAlbum', 'videoTagsAlbum', 'videoTitleAlbum'))
     def __init__(self, item_type, songs=None, **kwargs):
         self.metadata = {}
         self.dict = {}
-        app_fields = self.SONG_FIELDS if item_type == TreeWidgetType.SONG else self.ALBUM_FIELDS
+        app_fields = SONG_FIELDS if item_type == TreeWidgetType.SONG else ALBUM_FIELDS
         for field in (set(kwargs.keys()) | app_fields):
             # set all mandatory settings to their defaults if not
             # specified in the parameters

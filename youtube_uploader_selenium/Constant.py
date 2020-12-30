@@ -7,10 +7,21 @@ class Constant:
     USER_AVATAR_XPATH = '//img[@id="img"][@alt="Avatar image"]'
     VIDEO_TITLE = 'title'
     VIDEO_DESCRIPTION = 'description'
+    PLAYLIST = 'playlist'
+    TAGS = 'tags'
     DESCRIPTION_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/' \
                             'ytcp-uploads-details/div/ytcp-uploads-basics/ytcp-mention-textbox[2]'
     MORE_OPTIONS_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/' \
                              'ytcp-uploads-details/div/div/ytcp-button/div'
+    PLAYLIST_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/' \
+                         'ytcp-uploads-details/div/ytcp-uploads-basics/ytcp-video-metadata-playlists/' \
+                         'ytcp-text-dropdown-trigger/ytcp-dropdown-trigger/div'
+    PLAYLIST_NEW_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/ytcp-button[1]/div'
+    PLAYLIST_NEW_TITLE = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/div[1]/ytcp-form-textarea/div/textarea'
+    PLAYLIST_DONE_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/ytcp-button[3]/div'
+    PLAYLIST_CREATE_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[3]/ytcp-button[2]/div'
+    TAGS_TEXT_INPUT = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/ytcp-uploads-details/div/' \
+                       'ytcp-uploads-advanced/ytcp-form-input-container/div[1]/div[2]/ytcp-free-text-chip-bar/ytcp-chip-bar/div/input'
     TEXTBOX = 'textbox'
     TEXT_INPUT = 'text-input'
     RADIO_LABEL = 'radioLabel'
