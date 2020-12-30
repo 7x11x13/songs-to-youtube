@@ -13,7 +13,7 @@ from utils import load_ui
 from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
 from log import LogWidget
-from settings import SettingsWindow
+from settings import SettingsWindow, get_setting, SETTINGS_VALUES
 from progress_window import ProgressWindow
 
 
@@ -46,6 +46,10 @@ class MainWindow(QMainWindow):
         logging.info("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
         self.ui.splitter.setEnabled(True)
         del self.uploader
+        if get_setting("deleteAfterUploading") == SETTINGS_VALUES.CheckBox.CHECKED:
+            for path, success in results.items():
+                if success:
+                    os.remove(path)
         self.ui.treeWidget.remove_all()
 
 

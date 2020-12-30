@@ -179,9 +179,11 @@ class SongTreeWidget(QTreeView):
             item = self.model().item(row)
             if item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM:
                 item = AlbumTreeWidgetItem.from_standard_item(item)
+                item.before_render()
                 renderer.add_render_album_job(item)
             elif item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
                 item = SongTreeWidgetItem.from_standard_item(item)
+                item.before_render()
                 renderer.add_render_song_job(item)
         return renderer
 

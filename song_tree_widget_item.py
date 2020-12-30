@@ -6,6 +6,7 @@ from enum import IntEnum
 import audio_metadata
 import logging
 import os
+import datetime
 from string import Template
 
 from const import *
@@ -85,9 +86,11 @@ class TreeWidgetItemData:
                         self.metadata[key] = value
                     break
 
+        self.update_fields()
+
+    def update_fields(self):
         for field, value in self.dict.items():
             self.set_value(field, value)
-
 
     def to_dict(self):
         dict = {**self.dict, **self.metadata}
@@ -159,8 +162,8 @@ class SongTreeWidgetItem(QStandardItem):
     def get_duration_ms(self):
         return self.data(CustomDataRole.ITEMDATA).get_duration_ms()
 
-    def get_file_output(self):
-        return os.path.join(self.get("fileOutputDir"), self.get("fileOutputName"))
+    def before_render(self):
+        self.data(CustomDataRole.ITEMDATA).set_value("fileOutput", os.path.join(self.get("fileOutputDir"), self.get("fileOutputName")))
 
     def get_track_number(self):
         return self.data(CustomDataRole.ITEMDATA).get_track_number()
@@ -226,6 +229,16 @@ class AlbumTreeWidgetItem(QStandardItem):
     def get_duration_ms(self):
         return sum(song.get_duration_ms() for song in self.getChildren())
 
-    def get_file_output(self):
-        return os.path.join(self.get("fileOutputDirAlbum"), self.get("fileOutputNameAlbum"))
+    def before_render(self):
+        self.data(CustomDataRole.ITEMDATA).set_value("fileOutput", os.path.join(self.get("fileOutputDirAlbum"), self.get("fileOutputNameAlbum")))
+
+        # generate timestamps
+        timestamp = 0
+        timestamp_str = ""
+        for song in self.getChildren():
+            timestamp_str += "{} {}\n".format(datetime.timedelta(seconds=int(timestamp)), song.get("videoTitle"))
+            timestamp += song.get_duration_ms() / 1000
+        data = self.data(CustomDataRole.ITEMDATA)
+        data.set_value("timestamps", timestamp_str)
+        data.update_fields()
 

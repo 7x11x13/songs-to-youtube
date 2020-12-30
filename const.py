@@ -52,6 +52,7 @@ class SETTINGS_VALUES:
 
 
 SETTINGS_DEFAULTS = {
+    "deleteAfterUploading": SETTINGS_VALUES.CheckBox.CHECKED,
     "fileOutputDir": "~{song_dir}",
     "fileOutputName": "~{song_file}.mp4",
     "fileOutputDirAlbum": "~{album_dir}",
@@ -70,7 +71,7 @@ SETTINGS_DEFAULTS = {
     "videoDescription": "Uploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTags": "",
     "videoTitle": "~{tags.artist} - ~{tags.title}",
-    "videoDescriptionAlbum": "Uploaded with https://github.com/7x11x13/songs-to-youtube",
+    "videoDescriptionAlbum": "~{timestamps}\nUploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTagsAlbum": "",
     "videoTitleAlbum": "~{song.tags.artist} - ~{song.tags.album}",
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC

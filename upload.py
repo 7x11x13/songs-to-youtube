@@ -69,7 +69,7 @@ class Uploader(QObject):
             return
         if album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.SINGLE:
             if album.get('uploadYouTube') == SETTINGS_VALUES.CheckBox.CHECKED:
-                file = album.get_file_output()
+                file = album.get("fileOutput")
                 if self.render_results[file]:
                     metadata = {'title': album.get('videoTitleAlbum'), 'description': album.get('videoDescriptionAlbum')}
                     self._upload(file, metadata)
@@ -79,7 +79,7 @@ class Uploader(QObject):
 
     def add_upload_song_job(self, song: SongTreeWidgetItem):
         if song.get('uploadYouTube') == SETTINGS_VALUES.CheckBox.CHECKED:
-            file = song.get_file_output()
+            file = song.get("fileOutput")
             if self.render_results[file]:
                 metadata = {'title': song.get('videoTitle'), 'description': song.get('videoDescription')}
                 self._upload(file, metadata)

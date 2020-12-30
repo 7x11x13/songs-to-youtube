@@ -7,6 +7,7 @@ import logging
 import time
 import traceback
 import atexit
+import os
 from threading import Thread
 from queue import Queue
 
@@ -73,9 +74,7 @@ class RenderSongWorker(QObject):
             command_str = ("ffmpeg -loglevel error -progress pipe:1 -y -loop 1 -i \"{coverArt}\" -i \"{song_path}\" "
             "-vf \"scale='min({videoWidth}, iw)':'min({videoHeight}, ih)':force_original_aspect_ratio=decrease,"
             "pad={videoWidth}:{videoHeight}:-1:-1:color={backgroundColor}\" "
-            '-c:a aac -ab {audioBitrate} -c:v libx264 -pix_fmt yuv420p -shortest -strict -2 "{fileOutputPath}"').format(
-                fileOutputPath=self.song.get_file_output(),
-                **self.song.to_dict())
+            '-c:a aac -ab {audioBitrate} -c:v libx264 -pix_fmt yuv420p -shortest -strict -2 "{fileOutput}"').format(**self.song.to_dict())
 
             handler = ProcessHandler()
             handler.stderr.connect(self.error.emit)
@@ -90,7 +89,7 @@ class RenderSongWorker(QObject):
         return self.song.get_duration_ms()
 
     def __str__(self):
-        return self.song.get_file_output()
+        return self.song.get("fileOutput")
 
 class CombineSongWorker(QObject):
     finished = Signal(bool)
@@ -107,16 +106,19 @@ class CombineSongWorker(QObject):
             song_list.open(QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text)
             # song_list.setAutoRemove(False)
             for song in self.album.getChildren():
-                song_list.write(QByteArray("file 'file:{}'\n".format(song.get_file_output())))
+                song_list.write(QByteArray("file 'file:{}'\n".format(song.get("fileOutput"))))
             song_list.close()
             command_str = ("ffmpeg -loglevel error -progress pipe:1 -y -f concat "
                            "-safe 0 -i \"{input_file_list}\" -c copy \"{fileOutputPath}\"").format(
                                 input_file_list=song_list.fileName(),
-                                fileOutputPath=self.album.get_file_output())
+                                fileOutputPath=self.album.get("fileOutput"))
             handler = ProcessHandler()
             handler.stderr.connect(self.error.emit)
             handler.stdout.connect(self.progress.emit)
             errors = handler.run(command_str)
+            if not errors:
+                for song in self.album.getChildren():
+                    os.remove(song.get("fileOutput"))
             self.finished.emit(not errors)
         except Exception as e:
             self.error.emit(traceback.format_exc())
@@ -126,7 +128,7 @@ class CombineSongWorker(QObject):
         return self.album.get_duration_ms()
 
     def __str__(self):
-        return self.album.get_file_output()
+        return self.album.get("fileOutput")
 
 
 class AlbumRenderHelper:
@@ -139,7 +141,8 @@ class AlbumRenderHelper:
         self.error = False
 
     def worker_done(self, worker):
-        self.workers.discard(worker)
+        if worker in self.workers:
+            self.workers.discard(worker)
         if len(self.workers) == 0 and not self.error:
             # done rendering songs,
             # begin concatenation
@@ -158,6 +161,7 @@ class AlbumRenderHelper:
         renderer.worker_done.connect(self.worker_done)
         renderer.worker_error.connect(self.worker_error)
         for song in self.album.getChildren():
+            song.before_render()
             worker = renderer.add_render_song_job(song)
             self.workers.add(worker)
         self.combine_worker = renderer.combine_songs_into_album(self.album)
