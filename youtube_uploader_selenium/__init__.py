@@ -67,7 +67,7 @@ class YouTubeUploader:
         self.browser.find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(absolute_video_path)
         self.logger.debug('Attached video {}'.format(self.video_path))
         time.sleep(Constant.USER_WAITING_TIME)
-        if (title_field := self.browser.find(By.ID, Constant.TEXTBOX, timeout=10)) is None:
+        if (title_field := self.browser.find(By.ID, Constant.TEXTBOX, timeout=30)) is None:
             self.logger.error('Could not find title field')
             return False, None
         title_field.click()

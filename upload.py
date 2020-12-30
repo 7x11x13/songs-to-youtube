@@ -6,6 +6,7 @@ from queue import Queue
 from threading import Thread
 import logging
 import traceback
+import time
 
 from youtube_uploader_selenium import YouTubeUploader
 from song_tree_widget_item import *
@@ -21,6 +22,7 @@ class UploadThread(Thread):
     def run(self):
         try:
             self.uploader = YouTubeUploader(self.file_path, self.metadata)
+            time.sleep(5)
             success, video_id = self.uploader.upload()
             if success:
                 logging.info("Successfully uploaded {}, link at: https://youtube.com/watch?v={}".format(self.file_path, video_id))

@@ -36,7 +36,8 @@ class SongTreeModel(QStandardItemModel):
                     elif item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
                         indexes.append(index)
             data = dummy_model.mimeData(indexes)
-        return super().dropMimeData(data, action, row, column, parent)
+        ret = super().dropMimeData(data, action, row, column, parent)
+        return ret
 
 
 class SongTreeSelectionModel(QItemSelectionModel):
@@ -177,8 +178,10 @@ class SongTreeWidget(QTreeView):
         for row in range(self.model().rowCount()):
             item = self.model().item(row)
             if item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM:
+                item = AlbumTreeWidgetItem.from_standard_item(item)
                 renderer.add_render_album_job(item)
             elif item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
+                item = SongTreeWidgetItem.from_standard_item(item)
                 renderer.add_render_song_job(item)
         return renderer
 
@@ -187,7 +190,9 @@ class SongTreeWidget(QTreeView):
         for row in range(self.model().rowCount()):
             item = self.model().item(row)
             if item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM:
+                item = AlbumTreeWidgetItem.from_standard_item(item)
                 uploader.add_upload_album_job(item)
             elif item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
+                item = SongTreeWidgetItem.from_standard_item(item)
                 uploader.add_upload_song_job(item)
         return uploader

@@ -165,6 +165,15 @@ class SongTreeWidgetItem(QStandardItem):
     def get_track_number(self):
         return self.data(CustomDataRole.ITEMDATA).get_track_number()
 
+    @classmethod
+    def from_standard_item(cls, item: QStandardItem):
+        for name, value in cls.__dict__.items():
+            if callable(value) and name != '__init__':
+                bound = value.__get__(item)
+                setattr(item, name, bound)
+        return item
+
+
 
 class AlbumTreeWidgetItem(QStandardItem):
     def __init__(self, dir_path, songs, *args):
@@ -199,12 +208,20 @@ class AlbumTreeWidgetItem(QStandardItem):
 
     def getChildren(self):
         for i in range(self.childCount()):
-            yield self.child(i)
+            yield SongTreeWidgetItem.from_standard_item(self.child(i))
 
     @staticmethod
     def getChildrenFromStandardItem(item: QStandardItem):
         for i in range(item.rowCount()):
             yield item.child(i)
+
+    @classmethod
+    def from_standard_item(cls, item: QStandardItem):
+        for name, value in cls.__dict__.items():
+            if callable(value) and name != '__init__':
+                bound = value.__get__(item)
+                setattr(item, name, bound)
+        return item
 
     def get_duration_ms(self):
         return sum(song.get_duration_ms() for song in self.getChildren())
