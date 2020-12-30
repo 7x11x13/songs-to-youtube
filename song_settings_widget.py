@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox, Q
 from PySide6.QtGui import QPixmap
 
 from settings import SETTINGS_VALUES, SettingCheckBox, CoverArtDisplay, SettingsScrollArea
-from utils import load_ui, get_all_fields, get_field
+from utils import load_ui, get_all_fields, get_all_visible_fields, get_field
 from const import SUPPORTED_IMAGE_FILTER, CustomDataRole
 from song_tree_widget_item import *
 
@@ -95,7 +95,7 @@ class SongSettingsWidget(QWidget):
         self.field_original_values = {}
         self.set_button_box_enabled(False)
         for data in {i.data(CustomDataRole.ITEMDATA) for i in self.tree_indexes}:  
-            for field in get_all_fields(self):
+            for field in get_all_visible_fields(self):
                 value = field.get()
                 if value != SETTINGS_VALUES.MULTIPLE_VALUES:
                     data.set_value(field.name, value)
@@ -116,7 +116,7 @@ class SongSettingsWidget(QWidget):
         self.set_button_box_enabled(False)
         items = [i.data(CustomDataRole.ITEMDATA).to_dict() for i in self.tree_indexes]
         # set settings based on selected items
-        for field in get_all_fields(self):
+        for field in get_all_visible_fields(self):
             values = {dict(i)[field.name] for i in items if field.name in i}
             if len(values) == 0:
                 continue

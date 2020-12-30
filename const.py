@@ -54,16 +54,15 @@ class SETTINGS_VALUES:
 SETTINGS_DEFAULTS = {
     "deleteAfterUploading": SETTINGS_VALUES.CheckBox.CHECKED,
     "fileOutputDir": "~{song_dir}",
-    "fileOutputName": "~{song_file}.mp4",
+    "fileOutputName": "~{song_file}.avi",
     "fileOutputDirAlbum": "~{album_dir}",
-    "fileOutputNameAlbum": "~{song.tags.album}.mp4",
+    "fileOutputNameAlbum": "~{song.tags.album}.avi",
     "coverArt": ":/image/default.jpg",
     "extractCoverArt": SETTINGS_VALUES.CheckBox.CHECKED,
     "backgroundColor": "black",
     "dragAndDropBehavior": SETTINGS_VALUES.DragAndDrop.ALBUM_MODE,
     "maxProcesses": "8",
     "logLevel": SETTINGS_VALUES.LogLevel.DEBUG,
-    "audioBitrate": "384k",
     "videoHeight": "720",
     "videoWidth": "1280",
     "uploadYouTube": SETTINGS_VALUES.CheckBox.UNCHECKED,
@@ -74,7 +73,8 @@ SETTINGS_DEFAULTS = {
     "videoDescriptionAlbum": "~{timestamps}\nUploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTagsAlbum": "",
     "videoTitleAlbum": "~{song.tags.artist} - ~{song.tags.album}",
-    "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC
+    "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC,
+    "inputFrameRate": "5"
 }
 
 

@@ -8,12 +8,13 @@ import logging
 import pathlib
 
 from utils import load_ui
+from const import SETTINGS_VALUES
 
 # Custom widgets
 from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
 from log import LogWidget
-from settings import SettingsWindow, get_setting, SETTINGS_VALUES
+from settings import SettingsWindow, get_setting
 from progress_window import ProgressWindow
 
 

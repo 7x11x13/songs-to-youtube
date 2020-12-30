@@ -26,7 +26,7 @@ class SettingTemplate(Template):
     braceidpattern = r"[^{}]*"
 
 class TreeWidgetItemData:
-    SONG_FIELDS = set(('audioBitrate', 'backgroundColor', 'videoHeight', 'videoWidth',
+    SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',
                        'uploadYouTube', 'coverArt', 'videoDescription', 'videoTags',
                        'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName'))
     ALBUM_FIELDS = set(('albumPlaylist', 'fileOutputDirAlbum', 'fileOutputNameAlbum',

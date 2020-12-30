@@ -54,7 +54,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-221</y>
         <width>433</width>
         <height>1431</height>
        </rect>
@@ -267,19 +267,22 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_26">
+           <widget class="QLabel" name="label_9">
             <property name="text">
-             <string>Audio bitrate:</string>
+             <string>Input frame rate (lower = faster render, higher = more accurate video length):</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="audioBitrate">
+           <widget class="QSpinBox" name="inputFrameRate">
             <property name="suffix">
-             <string>k</string>
+             <string/>
+            </property>
+            <property name="minimum">
+             <number>1</number>
             </property>
             <property name="maximum">
-             <number>99999</number>
+             <number>1000</number>
             </property>
            </widget>
           </item>
