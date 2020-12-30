@@ -119,8 +119,12 @@ class TreeWidgetItemData:
 
     def get_track_number(self):
         if 'tags.tracknumber' in self.metadata:
-            return self.metadata['tags.tracknumber']
-        return ""
+            try:
+                return int(self.metadata['tags.tracknumber'])
+            except:
+                logging.warning("Could not convert {} to int".format(self.metadata['tags.tracknumber']))
+                return 0
+        return 0
 
     def __str__(self):
         return str(self.dict)
