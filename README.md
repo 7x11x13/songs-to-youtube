@@ -32,6 +32,7 @@ Write `~{key}` in any text field and it will be replaced with an appropriate val
 - `~{tags.title}` - name of the song
 #### Album metadata
 - `~{album_dir}` - directory of the album
+- `~{timestamps}` - special key that generates timestamps based on song lengths
 - `~{song.tags.artist}` - name of the album's artist (usually)
 
 The first song of an album can have its keys accessed by the album by prefixing the key with `song.`
