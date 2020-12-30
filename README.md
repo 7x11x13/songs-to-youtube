@@ -20,7 +20,9 @@ Convert audio files to videos and upload them to YouTube automatically.
 Download the source code and run `py main.py`
 
 ## Notes
-You must login once on the first upload. This is far from finished; there are probably a lot of bugs, and many features to be implemented. This application works best when all your songs have been properly tagged.
+- You must login once on the first upload.
+- If you don't care about the accuracy of the produced video length, set the input frame rate to 1 to render as fast as possible.
+  If you care about the accuracy (e.g. to produce accurate timestamps for album descriptions) set the input frame rate to at least 10
 
 ### Template strings
 Write `~{key}` in any text field and it will be replaced with an appropriate value. For now there is no way to see what keys are available for each item, but here are some useful ones:
