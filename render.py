@@ -199,12 +199,15 @@ class Renderer(QObject):
         super().__init__()
 
     def _worker_progress(self, worker, progress):
-        key, value = progress.strip().split("=")
-        if key == "out_time_us":
-            current_time_ms = int(value) // 1000
-            total_time_ms = worker.get_duration_ms()
-            progress = min(int((current_time_ms / total_time_ms) * 100), 100)
-            self.worker_progress.emit(str(worker), progress)
+        try:
+            key, value = progress.strip().split("=")
+            if key == "out_time_us":
+                current_time_ms = int(value) // 1000
+                total_time_ms = worker.get_duration_ms()
+                progress = max(0, min(int((current_time_ms / total_time_ms) * 100), 100))
+                self.worker_progress.emit(str(worker), progress)
+        except:
+            logging.warning("Could not parse worker_progress line: {}".format(progress))
 
 
     def worker_finished(self, worker, thread, success):
