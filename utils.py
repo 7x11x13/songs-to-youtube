@@ -1,5 +1,6 @@
 # This Python file uses the following encoding: utf-8
 from PySide6.QtCore import QDirIterator, QDir, QFileInfo, QMimeDatabase, QObject, QFile, Qt, QByteArray, QBuffer, QIODevice
+from PySide6.QtWidgets import QWidget
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QPixmap
 
@@ -139,8 +140,16 @@ def get_all_fields(obj: QObject):
     """Returns all the input widget children of the given object as InputFields"""
     for widget in get_all_children(obj):
         class_name = widget.metaObject().className()
-        if class_name in WIDGET_FUNCTIONS:
+        if class_name in WIDGET_FUNCTIONS and widget.objectName() != "qt_spinbox_lineedit":
             yield InputField(widget)
+
+def get_all_visible_fields(obj: QObject):
+    """Returns all visible InputFields"""
+    for widget in get_all_children(obj):
+        if isinstance(widget, QWidget) and widget.isVisible():
+            class_name = widget.metaObject().className()
+            if class_name in WIDGET_FUNCTIONS and widget.objectName() != "qt_spinbox_lineedit":
+                yield InputField(widget)
 
 def find_ancestor(obj: QObject, type: str="", name: str=""):
     """Returns the closest ancestor of obj with type and name given"""
