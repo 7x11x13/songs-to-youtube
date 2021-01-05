@@ -101,7 +101,10 @@ class YouTubeUploader:
             )
             if checkbox is None:
                 self.logger.info("Could not find playlist checkbox, attempting to create new playlist")
-                self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON).click()
+                playlist_new_button = self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON)
+                self.browser.move_to_element(playlist_new_button)
+                time.sleep(Constant.USER_WAITING_TIME)
+                playlist_new_button.click()
                 time.sleep(Constant.USER_WAITING_TIME)
                 playlist_title = self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_TITLE)
                 if playlist_title is None:
@@ -111,6 +114,17 @@ class YouTubeUploader:
                 time.sleep(Constant.USER_WAITING_TIME)
                 playlist_title.send_keys(playlist)
                 time.sleep(Constant.USER_WAITING_TIME)
+
+                # Set playlist visibility
+                self.browser.find(By.XPATH, Constant.PLAYLIST_VISIBILITY_DROPDOWN).click()
+                time.sleep(Constant.USER_WAITING_TIME)
+                playlist_visibility = self.browser.find(By.XPATH, '//*[@test-id="{}"]'.format(self.metadata_dict['visibility']))
+                if playlist_visibility is None:
+                    logging.error("Could not find playlist visibility option {}".format(self.metadata_dict['visibility']))
+                    return False, None
+                playlist_visibility.click()
+                time.sleep(Constant.USER_WAITING_TIME)
+
                 self.browser.find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
                 time.sleep(Constant.USER_WAITING_TIME)
                 checkbox = self.browser.find(
@@ -140,9 +154,9 @@ class YouTubeUploader:
         self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
         self.logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
 
-        public_main_button = self.browser.find(By.NAME, Constant.PUBLIC_BUTTON)
-        self.browser.find(By.ID, Constant.RADIO_LABEL, public_main_button).click()
-        self.logger.debug('Made the video {}'.format(Constant.PUBLIC_BUTTON))
+        visibility_button = self.browser.find(By.NAME, self.metadata_dict['visibility'])
+        self.browser.find(By.ID, Constant.RADIO_LABEL, visibility_button).click()
+        self.logger.debug('Made the video {}'.format(self.metadata_dict['visibility']))
 
         video_id = self.__get_video_id()
 

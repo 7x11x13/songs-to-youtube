@@ -38,7 +38,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-577</y>
+        <y>-735</y>
         <width>423</width>
         <height>1245</height>
        </rect>
@@ -305,12 +305,12 @@
            <widget class="QComboBox" name="videoVisibility">
             <item>
              <property name="text">
-              <string>Public</string>
+              <string>PUBLIC</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Unlisted</string>
+              <string>UNLISTED</string>
              </property>
             </item>
            </widget>

@@ -73,7 +73,8 @@ class Uploader(QObject):
                 if self.render_results[file]:
                     metadata = {'title': album.get('videoTitleAlbum'),
                                 'description': album.get('videoDescriptionAlbum'),
-                                'tags': album.get('videoTagsAlbum')}
+                                'tags': album.get('videoTagsAlbum'),
+                                'visibility': album.get('videoVisibility')}
                     self._upload(file, metadata)
         elif album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.MULTIPLE:
             for song in album.getChildren():
@@ -86,7 +87,8 @@ class Uploader(QObject):
                 metadata = {'title': song.get('videoTitle'),
                             'description': song.get('videoDescription'),
                             'tags': song.get('videoTags'),
-                            'playlist': song.get('playlistName')}
+                            'playlist': song.get('playlistName'),
+                            'visibility': song.get('videoVisibility')}
                 self._upload(file, metadata)
 
     def is_uploading(self):

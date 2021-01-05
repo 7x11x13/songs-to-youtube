@@ -42,8 +42,8 @@ class SETTINGS_VALUES:
         SINGLE = "Single video"
 
     class VideoVisibility(str, Enum):
-        PUBLIC = "Public"
-        UNLISTED = "Unlisted"
+        PUBLIC = "PUBLIC"
+        UNLISTED = "UNLISTED"
 
     class CheckBox(str, Enum):
         UNCHECKED = "PySide2.QtCore.Qt.CheckState.Unchecked"

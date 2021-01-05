@@ -20,6 +20,7 @@ class Constant:
     PLAYLIST_NEW_TITLE = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/div[1]/ytcp-form-textarea/div/textarea'
     PLAYLIST_DONE_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/ytcp-button[3]/div'
     PLAYLIST_CREATE_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[3]/ytcp-button[2]/div'
+    PLAYLIST_VISIBILITY_DROPDOWN = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/div[2]/ytcp-text-dropdown-trigger'
     TAGS_TEXT_INPUT = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/ytcp-uploads-details/div/' \
                        'ytcp-uploads-advanced/ytcp-form-input-container/div[1]/div[2]/ytcp-free-text-chip-bar/ytcp-chip-bar/div/input'
     TEXTBOX = 'textbox'
@@ -29,7 +30,6 @@ class Constant:
                        'div/div[1]/ytcp-video-upload-progress/span'
     NOT_MADE_FOR_KIDS_LABEL = 'NOT_MADE_FOR_KIDS'
     NEXT_BUTTON = 'next-button'
-    PUBLIC_BUTTON = 'PUBLIC'
     VIDEO_URL_CONTAINER = "//span[@class='video-url-fadeable style-scope ytcp-video-info']"
     VIDEO_URL_ELEMENT = "//a[@class='style-scope ytcp-video-info']"
     HREF = 'href'
