@@ -74,7 +74,10 @@ class YouTubeUploader:
         time.sleep(Constant.USER_WAITING_TIME)
         title_field.clear()
         time.sleep(Constant.USER_WAITING_TIME)
-        title_field.send_keys(Keys.COMMAND + 'a')
+        if sys.platform == 'darwin':
+            title_field.send_keys(Keys.COMMAND + 'a')
+        else:
+            title_field.send_keys(Keys.CONTROL + 'a')
         time.sleep(Constant.USER_WAITING_TIME)
         title_field.send_keys(self.metadata_dict[Constant.VIDEO_TITLE])
         self.logger.debug('The video title was set to \"{}\"'.format(self.metadata_dict[Constant.VIDEO_TITLE]))
