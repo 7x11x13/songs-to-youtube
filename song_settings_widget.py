@@ -53,7 +53,11 @@ class SongSettingsWidget(QWidget):
                 field.on_update(lambda text: self.set_youtube_enabled(text != SETTINGS_VALUES.CheckBox.UNCHECKED))
 
     def change_cover_art(self):
-        file = QFileDialog.getOpenFileName(self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER)[0]
+        dir_setting = 'song_dir' if self.item_type == TreeWidgetType.SONG else 'album_dir'
+        for e in self.tree_indexes:
+            dir = e.data(CustomDataRole.ITEMDATA).get_value(dir_setting)
+            break
+        file = QFileDialog.getOpenFileName(self, "Import album artwork", dir, SUPPORTED_IMAGE_FILTER)[0]
         self.findChild(CoverArtDisplay).set(file)
 
     def set_youtube_enabled(self, enabled):
