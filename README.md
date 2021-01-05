@@ -2,6 +2,8 @@
 
 Convert audio files to videos and upload them to YouTube automatically.
 
+![Example](/docs/example.png)
+
 ## Features
 - Extract album covers from audio files
 - Extract other metadata which can be used in template strings for the video title/description etc.
