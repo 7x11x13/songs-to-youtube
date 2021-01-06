@@ -21,6 +21,7 @@ class Constant:
     PLAYLIST_DONE_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/ytcp-button[3]/div'
     PLAYLIST_CREATE_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[3]/ytcp-button[2]/div'
     PLAYLIST_VISIBILITY_DROPDOWN = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/div[2]/ytcp-text-dropdown-trigger'
+    TOOLTIP = '//ytcp-paper-tooltip'
     TAGS_TEXT_INPUT = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/ytcp-uploads-details/div/' \
                        'ytcp-uploads-advanced/ytcp-form-input-container/div[1]/div[2]/ytcp-free-text-chip-bar/ytcp-chip-bar/div/input'
     TEXTBOX = 'textbox'

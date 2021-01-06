@@ -141,6 +141,12 @@ class YouTubeUploader:
                 self.browser.find(By.XPATH, Constant.PLAYLIST_DONE_BUTTON).click()
                 time.sleep(Constant.USER_WAITING_TIME)
 
+        # hide tooltips which can obscure buttons
+        tooltips = self.browser.find_all(By.XPATH, Constant.TOOLTIP)
+        if tooltips is not None:
+            for element in tooltips:
+                self.browser.execute_script_on_element("arguments[0].style.display = 'none'", element)
+
         if tags:
             self.browser.find(By.XPATH, Constant.MORE_OPTIONS_CONTAINER).click()
             time.sleep(Constant.USER_WAITING_TIME)
