@@ -101,10 +101,7 @@ class TreeWidgetItemData:
 
     def set_value(self, field, value):
         # replace {variable} with value from metadata
-        try:
-            value = SettingTemplate(value).substitute(**self.to_dict())
-        except Exception as e:
-            logging.info("Invalid key: {}".format(e))
+        value = SettingTemplate(value).safe_substitute(**self.to_dict())
         self.dict[field] = value
 
     def get_duration_ms(self):

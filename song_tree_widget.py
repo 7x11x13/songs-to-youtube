@@ -1,16 +1,17 @@
 # This Python file uses the following encoding: utf-8
-from PySide6.QtCore import Qt, QFileInfo, QModelIndex, QItemSelection, QItemSelectionModel, QDir, QFile, QByteArray
-from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem, QImage
-from PySide6.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea
+from PySide6.QtCore import Qt, QFileInfo, QModelIndex, QItemSelection, QItemSelectionModel, QDir, QFile, QByteArray, QPoint
+from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem, QImage, QAction
+from PySide6.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea, QMenu
 
 import logging
 from enum import IntEnum
 
-from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories
+from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories, load_ui
 from settings import SETTINGS_VALUES, get_setting
 from song_tree_widget_item import *
 from render import Renderer
 from upload import Uploader
+from metadata_table_widget import MetadataTableWidget
 
 
 class SongTreeModel(QStandardItemModel):
@@ -98,6 +99,8 @@ class SongTreeWidget(QTreeView):
         self.setSelectionModel(SongTreeSelectionModel(self.model()))
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.on_context_menu)
 
     def _create_album_item(self, dir_path, songs):
         return AlbumTreeWidgetItem(dir_path, songs)
@@ -107,6 +110,18 @@ class SongTreeWidget(QTreeView):
 
     def addTopLevelItem(self, item):
         self.model().appendRow(item)
+
+    def show_metadata_menu(self, index):
+        self.metadata_dialog = load_ui("metadata.ui", (MetadataTableWidget,))
+        self.metadata_dialog.tableWidget.from_data(index.data(CustomDataRole.ITEMDATA))
+        self.metadata_dialog.show()
+
+    def on_context_menu(self, pos: QPoint):
+        index = self.indexAt(pos)
+        menu = QMenu(self)
+        action = menu.addAction("View metadata")
+        action.triggered.connect(lambda chk=False, index=index: self.show_metadata_menu(index))
+        menu.popup(self.viewport().mapToGlobal(pos))
 
     def dragEnterEvent(self, event: QDragEnterEvent):
         if event.source() is self:
