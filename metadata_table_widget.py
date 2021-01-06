@@ -11,12 +11,12 @@ class MetadataTableWidget(QTableWidget):
         super().__init__(*args)
 
     def from_data(self, data: TreeWidgetItemData):
-        for key, value in data.metadata.items():
+        for key, value in data.to_dict().items():
             self.insertRow(self.rowCount())
             key_item = QTableWidgetItem(key)
             key_item.setFlags(Qt.ItemIsEnabled | Qt.ItemNeverHasChildren)
             value_item = QTableWidgetItem(value)
-            value_item.setFlags(Qt.ItemIsEnabled | Qt.ItemNeverHasChildren | Qt.ItemIsEditable | Qt.ItemIsSelectable)
+            value_item.setFlags(Qt.ItemIsEnabled | Qt.ItemNeverHasChildren)
             self.setItem(self.rowCount() - 1, 0, key_item)
             self.setItem(self.rowCount() - 1, 1, value_item)
 
