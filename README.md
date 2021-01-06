@@ -28,13 +28,15 @@ Download the source code and run `py main.py`
 - If you get an error saying "Too large number of skipped frames XXXXX > 60000" try increasing the input frame rate
 
 ### Template strings
-Write `~{key}` in any text field and it will be replaced with an appropriate value. For now there is no way to see what keys are available for each item, but here are some useful ones:
+Write `~{key}` in any text field and it will be replaced with an appropriate value. To see the available metadata values, right click on an album or song and select "View metadata."
+Here are some useful values:
 #### Song metadata
 - `~{song_dir}` - directory of the input audio file
 - `~{song_file}` - file name of the input audio
 - `~{tags.album}` - name of the song's album
 - `~{tags.artist}` - name of the song's artist
 - `~{tags.title}` - name of the song
+- `~{tags.comment.text}` - comment; used by bandcamp to link to the artist's page
 #### Album metadata
 - `~{album_dir}` - directory of the album
 - `~{timestamps}` - special key that generates timestamps based on song lengths
