@@ -3,8 +3,10 @@
     Based on https://github.com/linouk23/youtube_uploader_selenium"""
 
 from selenium_firefox.firefox import Firefox, By, Keys
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from typing import Optional
 import time
+import os
 from .Constant import *
 from pathlib import Path
 import logging
@@ -13,14 +15,55 @@ import sys
 logging.basicConfig()
 
 
+class YouTubeLogin:
+
+    """Let user login to YouTube and save the cookies"""
+    def __init__(self):
+        self.browser = Firefox(full_screen=False)
+        self.logger = logging.getLogger()
+
+    @staticmethod
+    def get_all_usernames():
+        current_folder_path = os.path.dirname(os.path.abspath(__file__))
+        general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
+        os.makedirs(general_cookies_folder_path, exist_ok=True)
+        return next(os.walk(general_cookies_folder_path))[1]
+
+
+    def get_login(self):
+
+        self.browser.get(Constant.YOUTUBE_URL)
+        time.sleep(Constant.USER_WAITING_TIME)
+        while (avatar := self.browser.find(By.XPATH, Constant.USER_AVATAR_XPATH)) is None:
+            time.sleep(1)
+        avatar.click()
+        username_div = self.browser.find(By.ID, Constant.USERNAME_ID, timeout=30)
+        username = username_div.text
+        logging.info("Logged in as {}".format(username))
+        self.browser.get(Constant.YOUTUBE_URL)
+        time.sleep(Constant.USER_WAITING_TIME)
+
+        current_folder_path = os.path.dirname(os.path.abspath(__file__))
+        general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
+        os.makedirs(general_cookies_folder_path, exist_ok=True)
+
+        self.browser.cookies_folder_path = os.path.join(general_cookies_folder_path, username)
+        os.makedirs(self.browser.cookies_folder_path, exist_ok=True)
+        self.browser.save_cookies()
+        self.browser.driver.quit()
+
+        return username
+
 class YouTubeUploader:
     """A class for uploading videos on YouTube via Selenium using metadata dict"""
 
-    def __init__(self, video_path, metadata) -> None:
+    def __init__(self, video_path, metadata, username) -> None:
         self.video_path = video_path
         self.metadata_dict = metadata
-        current_working_dir = str(Path.cwd())
-        self.browser = Firefox(current_working_dir, current_working_dir, full_screen=False)
+        current_folder_path = os.path.dirname(os.path.abspath(__file__))
+        general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
+        cookies_path = os.path.join(general_cookies_folder_path, username)
+        self.browser = Firefox(full_screen=False, cookies_folder_path=cookies_path)
         self.logger = logging.getLogger()
         self.__validate_inputs()
 
@@ -50,13 +93,7 @@ class YouTubeUploader:
             time.sleep(Constant.USER_WAITING_TIME)
             self.browser.refresh()
         else:
-            self.browser.execute_script("alert('Please log in to the desired youtube account. Do not close the browser until uploading is complete');")
-            while self.browser.find(By.XPATH, Constant.USER_AVATAR_XPATH) is None:
-                time.sleep(1)
-            logging.info("Logged in")
-            self.browser.get(Constant.YOUTUBE_URL)
-            time.sleep(Constant.USER_WAITING_TIME)
-            self.browser.save_cookies()
+            raise Exception("Could not find cookies at path {}".format(self.browser.cookies_folder_path))
 
     def __upload(self) -> (bool, Optional[str]):
         self.browser.get(Constant.YOUTUBE_URL)
@@ -153,7 +190,10 @@ class YouTubeUploader:
             self.browser.find(By.XPATH, Constant.TAGS_TEXT_INPUT).send_keys(tags)
             time.sleep(Constant.USER_WAITING_TIME)
 
+        time.sleep(Constant.USER_WAITING_TIME)
         kids_section = self.browser.find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
+        self.browser.scroll_to_element(kids_section)
+        time.sleep(Constant.USER_WAITING_TIME)
         self.browser.find(By.ID, Constant.RADIO_LABEL, kids_section).click()
         self.logger.debug('Selected \"{}\"'.format(Constant.NOT_MADE_FOR_KIDS_LABEL))
 

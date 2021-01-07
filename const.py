@@ -75,7 +75,8 @@ SETTINGS_DEFAULTS = {
     "videoTagsAlbum": "",
     "videoTitleAlbum": "~{song.tags.artist} - ~{song.tags.album}",
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC,
-    "inputFrameRate": "5"
+    "inputFrameRate": "1",
+    "username": ""
 }
 
 SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',

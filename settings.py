@@ -1,11 +1,15 @@
 # This Python file uses the following encoding: utf-8
 from PySide6.QtCore import Signal, QSettings, Qt
-from PySide6.QtWidgets import QDialog, QCheckBox, QLabel, QFileDialog, QScrollArea
+from PySide6.QtWidgets import QDialog, QCheckBox, QLabel, QFileDialog, QScrollArea, QMessageBox
 from PySide6.QtGui import QPixmap
 
 import logging
+import traceback
+import time
+from threading import Thread
 
 from utils import load_ui, get_all_fields, find_ancestor, mimedata_has_image, get_image_from_mimedata
+from youtube_uploader_selenium import YouTubeLogin
 from const import *
 
 def get_settings():
@@ -105,6 +109,23 @@ class SettingsScrollArea(QScrollArea):
         super().resizeEvent(event)
         self.findChild(CoverArtDisplay).scroll_area_width_resized(event.size().width())
 
+class LoginThread(Thread):
+
+    def __init__(self, callback=lambda: None):
+        super().__init__()
+        self.callback = callback
+
+    def run(self):
+        try:
+            self.login = YouTubeLogin()
+            time.sleep(5)
+            username = self.login.get_login()
+            self.callback(True, username)
+        except Exception as e:
+            logging.error("Error while getting login")
+            logging.error(traceback.format_exc())
+            logging.error(e)
+            self.callback(False, None)
 
 class SettingsWindow(QDialog):
 
@@ -115,6 +136,7 @@ class SettingsWindow(QDialog):
         self.ui = load_ui("settingswindow.ui", (CoverArtDisplay, SettingCheckBox, SettingsScrollArea))
         self.connect_actions()
         self.load_settings()
+        self.login_thread = None
 
     def save_settings(self):
         settings = get_settings()
@@ -123,9 +145,27 @@ class SettingsWindow(QDialog):
         self.settings_changed.emit()
 
     def load_settings(self):
+        for username in YouTubeLogin.get_all_usernames():
+            self.ui.username.addItem(username)
         settings = get_settings()
         for field in get_all_fields(self.ui):
             field.set(get_setting(field.name))
+
+    def on_login(self, success, username):
+        self.ui.setEnabled(True)
+        self.login_thread = None
+        if success:
+            self.ui.username.addItem(username)
+            self.ui.username.setCurrentText(username)
+
+    def add_new_user(self):
+        if self.login_thread is None:
+            self.ui.setEnabled(False)
+            self.login_thread = LoginThread(self.on_login)
+            self.login_thread.start()
+            QMessageBox.information(self, "Add new user",
+                                             "Please log in to your YouTube account. "
+                                             "The window will close automatically when you log in.")
 
     def change_cover_art(self):
         file = QFileDialog.getOpenFileName(self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER)[0]
@@ -138,3 +178,4 @@ class SettingsWindow(QDialog):
         self.ui.buttonBox.accepted.connect(self.save_settings)
         self.ui.buttonBox.rejected.connect(self.reject)
         self.ui.coverArtButton.clicked.connect(self.change_cover_art)
+        self.ui.addNewUserButton.clicked.connect(self.add_new_user)

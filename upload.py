@@ -10,18 +10,20 @@ import time
 
 from youtube_uploader_selenium import YouTubeUploader
 from song_tree_widget_item import *
+from settings import get_setting
 
 class UploadThread(Thread):
 
-    def __init__(self, file_path, metadata, callback=lambda: None):
+    def __init__(self, file_path, metadata, username, callback=lambda: None):
         super().__init__()
         self.file_path = file_path
         self.metadata = metadata
         self.callback = callback
+        self.username = username
 
     def run(self):
         try:
-            self.uploader = YouTubeUploader(self.file_path, self.metadata)
+            self.uploader = YouTubeUploader(self.file_path, self.metadata, self.username)
             time.sleep(5)
             success, video_id = self.uploader.upload()
             if success:
@@ -58,7 +60,7 @@ class Uploader(QObject):
             self.threads[0].start()
 
     def _upload(self, file_path, metadata):
-        thread = UploadThread(file_path, metadata, self.on_done_uploading)
+        thread = UploadThread(file_path, metadata, get_setting('username'), self.on_done_uploading)
         self.threads.append(thread)
         if not self.uploading:
             self.uploading = True
