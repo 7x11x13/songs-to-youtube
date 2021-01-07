@@ -22,7 +22,7 @@ Convert audio files to videos and upload them to YouTube automatically.
 Download the source code and run `py main.py`
 
 ## Notes
-- You must login once on the first upload.
+- Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
 - If you don't care about the accuracy of the produced video length, set the input frame rate to 1 to render as fast as possible.
   If you care about the accuracy (e.g. to produce accurate timestamps for album descriptions) set the input frame rate to at least 10
 - If you get an error saying "Too large number of skipped frames XXXXX > 60000" try increasing the input frame rate
