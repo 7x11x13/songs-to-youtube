@@ -9,6 +9,7 @@ import time
 import os
 from .Constant import *
 from pathlib import Path
+import shutil
 import logging
 import sys
 
@@ -23,12 +24,23 @@ class YouTubeLogin:
         self.logger = logging.getLogger()
 
     @staticmethod
+    def get_cookie_path_from_username(username):
+        current_folder_path = os.path.dirname(os.path.abspath(__file__))
+        general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
+        os.makedirs(general_cookies_folder_path, exist_ok=True)
+        return os.path.join(general_cookies_folder_path, username)
+
+    @staticmethod
     def get_all_usernames():
         current_folder_path = os.path.dirname(os.path.abspath(__file__))
         general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
         os.makedirs(general_cookies_folder_path, exist_ok=True)
         return next(os.walk(general_cookies_folder_path))[1]
 
+    @staticmethod
+    def remove_user_cookies(username):
+        cookie_folder = YouTubeLogin.get_cookie_path_from_username(username)
+        shutil.rmtree(cookie_folder)
 
     def get_login(self):
 
@@ -43,11 +55,7 @@ class YouTubeLogin:
         self.browser.get(Constant.YOUTUBE_URL)
         time.sleep(Constant.USER_WAITING_TIME)
 
-        current_folder_path = os.path.dirname(os.path.abspath(__file__))
-        general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
-        os.makedirs(general_cookies_folder_path, exist_ok=True)
-
-        self.browser.cookies_folder_path = os.path.join(general_cookies_folder_path, username)
+        self.browser.cookies_folder_path = self.get_cookie_path_from_username(username)
         os.makedirs(self.browser.cookies_folder_path, exist_ok=True)
         self.browser.save_cookies()
         self.browser.driver.quit()
@@ -60,9 +68,7 @@ class YouTubeUploader:
     def __init__(self, video_path, metadata, username) -> None:
         self.video_path = video_path
         self.metadata_dict = metadata
-        current_folder_path = os.path.dirname(os.path.abspath(__file__))
-        general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
-        cookies_path = os.path.join(general_cookies_folder_path, username)
+        cookies_path = YouTubeLogin.get_cookie_path_from_username(username)
         self.browser = Firefox(full_screen=False, cookies_folder_path=cookies_path)
         self.logger = logging.getLogger()
         self.__validate_inputs()

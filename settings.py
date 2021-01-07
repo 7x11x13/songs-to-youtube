@@ -167,6 +167,13 @@ class SettingsWindow(QDialog):
                                              "Please log in to your YouTube account. "
                                              "The window will close automatically when you log in.")
 
+    def remove_user(self):
+        combo_box = self.ui.username
+        username = combo_box.currentText()
+        if username != "":
+            combo_box.removeItem(combo_box.currentIndex())
+            YouTubeLogin.remove_user_cookies(username)
+
     def change_cover_art(self):
         file = QFileDialog.getOpenFileName(self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER)[0]
         self.ui.coverArt.set(file)
@@ -179,3 +186,4 @@ class SettingsWindow(QDialog):
         self.ui.buttonBox.rejected.connect(self.reject)
         self.ui.coverArtButton.clicked.connect(self.change_cover_art)
         self.ui.addNewUserButton.clicked.connect(self.add_new_user)
+        self.ui.removeUserButton.clicked.connect(self.remove_user)
