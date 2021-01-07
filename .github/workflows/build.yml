@@ -26,7 +26,7 @@ jobs:
       - name: Build binary with PyInstaller
         run: pyinstaller --clean -y songs-to-youtube.spec
       - name: Zip release files
-        run: 7z a songs-to-youtube-${{matrix.os}}.zip dist/songs-to-youtube/*
+        run: 7z a songs-to-youtube-${{matrix.os}}.zip ./dist/songs-to-youtube/*
       - name: Upload release files
         uses: svenstaro/upload-release-action@v2
         with:
