@@ -20,9 +20,9 @@ jobs:
           python-version: ${{matrix.python-version}}
       - name: Install dependencies
         run: |
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt
-        python -m pip install pyinstaller
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pyinstaller
       - name: Build binary with PyInstaller
         run: pyinstaller --clean -y songs-to-youtube.spec
       - name: Zip release files
