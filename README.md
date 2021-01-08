@@ -10,16 +10,24 @@ Convert audio files to videos and upload them to YouTube automatically.
 - Concatenate songs to upload an album as a single video
 - Drag and drop support for audio files and album covers
 
-## Requirements
-
-- Install required Python modules with `py -m pip install -r requirements.txt`
-- [FFmpeg](https://ffmpeg.org/download.html) binary is required to convert the songs into videos
+## Pre-installation
+- [FFmpeg](https://ffmpeg.org/download.html) binary is required to convert songs into videos
 - [Firefox](https://www.mozilla.org/firefox/new/) and [geckodriver](https://github.com/mozilla/geckodriver/releases) binaries are required to upload to YouTube
 - Make sure FFmpeg and geckodriver are both in your PATH environment variable
 
-## Usage
+## Installation
 
-Download the source code and run `py main.py`
+There are two ways to install this program:
+
+### PyInstaller
+
+Download the latest release for your platform [here](https://github.com/7x11x13/songs-to-youtube/releases), unzip the archive, and run the songs-to-youtube executable
+
+### Run from source
+If you have issues running the exectuable, you can try running the program from the source code:
+1. Download the source code
+2. Install required Python modules with `python3 -m pip install -r requirements.txt`
+3. Run the program with `python3 main.py`
 
 ## Notes
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
