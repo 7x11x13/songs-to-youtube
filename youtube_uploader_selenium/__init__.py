@@ -13,6 +13,8 @@ import shutil
 import logging
 import sys
 
+from PySide6.QtCore import QStandardPaths
+
 logging.basicConfig()
 
 
@@ -25,15 +27,15 @@ class YouTubeLogin:
 
     @staticmethod
     def get_cookie_path_from_username(username):
-        current_folder_path = os.path.dirname(os.path.abspath(__file__))
-        general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
+        appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+        general_cookies_folder_path = os.path.join(appdata_path, 'cookies')
         os.makedirs(general_cookies_folder_path, exist_ok=True)
         return os.path.join(general_cookies_folder_path, username)
 
     @staticmethod
     def get_all_usernames():
-        current_folder_path = os.path.dirname(os.path.abspath(__file__))
-        general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
+        appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+        general_cookies_folder_path = os.path.join(appdata_path, 'cookies')
         os.makedirs(general_cookies_folder_path, exist_ok=True)
         return next(os.walk(general_cookies_folder_path))[1]
 

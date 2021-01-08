@@ -8,7 +8,7 @@ import logging
 import pathlib
 
 from utils import load_ui
-from const import SETTINGS_VALUES
+from const import SETTINGS_VALUES, APPLICATION, ORGANIZATION
 
 # Custom widgets
 from song_settings_widget import SongSettingsWidget
@@ -94,6 +94,8 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication([])
+    app.setOrganizationName(ORGANIZATION)
+    app.setApplicationName(APPLICATION)
     widget = MainWindow()
     widget.show()
     sys.exit(app.exec_())
