@@ -24,6 +24,7 @@ block_cipher = None
 a = Analysis(['main.py'],
              pathex=[SHIBOKEN_PATH, '.'],
              binaries=binaries,
+             datas=[('ui/*.ui', 'ui')],
              hiddenimports=['PySide6.QtXml'],
              hookspath=[],
              runtime_hooks=[],
