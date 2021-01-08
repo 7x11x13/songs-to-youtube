@@ -9,14 +9,14 @@ PYSIDE_PATH = PySide6.__path__[0]
 SHIBOKEN_PATH = shiboken6.__path__[0]
 
 if sys.platform == 'darwin':
-    binaries = [(os.path.join(PYSIDE_PATH, 'Qt', 'plugins', 'platforms', '*'), 'platforms'),
-              (os.path.join(PYSIDE_PATH, 'Qt', 'plugins', 'styles', '*'), 'styles')]
+    pyside_includes = ('platforms', 'styles', 'iconengines', 'imageformats')
+    binaries = [(os.path.join(PYSIDE_PATH, 'Qt', 'plugins', name, '*'), name) for name in pyside_includes]
 elif sys.platform == 'win32' or sys.platform == 'cygwin':
-    binaries = [(os.path.join(PYSIDE_PATH, 'plugins', 'platforms', '*'), 'platforms'),
-     (os.path.join(PYSIDE_PATH, 'plugins', 'styles', '*'), 'styles')]
+    pyside_includes = ('platforms', 'styles', 'iconengines', 'imageformats')
+    binaries = [(os.path.join(PYSIDE_PATH, 'plugins', name, '*'), name) for name in pyside_includes]
 else:
-    binaries = [(os.path.join(PYSIDE_PATH, 'Qt', 'plugins', 'platforms', '*'), 'platforms'),
-              (os.path.join(PYSIDE_PATH, 'Qt', 'plugins', 'platformthemes', '*'), 'platformthemes')]
+    pyside_includes = ('platforms', 'platformthemes', 'iconengines', 'imageformats', 'platforminputcontexts')
+    binaries = [(os.path.join(PYSIDE_PATH, 'Qt', 'plugins', name, '*'), name) for name in pyside_includes]
 
 block_cipher = None
 
