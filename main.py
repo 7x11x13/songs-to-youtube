@@ -1,11 +1,14 @@
 # This Python file uses the following encoding: utf-8
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, QListView, QTreeView, QAbstractItemView, QMessageBox
+from PySide6.QtGui import QIcon
 
 
 import sys
 import os
 import logging
 import pathlib
+
+import resource
 
 from utils import load_ui
 from const import SETTINGS_VALUES, APPLICATION, ORGANIZATION
@@ -94,6 +97,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication([])
+    app.setWindowIcon(QIcon(":/image/icon.ico"))
     app.setOrganizationName(ORGANIZATION)
     app.setApplicationName(APPLICATION)
     widget = MainWindow()

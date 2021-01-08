@@ -4,7 +4,6 @@ from PySide6.QtCore import Qt, QFile, QDir
 
 from enum import Enum, IntEnum
 
-import resource
 import atexit
 
 class TreeWidgetType(IntEnum):

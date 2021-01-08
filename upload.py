@@ -23,6 +23,8 @@ class UploadThread(Thread):
 
     def run(self):
         try:
+            if self.username == "":
+                raise Exception("No user selected to upload to")
             self.uploader = YouTubeUploader(self.file_path, self.metadata, self.username)
             time.sleep(5)
             success, video_id = self.uploader.upload()
