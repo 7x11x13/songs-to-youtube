@@ -145,7 +145,7 @@ class YouTubeUploader:
             self.browser.find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
             time.sleep(Constant.USER_WAITING_TIME)
             checkbox = self.browser.find(
-                By.XPATH, "//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][contains(text(), '{}')]]/ytcp-checkbox-lit".format(playlist)
+                By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][translate(., '\u200b', '')='{}']]/ytcp-checkbox-lit".format(playlist)
             )
             if checkbox is None:
                 self.logger.info("Could not find playlist checkbox, attempting to create new playlist")
@@ -176,7 +176,7 @@ class YouTubeUploader:
                 self.browser.find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
                 time.sleep(Constant.USER_WAITING_TIME)
                 checkbox = self.browser.find(
-                    By.XPATH, "//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][contains(text(), '{}')]]/ytcp-checkbox-lit".format(playlist)
+                    By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][translate(., '\u200b', '')='{}']]/ytcp-checkbox-lit".format(playlist)
                 )
             if checkbox is None:
                 logging.error("Could not find playlist: {}".format(playlist))
