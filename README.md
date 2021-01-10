@@ -23,7 +23,8 @@ There are two ways to install this program:
 
 ### PyInstaller
 
-Download the latest release for your platform [here](https://github.com/7x11x13/songs-to-youtube/releases), unzip the archive, and run the songs-to-youtube executable
+Download the latest release for your platform [here](https://github.com/7x11x13/songs-to-youtube/releases), unzip the archive, and run the songs-to-youtube executable.
+Currently the Windows exectuable is flagged as a virus by Microsoft Defender, among others. If that is the case, you can just run from the source code.
 
 ### Run from source
 If you have issues running the exectuable, you can try running the program from the source code:
