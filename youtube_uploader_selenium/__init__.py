@@ -148,6 +148,12 @@ class YouTubeUploader:
                 By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][translate(., '\u200b', '')='{}']]/ytcp-checkbox-lit".format(playlist)
             )
             if checkbox is None:
+                # For some reason the above XPATH string doesn't work when the title doesn't have zero width spaces
+                # it works in the browser console, but not from geckodriver :/
+                checkbox = self.browser.find(
+                    By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][text()='{}']]/ytcp-checkbox-lit".format(playlist)
+                )
+            if checkbox is None:
                 self.logger.info("Could not find playlist checkbox, attempting to create new playlist")
                 playlist_new_button = self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON)
                 self.browser.move_to_element(playlist_new_button)
@@ -178,6 +184,10 @@ class YouTubeUploader:
                 checkbox = self.browser.find(
                     By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][translate(., '\u200b', '')='{}']]/ytcp-checkbox-lit".format(playlist)
                 )
+                if checkbox is None:
+                    checkbox = self.browser.find(
+                        By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][text()='{}']]/ytcp-checkbox-lit".format(playlist)
+                    )
             if checkbox is None:
                 logging.error("Could not find playlist: {}".format(playlist))
             else:
