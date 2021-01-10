@@ -15,7 +15,7 @@ from settings import get_setting
 class UploadThread(Thread):
 
     def __init__(self, file_path, metadata, username, callback=lambda: None):
-        super().__init__()
+        super().__init__(daemon=True)
         self.file_path = file_path
         self.metadata = metadata
         self.callback = callback
@@ -45,7 +45,6 @@ class Uploader(QObject):
 
     def __init__(self, render_results, *args):
         super().__init__()
-
         self.uploading = False
         self.threads = []
         self.results = {}
