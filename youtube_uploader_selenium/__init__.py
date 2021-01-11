@@ -67,10 +67,11 @@ class YouTubeLogin:
 class YouTubeUploader:
     """A class for uploading videos on YouTube via Selenium using metadata dict"""
 
-    def __init__(self, video_path, metadata, username) -> None:
+    def __init__(self, video_path, metadata, username, cookies_path="") -> None:
         self.video_path = video_path
         self.metadata_dict = metadata
-        cookies_path = YouTubeLogin.get_cookie_path_from_username(username)
+        if cookies_path == "":
+            cookies_path = YouTubeLogin.get_cookie_path_from_username(username)
         self.browser = Firefox(full_screen=False, cookies_folder_path=cookies_path)
         self.logger = logging.getLogger()
         self.__validate_inputs()
@@ -102,6 +103,17 @@ class YouTubeUploader:
             self.browser.refresh()
         else:
             raise Exception("Could not find cookies at path {}".format(self.browser.cookies_folder_path))
+
+    def __find_playlist_checkbox(self, name):
+        try:
+            for element in self.browser.find_all(By.XPATH, Constant.PLAYLIST_LABEL):
+                name_element = element.find_element_by_xpath(".//span/span[@class='label label-text style-scope ytcp-checkbox-group']")
+                if name_element.text == name:
+                    return element.find_element_by_xpath(".//ytcp-checkbox-lit")
+        except Exception as e:
+            logging.warning(e)
+            return None
+
 
     def __upload(self) -> (bool, Optional[str]):
         self.browser.get(Constant.YOUTUBE_URL)
@@ -144,15 +156,7 @@ class YouTubeUploader:
         if playlist:
             self.browser.find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
             time.sleep(Constant.USER_WAITING_TIME)
-            checkbox = self.browser.find(
-                By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][translate(., '\u200b', '')='{}']]/ytcp-checkbox-lit".format(playlist)
-            )
-            if checkbox is None:
-                # For some reason the above XPATH string doesn't work when the title doesn't have zero width spaces
-                # it works in the browser console, but not from geckodriver :/
-                checkbox = self.browser.find(
-                    By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][text()='{}']]/ytcp-checkbox-lit".format(playlist)
-                )
+            checkbox = self.__find_playlist_checkbox(playlist)
             if checkbox is None:
                 self.logger.info("Could not find playlist checkbox, attempting to create new playlist")
                 playlist_new_button = self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON)
@@ -181,15 +185,10 @@ class YouTubeUploader:
 
                 self.browser.find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
                 time.sleep(Constant.USER_WAITING_TIME)
-                checkbox = self.browser.find(
-                    By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][translate(., '\u200b', '')='{}']]/ytcp-checkbox-lit".format(playlist)
-                )
-                if checkbox is None:
-                    checkbox = self.browser.find(
-                        By.XPATH, r"//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group'][text()='{}']]/ytcp-checkbox-lit".format(playlist)
-                    )
+                checkbox = self.__find_playlist_checkbox(playlist)
             if checkbox is None:
                 logging.error("Could not find playlist: {}".format(playlist))
+                return False, None
             else:
                 checkbox.click()
                 time.sleep(Constant.USER_WAITING_TIME)
