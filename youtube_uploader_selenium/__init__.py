@@ -72,7 +72,7 @@ class YouTubeUploader:
         self.metadata_dict = metadata
         if cookies_path == "":
             cookies_path = YouTubeLogin.get_cookie_path_from_username(username)
-        self.browser = Firefox(full_screen=False, cookies_folder_path=cookies_path)
+        self.browser = Firefox(full_screen=False, cookies_folder_path=cookies_path, default_find_func_timeout=10)
         self.logger = logging.getLogger()
         self.__validate_inputs()
 
