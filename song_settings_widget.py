@@ -1,5 +1,5 @@
 # This Python file uses the following encoding: utf-8
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QPersistentModelIndex
 from PySide6.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox, QPushButton, QFileDialog, QComboBox, QLabel
 from PySide6.QtGui import QPixmap
 
@@ -137,8 +137,10 @@ class SongSettingsWidget(QWidget):
             self.field_original_values[field.name] = value
 
     def song_tree_selection_changed(self, selected, deselected):
-        self.tree_indexes |= set(selected.indexes())   # add new selected indexes
-        self.tree_indexes -= set(deselected.indexes()) # remove deselected indexes
+        selected = [QPersistentModelIndex(i) for i in selected.indexes()]
+        deselected = [QPersistentModelIndex(i) for i in deselected.indexes()]
+        self.tree_indexes |= set(selected)   # add new selected indexes
+        self.tree_indexes -= set(deselected) # remove deselected indexes
         self.setVisible(len(self.tree_indexes) > 0) # hide window if nothing is selected
         if len(self.tree_indexes) > 0:
             for index in self.tree_indexes:

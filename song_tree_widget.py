@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 from PySide6.QtCore import Qt, QFileInfo, QModelIndex, QItemSelection, QItemSelectionModel, QDir, QFile, QByteArray, QPoint
-from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem, QImage, QAction
+from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem, QImage, QAction, QKeySequence, QShortcut
 from PySide6.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea, QMenu
 
 import logging
@@ -99,8 +99,15 @@ class SongTreeWidget(QTreeView):
         self.setSelectionModel(SongTreeSelectionModel(self.model()))
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
+
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.on_context_menu)
+
+        self.init_shortcuts()
+
+    def init_shortcuts(self):
+        self.del_shortcut = QShortcut(QKeySequence(QKeySequence.Delete), self)
+        self.del_shortcut.activated.connect(self.remove_selected_items)
 
     def _create_album_item(self, dir_path, songs):
         return AlbumTreeWidgetItem(dir_path, songs)
@@ -111,6 +118,11 @@ class SongTreeWidget(QTreeView):
     def addTopLevelItem(self, item):
         self.model().appendRow(item)
 
+    def remove_selected_items(self):
+        while len(self.selectedIndexes()) > 0:
+            index = self.selectedIndexes()[0]
+            index.model().removeRow(index.row(), index.parent())
+
     def show_metadata_menu(self, index):
         self.metadata_dialog = load_ui("metadata.ui", (MetadataTableWidget,))
         self.metadata_dialog.tableWidget.from_data(index.data(CustomDataRole.ITEMDATA))
@@ -119,8 +131,14 @@ class SongTreeWidget(QTreeView):
     def on_context_menu(self, pos: QPoint):
         index = self.indexAt(pos)
         menu = QMenu(self)
-        action = menu.addAction("View metadata")
-        action.triggered.connect(lambda chk=False, index=index: self.show_metadata_menu(index))
+
+        meta_action = menu.addAction("View metadata")
+        meta_action.triggered.connect(lambda chk=False, index=index: self.show_metadata_menu(index))
+
+        remove_action = menu.addAction("Remove")
+        remove_action.setShortcut(QKeySequence(QKeySequence.Delete))
+        remove_action.triggered.connect(self.remove_selected_items)
+
         menu.popup(self.viewport().mapToGlobal(pos))
 
     def dragEnterEvent(self, event: QDragEnterEvent):
