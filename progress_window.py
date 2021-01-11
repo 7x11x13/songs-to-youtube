@@ -49,8 +49,11 @@ class ProgressWindow(QWidget):
             self.init_worker_progress(worker_name)
         logging.error("{} - {}".format(worker_name, error))
 
-    def worker_done(self, worker_name):
-        logging.info("{} - Done".format(worker_name))
+    def worker_done(self, worker_name, success):
+        if success:
+            logging.success("{} - Done rendering".format(worker_name))
+        else:
+            logging.error("{} - Error while rendering".format(worker_name))
         worker = self.workers.pop(worker_name, None)
         if worker:
             worker.setVisible(False)

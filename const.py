@@ -61,7 +61,7 @@ SETTINGS_DEFAULTS = {
     "backgroundColor": "black",
     "dragAndDropBehavior": SETTINGS_VALUES.DragAndDrop.ALBUM_MODE,
     "maxProcesses": "8",
-    "logLevel": SETTINGS_VALUES.LogLevel.DEBUG,
+    "logLevel": SETTINGS_VALUES.LogLevel.ERROR,
     "videoHeight": "720",
     "videoWidth": "1280",
     "uploadYouTube": SETTINGS_VALUES.CheckBox.CHECKED,

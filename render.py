@@ -141,9 +141,11 @@ class AlbumRenderHelper:
         self.combine_worker = ""
         self.error = False
 
-    def worker_done(self, worker):
+    def worker_done(self, worker, success):
         if worker in self.workers:
             self.workers.discard(worker)
+            if not success:
+                self.error = True
         if len(self.workers) == 0 and not self.error:
             # done rendering songs,
             # begin concatenation
@@ -184,7 +186,7 @@ class Renderer(QObject):
     worker_error = Signal(str, str)
 
     # worker name
-    worker_done = Signal(str)
+    worker_done = Signal(str, bool)
 
     def __init__(self):
         # threads to be worked on
@@ -216,7 +218,7 @@ class Renderer(QObject):
 
 
     def worker_finished(self, worker, thread, success):
-        self.worker_done.emit(str(worker))
+        self.worker_done.emit(str(worker), success)
         self.results[str(worker)] = success
         thread.quit()
         worker.deleteLater()

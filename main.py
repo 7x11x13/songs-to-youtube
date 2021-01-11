@@ -16,7 +16,7 @@ from const import SETTINGS_VALUES, APPLICATION, ORGANIZATION
 # Custom widgets
 from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
-from log import LogWidget
+from log import LogWidget, addLoggingLevel
 from settings import SettingsWindow, get_setting
 from progress_window import ProgressWindow
 
@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
                 self.ui.treeWidget.addAlbum(album)
 
     def on_upload_finished(self, results):
-        logging.info("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
+        logging.success("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
         self.ui.splitter.setEnabled(True)
         del self.uploader
         if get_setting("deleteAfterUploading") == SETTINGS_VALUES.CheckBox.CHECKED:
@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
 
 
     def on_render_finished(self, results):
-        logging.info("{}/{} renders successful".format(sum(int(s) for s in results.values()),len(results)))
+        logging.success("{}/{} renders successful".format(sum(int(s) for s in results.values()),len(results)))
         # upload to youtube
         self.uploader = self.ui.treeWidget.get_uploader(results)
         self.uploader.finished.connect(self.on_upload_finished)
@@ -96,6 +96,7 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
+    addLoggingLevel("SUCCESS", 60, "success")
     app = QApplication([])
     app.setWindowIcon(QIcon(":/image/icon.ico"))
     app.setOrganizationName(ORGANIZATION)

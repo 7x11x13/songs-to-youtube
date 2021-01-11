@@ -29,7 +29,7 @@ class UploadThread(Thread):
             time.sleep(5)
             success, video_id = self.uploader.upload()
             if success:
-                logging.info("Successfully uploaded {}, link at: https://youtube.com/watch?v={}".format(self.file_path, video_id))
+                logging.success("Successfully uploaded {}, link at: https://youtube.com/watch?v={}".format(self.file_path, video_id))
             else:
                 logging.error("Could not upload {}".format(self.file_path))
             self.callback(success, self)
