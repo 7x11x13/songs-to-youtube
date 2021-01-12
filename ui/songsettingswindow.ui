@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-735</y>
+        <y>0</y>
         <width>423</width>
-        <height>1245</height>
+        <height>1340</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -171,6 +171,16 @@
           </item>
           <item>
            <widget class="QLineEdit" name="fileOutputName"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Command string:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="commandString"/>
           </item>
          </layout>
         </widget>

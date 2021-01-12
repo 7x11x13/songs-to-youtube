@@ -53,7 +53,7 @@ class SETTINGS_VALUES:
 SETTINGS_DEFAULTS = {
     "deleteAfterUploading": SETTINGS_VALUES.CheckBox.CHECKED,
     "fileOutputDir": "~{song_dir}",
-    "fileOutputName": "~{song_file}.avi",
+    "fileOutputName": "~{song_file}",
     "fileOutputDirAlbum": "~{album_dir}",
     "fileOutputNameAlbum": "~{song.tags.album}.avi",
     "coverArt": ":/image/default.jpg",
@@ -75,13 +75,17 @@ SETTINGS_DEFAULTS = {
     "videoTitleAlbum": "~{song.tags.artist} - ~{song.tags.album}",
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC,
     "inputFrameRate": "1",
-    "username": ""
+    "username": "",
+    "commandString": "ffmpeg -loglevel error -progress pipe:1 -y -r {inputFrameRate} -loop 1 -i \"{coverArt}\" -i \"{song_path}\" "
+                     "-r 30 -shortest -vf \"scale='min({videoWidth}, iw)':'min({videoHeight}, ih)':force_original_aspect_ratio=decrease,"
+                     "pad={videoWidth}:{videoHeight}:-1:-1:color={backgroundColor}\" "
+                     "-acodec copy -vcodec libx264 -fflags +shortest -max_interleave_delta 500M \"{fileOutput}.avi\""
 }
 
 SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',
                    'uploadYouTube', 'coverArt', 'videoDescription', 'videoTags',
                    'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName',
-                   'playlistName'))
+                   'playlistName', 'commandString'))
 ALBUM_FIELDS = set(('albumPlaylist', 'fileOutputDirAlbum', 'fileOutputNameAlbum',
                     'uploadYouTube', 'videoDescriptionAlbum', 'videoTagsAlbum', 'videoTitleAlbum'))
 

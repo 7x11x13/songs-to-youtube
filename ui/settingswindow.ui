@@ -54,9 +54,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-472</y>
         <width>433</width>
-        <height>1558</height>
+        <height>1684</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -373,6 +373,35 @@
           </item>
           <item>
            <widget class="QLineEdit" name="fileOutputName"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Command string:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="commandString"/>
+          </item>
+          <item alignment="Qt::AlignRight">
+           <widget class="QPushButton" name="resetCommandString">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Reset to default</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

@@ -178,6 +178,9 @@ class SettingsWindow(QDialog):
         file = QFileDialog.getOpenFileName(self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER)[0]
         self.ui.coverArt.set(file)
 
+    def reset_ffmpeg_command(self):
+        self.ui.commandString.setPlainText(SETTINGS_DEFAULTS["commandString"])
+
     def show(self):
         self.ui.show()
 
@@ -187,3 +190,4 @@ class SettingsWindow(QDialog):
         self.ui.coverArtButton.clicked.connect(self.change_cover_art)
         self.ui.addNewUserButton.clicked.connect(self.add_new_user)
         self.ui.removeUserButton.clicked.connect(self.remove_user)
+        self.ui.resetCommandString.clicked.connect(self.reset_ffmpeg_command)

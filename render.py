@@ -72,11 +72,8 @@ class RenderSongWorker(QObject):
 
     def run(self):
         try:
-            command_str = ("ffmpeg -loglevel error -progress pipe:1 -y -r {inputFrameRate} -loop 1 -i \"{coverArt}\" -i \"{song_path}\" "
-            "-r 30 -shortest -vf \"scale='min({videoWidth}, iw)':'min({videoHeight}, ih)':force_original_aspect_ratio=decrease,"
-            "pad={videoWidth}:{videoHeight}:-1:-1:color={backgroundColor}\" "
-            '-acodec copy -vcodec libx264 -fflags +shortest -max_interleave_delta 500M "{fileOutput}"').format(**self.song.to_dict())
-
+            command_str = (self.song.get("commandString")).format(**self.song.to_dict())
+            print(command_str)
             handler = ProcessHandler()
             handler.stderr.connect(self.error.emit)
             handler.stdout.connect(self.progress.emit)
