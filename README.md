@@ -7,10 +7,13 @@ Convert audio files to videos and upload them to YouTube automatically.
 ![Example](/docs/example.png)
 
 ## Features
-- Extract album covers from audio files
-- Extract other metadata which can be used in template strings for the video title/description etc.
-- Concatenate songs to upload an album as a single video
-- Drag and drop support for audio files and album covers
+- Extracts album covers from audio files
+- Extracts other metadata which can be used in template strings for the video title/description etc.
+- Can concatenate songs to upload an album as a single video
+- Can upload an album as a playlist of multiple videos
+- Encode multiple videos in parallel
+- Multi-user support
+- Does not re-encode audio
 
 ## Pre-installation
 - [FFmpeg](https://ffmpeg.org/download.html) binary is required to convert songs into videos
@@ -34,6 +37,9 @@ If you have issues running the exectuable, you can try running the program from 
 
 ## Notes
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
+- You can drag and drop songs on the main window to add them to the queue. The order in which they are uploaded goes from top to bottom
+- You can also drag and drop images onto a song's current album art to change it
+- You probably shouldn't change the output file extension from .avi
 - If you get an error saying "Too large number of skipped frames XXXXX > 60000" try increasing the input frame rate to 2
 
 ### Template strings
