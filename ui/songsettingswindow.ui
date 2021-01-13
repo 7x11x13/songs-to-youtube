@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
-        <width>423</width>
-        <height>1340</height>
+        <y>-55</y>
+        <width>405</width>
+        <height>1387</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -138,7 +138,7 @@
           <item>
            <widget class="QLabel" name="label_26">
             <property name="text">
-             <string>Input frame rate (lower = faster render, higher = more accurate video length):</string>
+             <string>Input frame rate (keep this at 1 unless you experience problems):</string>
             </property>
            </widget>
           </item>
@@ -372,6 +372,27 @@
               <height>16777215</height>
              </size>
             </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>Visibility:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="videoVisibilityAlbum">
+            <item>
+             <property name="text">
+              <string>PUBLIC</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>UNLISTED</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>

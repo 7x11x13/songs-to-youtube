@@ -1,5 +1,5 @@
 # This Python file uses the following encoding: utf-8
-from PySide6.QtCore import QByteArray, QTemporaryFile, QIODevice, QFileInfo
+from PySide6.QtCore import QByteArray, QTemporaryFile, QIODevice, QFileInfo, QDir
 from PySide6.QtGui import QStandardItem
 
 from enum import IntEnum
@@ -7,6 +7,7 @@ import audio_metadata
 import logging
 import os
 import datetime
+import subprocess
 from string import Template
 
 from const import *
@@ -27,7 +28,13 @@ class SettingTemplate(Template):
 
 class TreeWidgetItemData:
     def __init__(self, item_type, songs=None, **kwargs):
+
+        # metadata values
+        # can be any type
         self.metadata = {}
+
+        # application values
+        # always strings
         self.dict = {}
         app_fields = SONG_FIELDS if item_type == TreeWidgetType.SONG else ALBUM_FIELDS
         for field in (set(kwargs.keys()) | app_fields):
@@ -108,7 +115,7 @@ class TreeWidgetItemData:
         if 'streaminfo.duration' in self.metadata:
             return self.metadata['streaminfo.duration'] * 1000
         else:
-            logging.warning("Could not find duration of file {}".format(self.dict['song_path']))
+            logging.error("Could not find duration of file {}".format(self.dict['song_path']))
             logging.debug(self.metadata)
             return 180 * 1000
 
@@ -145,6 +152,9 @@ class SongTreeWidgetItem(QStandardItem):
     def get(self, field):
         return self.data(CustomDataRole.ITEMDATA).get_value(field)
 
+    def set(self, field, value):
+        self.data(CustomDataRole.ITEMDATA).set_value(field, value)
+
     def to_dict(self):
         return self.data(CustomDataRole.ITEMDATA).to_dict()
 
@@ -155,7 +165,12 @@ class SongTreeWidgetItem(QStandardItem):
         return self.data(CustomDataRole.ITEMDATA).get_duration_ms()
 
     def before_render(self):
-        self.data(CustomDataRole.ITEMDATA).set_value("fileOutput", os.path.join(self.get("fileOutputDir"), self.get("fileOutputName")))
+        self.set("fileOutput", os.path.join(self.get("fileOutputDir"), self.get("fileOutputName")))
+        self.set("tempFileOutput", os.path.join(QDir.tempPath(), self.get("fileOutputName")))
+        self.set("songDuration", str(self.get_duration_ms() / 1000))
+
+    def before_upload(self):
+        pass
 
     def get_track_number(self):
         return self.data(CustomDataRole.ITEMDATA).get_track_number()
@@ -224,12 +239,13 @@ class AlbumTreeWidgetItem(QStandardItem):
     def before_render(self):
         self.data(CustomDataRole.ITEMDATA).set_value("fileOutput", os.path.join(self.get("fileOutputDirAlbum"), self.get("fileOutputNameAlbum")))
 
+    def before_upload(self):
         # generate timestamps
         timestamp = 0
         timestamp_str = ""
         for song in self.getChildren():
             timestamp_str += "{} {}\n".format(datetime.timedelta(seconds=int(timestamp)), song.get("videoTitle"))
-            timestamp += song.get_duration_ms() / 1000
+            timestamp += float(song.get("realVideoLength"))
         data = self.data(CustomDataRole.ITEMDATA)
         data.set_value("timestamps", timestamp_str)
         data.update_fields()

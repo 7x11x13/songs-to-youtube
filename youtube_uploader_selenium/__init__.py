@@ -77,12 +77,13 @@ class YouTubeUploader:
         self.__validate_inputs()
 
     def __validate_inputs(self):
-        if not self.metadata_dict[Constant.VIDEO_TITLE]:
+        if Constant.VIDEO_TITLE not in self.metadata_dict:
             self.logger.warning("The video title was not found in metadata")
             self.metadata_dict[Constant.VIDEO_TITLE] = Path(self.video_path).stem
             self.logger.warning("The video title was set to {}".format(Path(self.video_path).stem))
-        if not self.metadata_dict[Constant.VIDEO_DESCRIPTION]:
-            self.logger.warning("The video description was not found in metadata")
+        for key in (Constant.VIDEO_DESCRIPTION, Constant.PLAYLIST, Constant.TAGS):
+            if key not in self.metadata_dict:
+                self.metadata_dict[key] = ""
 
     def upload(self) -> (bool, Optional[str]):
         try:

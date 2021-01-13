@@ -77,6 +77,14 @@ class RenderSongWorker(QObject):
             handler.stderr.connect(self.error.emit)
             handler.stdout.connect(self.progress.emit)
             errors = handler.run(command_str)
+            if not errors:
+                # cut video to exact length of song
+                handler = ProcessHandler()
+                handler.stderr.connect(self.error.emit)
+                handler.stdout.connect(self.progress.emit)
+                command_str = 'ffmpeg -loglevel error -progress pipe:1 -y -i "{tempFileOutput}" -t {songDuration} -acodec copy -vcodec copy "{fileOutput}"'.format(**self.song.to_dict())
+                errors = handler.run(command_str)
+                os.remove(self.song.get("tempFileOutput"))
             self.finished.emit(not errors)
         except Exception as e:
             self.error.emit(traceback.format_exc())
@@ -101,7 +109,6 @@ class CombineSongWorker(QObject):
         try:
             song_list = QTemporaryFile()
             song_list.open(QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text)
-            # song_list.setAutoRemove(False)
             for song in self.album.getChildren():
                 song_list.write(QByteArray("file 'file:{}'\n".format(song.get("fileOutput"))))
             song_list.close()
@@ -113,9 +120,17 @@ class CombineSongWorker(QObject):
             handler.stderr.connect(self.error.emit)
             handler.stdout.connect(self.progress.emit)
             errors = handler.run(command_str)
-            if not errors:
-                for song in self.album.getChildren():
+            for song in self.album.getChildren():
+                try:
+                    song_length = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
+                                                        "format=duration", "-of",
+                                                        "default=noprint_wrappers=1:nokey=1", song.get("fileOutput")],
+                                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT).stdout
+                    song.set("realVideoLength", song_length.decode('utf-8'))
                     os.remove(song.get("fileOutput"))
+                except Exception as e:
+                    logging.error("Could not get duration of video: {}".format(song.get("fileOutput")))
+                    raise
             self.finished.emit(not errors)
         except Exception as e:
             self.error.emit(traceback.format_exc())

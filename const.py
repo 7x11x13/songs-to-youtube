@@ -74,12 +74,13 @@ SETTINGS_DEFAULTS = {
     "videoTagsAlbum": "",
     "videoTitleAlbum": "~{song.tags.artist} - ~{song.tags.album}",
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC,
+    "videoVisibilityAlbum": SETTINGS_VALUES.VideoVisibility.PUBLIC,
     "inputFrameRate": "1",
     "username": "",
     "commandString": "ffmpeg -loglevel error -progress pipe:1 -y -r {inputFrameRate} -loop 1 -i \"{coverArt}\" -i \"{song_path}\" "
                      "-r 30 -shortest -vf \"scale='min({videoWidth}, iw)':'min({videoHeight}, ih)':force_original_aspect_ratio=decrease,"
                      "pad={videoWidth}:{videoHeight}:-1:-1:color={backgroundColor}\" "
-                     "-acodec copy -vcodec libx264 -fflags +shortest -max_interleave_delta 500M \"{fileOutput}\""
+                     "-acodec copy -vcodec libx264 -fflags +shortest -max_interleave_delta 500M \"{tempFileOutput}\""
 }
 
 SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',
@@ -87,7 +88,8 @@ SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWid
                    'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName',
                    'playlistName', 'commandString'))
 ALBUM_FIELDS = set(('albumPlaylist', 'fileOutputDirAlbum', 'fileOutputNameAlbum',
-                    'uploadYouTube', 'videoDescriptionAlbum', 'videoTagsAlbum', 'videoTitleAlbum'))
+                    'uploadYouTube', 'videoDescriptionAlbum', 'videoTagsAlbum', 'videoTitleAlbum',
+                    'videoVisibilityAlbum'))
 
 
 QDir.temp().mkdir(APPLICATION)

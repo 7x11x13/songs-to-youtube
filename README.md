@@ -34,9 +34,7 @@ If you have issues running the exectuable, you can try running the program from 
 
 ## Notes
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
-- If you don't care about the accuracy of the produced video length, set the input frame rate to 1 to render as fast as possible.
-  If you care about the accuracy (e.g. to produce accurate timestamps for album descriptions) set the input frame rate to at least 10
-- If you get an error saying "Too large number of skipped frames XXXXX > 60000" try increasing the input frame rate
+- If you get an error saying "Too large number of skipped frames XXXXX > 60000" try increasing the input frame rate to 2
 
 ### Template strings
 Write `~{key}` in any text field and it will be replaced with an appropriate value. To see the available metadata values, right click on an album or song and select "View metadata."
