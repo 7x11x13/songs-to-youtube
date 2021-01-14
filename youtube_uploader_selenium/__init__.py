@@ -67,14 +67,14 @@ class YouTubeLogin:
 class YouTubeUploader:
     """A class for uploading videos on YouTube via Selenium using metadata dict"""
 
-    def __init__(self, video_path, metadata, username, cookies_path="") -> None:
-        self.video_path = video_path
-        self.metadata_dict = metadata
+    def __init__(self, username, cookies_path="") -> None:
+        # Optional cookies_path to override username
+        # for debugging purposes
         if cookies_path == "":
             cookies_path = YouTubeLogin.get_cookie_path_from_username(username)
+        self.username = username
         self.browser = Firefox(full_screen=False, cookies_folder_path=cookies_path, default_find_func_timeout=10)
         self.logger = logging.getLogger()
-        self.__validate_inputs()
 
     def __validate_inputs(self):
         if Constant.VIDEO_TITLE not in self.metadata_dict:
@@ -85,8 +85,11 @@ class YouTubeUploader:
             if key not in self.metadata_dict:
                 self.metadata_dict[key] = ""
 
-    def upload(self) -> (bool, Optional[str]):
+    def upload(self, video_path, metadata) -> (bool, Optional[str]):
         try:
+            self.video_path = video_path
+            self.metadata_dict = metadata
+            self.__validate_inputs()
             self.__login()
             return self.__upload()
         except Exception as e:
@@ -97,6 +100,10 @@ class YouTubeUploader:
     def __login(self):
         self.browser.get(Constant.YOUTUBE_URL)
         time.sleep(Constant.USER_WAITING_TIME)
+
+        if self.browser.find(By.XPATH, Constant.USER_AVATAR_XPATH, timeout=5) is not None:
+            # already logged in
+            return
 
         if self.browser.has_cookies_for_current_website():
             self.browser.load_cookies()
@@ -248,9 +255,6 @@ class YouTubeUploader:
 
         done_button.click()
         self.logger.debug("Published the video with video_id = {}".format(video_id))
-        time.sleep(Constant.USER_WAITING_TIME)
-        self.browser.get(Constant.YOUTUBE_URL)
-        self.__quit()
         return True, video_id
 
     def __get_video_id(self) -> Optional[str]:
@@ -267,3 +271,6 @@ class YouTubeUploader:
 
     def __quit(self):
         self.browser.driver.quit()
+
+    def quit(self):
+        self.__quit()

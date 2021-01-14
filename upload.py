@@ -14,20 +14,16 @@ from settings import get_setting
 
 class UploadThread(Thread):
 
-    def __init__(self, file_path, metadata, username, callback=lambda: None):
+    def __init__(self, uploader, file_path, metadata, callback=lambda: None):
         super().__init__(daemon=True)
+        self.uploader = uploader
         self.file_path = file_path
         self.metadata = metadata
         self.callback = callback
-        self.username = username
 
     def run(self):
         try:
-            if self.username == "":
-                raise Exception("No user selected to upload to")
-            self.uploader = YouTubeUploader(self.file_path, self.metadata, self.username)
-            time.sleep(5)
-            success, video_id = self.uploader.upload()
+            success, video_id = self.uploader.upload(self.file_path, self.metadata)
             if success:
                 logging.success("Successfully uploaded {}, link at: https://youtube.com/watch?v={}".format(self.file_path, video_id))
             else:
@@ -45,6 +41,7 @@ class Uploader(QObject):
 
     def __init__(self, render_results, *args):
         super().__init__()
+        self.uploader = YouTubeUploader(get_setting('username'))
         self.uploading = False
         self.threads = []
         self.results = {}
@@ -55,13 +52,16 @@ class Uploader(QObject):
         self.threads.remove(thread)
         self.results[thread.file_path] = success
         if len(self.threads) == 0:
+            self.uploader.quit()
             self.finished.emit(self.results)
         else:
             self.uploading = True
             self.threads[0].start()
 
     def _upload(self, file_path, metadata):
-        thread = UploadThread(file_path, metadata, get_setting('username'), self.on_done_uploading)
+        if self.uploader.username == "":
+            raise Exception("No user selected to upload to")
+        thread = UploadThread(self.uploader, file_path, metadata, self.on_done_uploading)
         self.threads.append(thread)
         if not self.uploading:
             self.uploading = True

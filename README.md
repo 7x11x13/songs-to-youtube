@@ -11,7 +11,7 @@ Convert audio files to videos and upload them to YouTube automatically.
 - Extracts other metadata which can be used in template strings for the video title/description etc.
 - Can concatenate songs to upload an album as a single video
 - Can upload an album as a playlist of multiple videos
-- Encode multiple videos in parallel
+- Encodes multiple videos in parallel
 - Multi-user support
 - Does not re-encode audio
 
@@ -51,6 +51,7 @@ Here are some useful values:
 - `~{tags.album}` - name of the song's album
 - `~{tags.artist}` - name of the song's artist
 - `~{tags.title}` - name of the song
+- `~{tags.date}` - year of release
 - `~{tags.comment.text}` - comment; used by bandcamp to link to the artist's page
 #### Album metadata
 - `~{album_dir}` - directory of the album
