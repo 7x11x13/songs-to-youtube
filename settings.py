@@ -1,14 +1,15 @@
 # This Python file uses the following encoding: utf-8
 from PySide6.QtCore import Signal, QSettings, Qt
-from PySide6.QtWidgets import QDialog, QCheckBox, QLabel, QFileDialog, QScrollArea, QMessageBox
+from PySide6.QtWidgets import QDialog, QCheckBox, QLabel, QFileDialog, QScrollArea, QMessageBox, QDialogButtonBox
 from PySide6.QtGui import QPixmap
 
 import logging
 import traceback
 import time
+import os
 from threading import Thread
 
-from utils import load_ui, get_all_fields, find_ancestor, mimedata_has_image, get_image_from_mimedata
+from utils import *
 from youtube_uploader_selenium import YouTubeLogin
 from const import *
 
@@ -16,9 +17,8 @@ def get_settings():
     """Returns the QSettings for this application"""
     return QSettings(QSettings.IniFormat, QSettings.UserScope, ORGANIZATION, APPLICATION)
 
-def get_setting(setting: str):
+def get_setting(setting: str, settings=get_settings()):
     """Returns the value of the given setting (as a string) or None if it has no value"""
-    settings = get_settings()
     if setting not in SETTINGS_DEFAULTS:
         logging.warning("Setting {} is not recognized".format(setting))
         return None
@@ -131,25 +131,55 @@ class SettingsWindow(QDialog):
 
     settings_changed = Signal()
 
+    SAVE_PRESET_TEXT = "Save preset"
+    LOAD_PRESET_TEXT = "Load preset"
+
     def __init__(self, *args):
         super().__init__(*args)
         self.ui = load_ui("settingswindow.ui", (CoverArtDisplay, SettingCheckBox, SettingsScrollArea))
+        # rename default buttons
+        self.ui.buttonBox.addButton(SettingsWindow.SAVE_PRESET_TEXT, QDialogButtonBox.ApplyRole)
+        self.ui.buttonBox.addButton(SettingsWindow.LOAD_PRESET_TEXT, QDialogButtonBox.ApplyRole)
         self.connect_actions()
         self.load_settings()
         self.login_thread = None
 
+    def save_preset(self):
+        presets_dir = os.path.join(os.path.dirname(__file__), "presets")
+        if not os.path.exists(presets_dir):
+            os.makedirs(presets_dir)
+        file = QFileDialog.getSaveFileName(self, SettingsWindow.SAVE_PRESET_TEXT, presets_dir, "Configuration files (*.ini)")[0]
+        if file:
+            settings = QSettings(file, QSettings.IniFormat)
+            self.save_settings_from_fields(settings)
+
+    def load_preset(self):
+        presets_dir = os.path.join(os.path.dirname(__file__), "presets")
+        if not os.path.exists(presets_dir):
+            os.makedirs(presets_dir)
+        file = QFileDialog.getOpenFileName(self, SettingsWindow.LOAD_PRESET_TEXT, presets_dir, "Configuration files (*.ini)")[0]
+        if file:
+            settings = QSettings(file, QSettings.IniFormat)
+            self.set_fields_from_settings(settings)
+
     def save_settings(self):
         settings = get_settings()
-        for field in get_all_fields(self.ui):
-            settings.setValue(field.name, field.get())
+        self.save_settings_from_fields(settings)
         self.settings_changed.emit()
 
     def load_settings(self):
         for username in YouTubeLogin.get_all_usernames():
             self.ui.username.addItem(username)
         settings = get_settings()
+        self.set_fields_from_settings(settings)
+
+    def set_fields_from_settings(self, settings):
         for field in get_all_fields(self.ui):
-            field.set(get_setting(field.name))
+            field.set(get_setting(field.name, settings))
+
+    def save_settings_from_fields(self, settings):
+        for field in get_all_fields(self.ui):
+            settings.setValue(field.name, field.get())
 
     def on_login(self, success, username):
         self.ui.setEnabled(True)
@@ -187,6 +217,8 @@ class SettingsWindow(QDialog):
     def connect_actions(self):
         self.ui.buttonBox.accepted.connect(self.save_settings)
         self.ui.buttonBox.rejected.connect(self.reject)
+        find_child_text(self.ui.buttonBox, SettingsWindow.SAVE_PRESET_TEXT).clicked.connect(self.save_preset)
+        find_child_text(self.ui.buttonBox, SettingsWindow.LOAD_PRESET_TEXT).clicked.connect(self.load_preset)
         self.ui.coverArtButton.clicked.connect(self.change_cover_art)
         self.ui.addNewUserButton.clicked.connect(self.add_new_user)
         self.ui.removeUserButton.clicked.connect(self.remove_user)

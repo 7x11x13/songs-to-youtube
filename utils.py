@@ -127,6 +127,14 @@ def get_all_children(obj: QObject):
         yield child
         yield from get_all_children(child)
 
+def find_child_text(obj: QObject, text: str):
+    """Returns the child of obj with the given text"""
+    for child in obj.children():
+        get_text = getattr(child, "text", None)
+        if callable(get_text) and get_text() == text:
+            return child
+    return None
+
 def get_field(obj: QObject, field):
     for widget in get_all_children(obj):
         class_name = widget.metaObject().className()
