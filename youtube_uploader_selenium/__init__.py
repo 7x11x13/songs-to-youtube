@@ -85,6 +85,18 @@ class YouTubeUploader:
             if key not in self.metadata_dict:
                 self.metadata_dict[key] = ""
 
+        title = self.metadata_dict[Constant.VIDEO_TITLE]
+        if len(title) > Constant.MAX_TITLE_LENGTH:
+            self.metadata_dict[Constant.VIDEO_TITLE] = title[:Constant.MAX_TITLE_LENGTH]
+
+        description = self.metadata_dict[Constant.VIDEO_DESCRIPTION]
+        if len(description) > Constant.MAX_DESCRIPTION_LENGTH:
+            self.metadata_dict[Constant.VIDEO_DESCRIPTION] = description[:Constant.MAX_DESCRIPTION_LENGTH]
+
+        tags = self.metadata_dict[Constant.TAGS]
+        if len(tags) > Constant.MAX_TAGS_LENGTH:
+            self.metadata_dict[Constant.TAGS] = tags[:Constant.MAX_TAGS_LENGTH]
+
     def upload(self, video_path, metadata) -> (bool, Optional[str]):
         try:
             self.video_path = video_path

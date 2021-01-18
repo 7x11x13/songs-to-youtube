@@ -41,3 +41,7 @@ class Constant:
     DONE_BUTTON = 'done-button'
     INPUT_FILE_VIDEO = "//input[@type='file']"
     USERNAME_ID = "account-name"
+
+    MAX_TITLE_LENGTH = 100
+    MAX_DESCRIPTION_LENGTH = 5000
+    MAX_TAGS_LENGTH = 500
