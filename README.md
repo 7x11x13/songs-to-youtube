@@ -12,8 +12,8 @@ Convert audio files to videos and upload them to YouTube automatically.
 - Can concatenate songs to upload an album as a single video
 - Can upload an album as a playlist of multiple videos
 - Encodes multiple videos in parallel
-- Multi-user support
 - Does not re-encode audio
+- Supports multiple users, multiple presets
 
 ## Pre-installation
 - [FFmpeg](https://ffmpeg.org/download.html) binary is required to convert songs into videos
@@ -27,7 +27,7 @@ There are two ways to install this program:
 ### PyInstaller
 
 Download the latest release for your platform [here](https://github.com/7x11x13/songs-to-youtube/releases), unzip the archive, and run the songs-to-youtube executable.
-Currently the Windows exectuable is flagged as a virus by Microsoft Defender, among others. If that is the case, you can just run from the source code.
+Currently the Windows exectuable is flagged as a virus by Microsoft Defender, among others. If you don't want to add an exception to your antivirus, you can just run from the source code.
 
 ### Run from source
 If you have issues running the exectuable, you can try running the program from the source code:
@@ -41,6 +41,7 @@ If you have issues running the exectuable, you can try running the program from 
 - You can also drag and drop images onto a song's current album art to change it
 - You probably shouldn't change the output file extension from .avi
 - If you get an error saying "Too large number of skipped frames XXXXX > 60000" try increasing the input frame rate to 2
+- YouTube titles and descriptions do not allow angled brackets in them
 
 ### Template strings
 Write `~{key}` in any text field and it will be replaced with an appropriate value. To see the available metadata values, right click on an album or song and select "View metadata."
