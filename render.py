@@ -110,7 +110,7 @@ class CombineSongWorker(QObject):
             song_list = QTemporaryFile()
             song_list.open(QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text)
             for song in self.album.getChildren():
-                song_list.write(QByteArray("file 'file:{}'\n".format(song.get("fileOutput"))))
+                song_list.write(QByteArray("file 'file:{}'\n".format(song.get("fileOutput").replace("'", "'\\''"))))
             song_list.close()
             command_str = ("ffmpeg -loglevel error -progress pipe:1 -y -f concat "
                            "-safe 0 -i \"{input_file_list}\" -c copy \"{fileOutputPath}\"").format(
