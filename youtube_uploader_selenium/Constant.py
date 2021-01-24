@@ -43,6 +43,7 @@ class Constant:
     DONE_BUTTON = 'done-button'
     INPUT_FILE_VIDEO = "//input[@type='file']"
     USERNAME_ID = "account-name"
+    VIDEO_PUBLISHED_DIALOG = '//*[@id="dialog-title"]'
 
     MAX_TITLE_LENGTH = 100
     MAX_DESCRIPTION_LENGTH = 5000

@@ -300,6 +300,9 @@ class YouTubeUploader:
 
         done_button.click()
         self.logger.debug("Published the video with video_id = {}".format(video_id))
+        # wait for youtube to save the video info
+        while self.browser.find(By.XPATH, Constant.VIDEO_PUBLISHED_DIALOG) is None:
+            time.sleep(1)
         return True, video_id
 
     def __get_video_id(self) -> Optional[str]:
