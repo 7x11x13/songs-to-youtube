@@ -14,6 +14,7 @@ Convert audio files to videos and upload them to YouTube automatically.
 - Encodes multiple videos in parallel
 - Does not re-encode audio
 - Supports multiple users, multiple presets
+- Does not use YouTube API; upload up to 50-100 videos per day
 
 ## Pre-installation
 - [FFmpeg](https://ffmpeg.org/download.html) binary is required to convert songs into videos
@@ -43,7 +44,7 @@ If you have issues running the exectuable, you can try running the program from 
 - YouTube titles and descriptions do not allow angled brackets in them
 
 ### Template strings
-Write `~{key}` in any text field and it will be replaced with an appropriate value. To see the available metadata values, right click on an album or song and select "View metadata."
+Write `~{key}` in any text field and it will be replaced with an appropriate value. To see the available keys, right click on an album or song and select "View metadata."
 Here are some useful values:
 #### Song metadata
 - `~{song_dir}` - directory of the input audio file
@@ -52,7 +53,7 @@ Here are some useful values:
 - `~{tags.artist}` - name of the song's artist
 - `~{tags.title}` - name of the song
 - `~{tags.date}` - year of release
-- `~{tags.comment.text}` - comment; used by bandcamp to link to the artist's page
+- `~{tags.comment.text}` - comment used by bandcamp to link to the artist's page
 #### Album metadata
 - `~{album_dir}` - directory of the album
 - `~{timestamps}` - special key that generates timestamps based on song lengths
