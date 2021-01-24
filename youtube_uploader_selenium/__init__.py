@@ -7,6 +7,7 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from typing import Optional
 import time
 import os
+import re
 from .Constant import *
 from pathlib import Path
 import shutil
@@ -127,14 +128,43 @@ class YouTubeUploader:
         else:
             raise Exception("Could not find cookies at path {}".format(self.browser.cookies_folder_path))
 
+    def __find_playlist_checkbox_no_search(self, name):
+        for element in self.browser.find_all(By.XPATH, Constant.PLAYLIST_LABEL):
+            name_element = element.find_element_by_xpath(".//span/span[@class='label label-text style-scope ytcp-checkbox-group']")
+            if name_element.text == name:
+                return element.find_element_by_xpath(".//ytcp-checkbox-lit")
+        return None
+
     def __find_playlist_checkbox(self, name):
         try:
-            for element in self.browser.find_all(By.XPATH, Constant.PLAYLIST_LABEL):
-                name_element = element.find_element_by_xpath(".//span/span[@class='label label-text style-scope ytcp-checkbox-group']")
-                if name_element.text == name:
-                    return element.find_element_by_xpath(".//ytcp-checkbox-lit")
+            checkbox = self.__find_playlist_checkbox_no_search(name)
+
+            if not checkbox:
+                # sometimes a newly created playlist will not show up in the list of playlists
+                # we can search for it to update the list
+                search = self.browser.find(By.XPATH, Constant.PLAYLIST_SEARCH)
+
+                # search behaves weird with opening brackets / parentheses,
+                # possibly other characters as well
+                # need to investigate this further:
+                # Uncaught SyntaxError: unterminated character class
+                # Uncaught SyntaxError: unterminated parenthetical
+                phrases = re.split(r"[\[(]", name)
+                phrases.sort(key=lambda p: len(p))
+                search.click()
+                time.sleep(Constant.USER_WAITING_TIME)
+                search.clear()
+                time.sleep(Constant.USER_WAITING_TIME)
+                search.send_keys(phrases[-1])
+                checkbox = self.__find_playlist_checkbox_no_search(name)
+                # clear search so we can create new playlist
+                self.browser.find(By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON).click()
+
+
+            return checkbox
+
         except Exception as e:
-            logging.warning(e)
+            logging.error(e)
             return None
 
 

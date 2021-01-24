@@ -16,6 +16,8 @@ class Constant:
     PLAYLIST_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/' \
                          'ytcp-uploads-details/div/ytcp-uploads-basics/ytcp-video-metadata-playlists/' \
                          'ytcp-text-dropdown-trigger/ytcp-dropdown-trigger/div'
+    PLAYLIST_SEARCH = '//*[@id="search-input"]'
+    PLAYLIST_SEARCH_CLEAR_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[1]/ytcp-icon-button'
     PLAYLIST_NEW_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/ytcp-button[1]/div'
     PLAYLIST_NEW_TITLE = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/div[1]/ytcp-form-textarea/div/textarea'
     PLAYLIST_DONE_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/ytcp-button[3]/div'
