@@ -15,7 +15,7 @@ class MetadataTableWidget(QTableWidget):
             self.insertRow(self.rowCount())
             key_item = QTableWidgetItem(key)
             key_item.setFlags(Qt.ItemIsEnabled | Qt.ItemNeverHasChildren)
-            value_item = QTableWidgetItem(value)
+            value_item = QTableWidgetItem(str(value))
             value_item.setFlags(Qt.ItemIsEnabled | Qt.ItemNeverHasChildren)
             self.setItem(self.rowCount() - 1, 0, key_item)
             self.setItem(self.rowCount() - 1, 1, value_item)
