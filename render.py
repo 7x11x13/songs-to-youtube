@@ -168,8 +168,6 @@ class AlbumRenderHelper:
             # cancel concatenation job
             self.error = True
             self.renderer.cancel_worker(self.combine_worker)
-            for w in self.workers:
-                self.renderer.cancel_worker(w)
 
     def render(self, renderer):
         renderer.worker_done.connect(self.worker_done)
@@ -237,7 +235,8 @@ class Renderer(QObject):
 
     def thread_finished(self, thread):
         thread.deleteLater()
-        self.threads.remove(thread)
+        if thread in self.threads:
+            self.threads.remove(thread)
         for w, t in self.workers.items():
             if t == thread:
                 del self.workers[w]
@@ -267,9 +266,11 @@ class Renderer(QObject):
         if worker_name in self.workers:
             thread = self.workers[worker_name]
             thread.quit()
-            self.threads.remove(thread)
+            if thread in self.threads:
+                self.threads.remove(thread)
             if len(self.threads) == 0:
                 self.working = False
+            del self.workers[worker_name]
 
     def add_worker(self, worker, auto_start=True):
         thread = QThread()
@@ -284,16 +285,17 @@ class Renderer(QObject):
         self.workers[str(worker)] = thread
 
     def add_render_album_job(self, album: AlbumTreeWidgetItem):
+        album.before_render()
         if album.childCount() == 0:
             return
         if album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.SINGLE:
             self.helpers.append(AlbumRenderHelper(album).render(self))
         elif album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.MULTIPLE:
             for song in album.getChildren():
-                song.before_render()
                 self.add_render_song_job(song)
 
     def add_render_song_job(self, song: SongTreeWidgetItem):
+        song.before_render()
         worker = RenderSongWorker(song)
         self.add_worker(worker)
         return str(worker)
