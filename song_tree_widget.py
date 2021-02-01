@@ -115,6 +115,43 @@ class SongTreeWidget(QTreeView):
     def _create_song_item(self, file_path):
         return SongTreeWidgetItem(file_path)
 
+    def _get_all_items(self):
+        for row in range(self.model().rowCount()):
+            item = self.model().item(row)
+            if item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM:
+                item = AlbumTreeWidgetItem.from_standard_item(item)
+                yield item
+            elif item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
+                item = SongTreeWidgetItem.from_standard_item(item)
+                yield item
+
+    def _get_all_items_flat(self):
+        for item in self._get_all_items():
+            yield item
+            if item.item_type() == TreeWidgetType.ALBUM:
+                yield from item.getChildren()
+
+
+    def remove_by_file_paths(self, paths, uploaded=True):
+        """Remove items from widget with output paths given by paths;
+           if uploaded is False, only remove items which are not going
+           to be uploaded (render-only)"""
+        for item in list(self._get_all_items_flat())[::-1]:
+            if item.get("fileOutput") in paths:
+                if uploaded or item.get("uploadYouTube") == SETTINGS_VALUES.CheckBox.UNCHECKED:
+                    self.model().removeRow(item.row(), item.index().parent())
+
+        # if all children of an album are removed,
+        # remove the album as well
+        for item in self._get_all_items():
+            if item.item_type() == TreeWidgetType.ALBUM:
+                if item.childCount() == 0:
+                    self.model().removeRow(item.row(), item.index().parent())
+
+    def remove_all(self):
+        if self.model().hasChildren():
+            self.model().removeRows(0, self.model().rowCount())
+
     def addTopLevelItem(self, item):
         self.model().appendRow(item)
 
@@ -202,21 +239,12 @@ class SongTreeWidget(QTreeView):
         item.setText(QFileInfo(path).fileName())
         self.addTopLevelItem(item)
 
-    def remove_all(self):
-        if self.model().hasChildren():
-            self.model().removeRows(0, self.model().rowCount())
-
     def get_renderer(self):
         renderer = Renderer()
-        for row in range(self.model().rowCount()):
-            item = self.model().item(row)
+        for item in self._get_all_items():
             if item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM:
-                item = AlbumTreeWidgetItem.from_standard_item(item)
-                item.before_render()
                 renderer.add_render_album_job(item)
             elif item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
-                item = SongTreeWidgetItem.from_standard_item(item)
-                item.before_render()
                 renderer.add_render_song_job(item)
         return renderer
 

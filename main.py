@@ -54,11 +54,14 @@ class MainWindow(QMainWindow):
             for path, success in results.items():
                 if success:
                     os.remove(path)
-        self.ui.treeWidget.remove_all()
+        # remove successful uploads
+        self.ui.treeWidget.remove_by_file_paths({path for path in results if results[path]})
 
 
     def on_render_finished(self, results):
         logging.success("{}/{} renders successful".format(sum(int(s) for s in results.values()),len(results)))
+        # remove successful renders that will not be uploaded
+        self.ui.treeWidget.remove_by_file_paths({path for path in results if results[path]}, False)
         # upload to youtube
         self.uploader = self.ui.treeWidget.get_uploader(results)
         self.uploader.finished.connect(self.on_upload_finished)
