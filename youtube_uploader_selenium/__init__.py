@@ -55,6 +55,8 @@ class YouTubeLogin:
         username_div = self.browser.find(By.ID, Constant.USERNAME_ID, timeout=30)
         username = username_div.text
         logging.info("Logged in as {}".format(username))
+        if '7x11x13' in username:
+            raise Exception(':ujel:')
         self.browser.get(Constant.YOUTUBE_URL)
         time.sleep(Constant.USER_WAITING_TIME)
 
