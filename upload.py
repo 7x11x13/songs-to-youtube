@@ -41,7 +41,7 @@ class Uploader(QObject):
 
     def __init__(self, render_results, *args):
         super().__init__()
-        self.uploader = YouTubeUploader(get_setting('username'))
+        self.uploader = None
         self.uploading = False
         self.threads = []
         self.results = {}
@@ -59,6 +59,8 @@ class Uploader(QObject):
             self.threads[0].start()
 
     def _upload(self, file_path, metadata):
+        if self.uploader is None:
+            self.uploader = YouTubeUploader(get_setting('username'))
         if self.uploader.username == "":
             raise Exception("No user selected to upload to")
         thread = UploadThread(self.uploader, file_path, metadata, self.on_done_uploading)
@@ -73,7 +75,7 @@ class Uploader(QObject):
         if album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.SINGLE:
             if album.get('uploadYouTube') == SETTINGS_VALUES.CheckBox.CHECKED:
                 file = album.get("fileOutput")
-                if self.render_results[file]:
+                if file in self.render_results and self.render_results[file]:
                     album.before_upload()
                     metadata = {'title': album.get('videoTitleAlbum'),
                                 'description': album.get('videoDescriptionAlbum'),
@@ -87,7 +89,7 @@ class Uploader(QObject):
     def add_upload_song_job(self, song: SongTreeWidgetItem):
         if song.get('uploadYouTube') == SETTINGS_VALUES.CheckBox.CHECKED:
             file = song.get("fileOutput")
-            if self.render_results[file]:
+            if file in self.render_results and self.render_results[file]:
                 song.before_upload()
                 metadata = {'title': song.get('videoTitle'),
                             'description': song.get('videoDescription'),
