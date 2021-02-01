@@ -12,7 +12,6 @@ Convert audio files to videos and upload them to YouTube automatically.
 - Can concatenate songs to upload an album as a single video
 - Can upload an album as a playlist of multiple videos
 - Encodes multiple videos in parallel
-- Does not re-encode audio
 - Supports multiple users, multiple presets
 - Does not use YouTube API; upload up to 50-100 videos per day
 
@@ -40,7 +39,7 @@ If you have issues running the exectuable, you can try running the program from 
 - You can drag and drop songs on the main window to add them to the queue. The order in which they are uploaded goes from top to bottom
 - You can also drag and drop images onto a song's current album art to change it
 - You probably shouldn't change the output file extension from .avi
-- If you get an error saying "Too large number of skipped frames XXXXX > 60000" try increasing the input frame rate to 2
+- You can use `acodec copy` in the FFmpeg command to avoid re-encoding audio, but beware that it will cause weird errors for certain audio codecs, including FLAC
 - YouTube titles and descriptions do not allow angled brackets in them
 
 ### Template strings
