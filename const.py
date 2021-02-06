@@ -77,10 +77,8 @@ SETTINGS_DEFAULTS = {
     "videoVisibilityAlbum": SETTINGS_VALUES.VideoVisibility.PUBLIC,
     "inputFrameRate": "1",
     "username": "",
-    "commandString": "ffmpeg -loglevel error -progress pipe:1 -y -r {inputFrameRate} -loop 1 -i \"{coverArt}\" -i \"{song_path}\" "
-                     "-r 30 -shortest -vf \"scale='min({videoWidth}, iw)':'min({videoHeight}, ih)':force_original_aspect_ratio=decrease,"
-                     "pad={videoWidth}:{videoHeight}:-1:-1:color={backgroundColor}\" "
-                     "-acodec libmp3lame -ab 320k -vcodec libx264 -fflags +shortest -max_interleave_delta 500M \"{tempFileOutput}\""
+    "SAVEcommandString": "",
+    "commandString": ""
 }
 
 SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',

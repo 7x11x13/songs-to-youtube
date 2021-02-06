@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-55</y>
+        <y>-187</y>
         <width>405</width>
-        <height>1387</height>
+        <height>1415</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -180,7 +180,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="commandString"/>
+           <widget class="QPlainTextEdit" name="commandString">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="SAVEcommandString"/>
           </item>
          </layout>
         </widget>

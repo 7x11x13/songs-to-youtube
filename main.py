@@ -1,12 +1,14 @@
 # This Python file uses the following encoding: utf-8
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, QListView, QTreeView, QAbstractItemView, QMessageBox
 from PySide6.QtGui import QIcon
+from PySide6.QtCore import QSettings
 
 
 import sys
 import os
 import logging
 import pathlib
+import shutil
 
 import resource
 
@@ -17,7 +19,7 @@ from const import SETTINGS_VALUES, APPLICATION, ORGANIZATION
 from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
 from log import LogWidget, addLoggingLevel
-from settings import SettingsWindow, get_setting
+from settings import SettingsWindow, get_setting, get_settings
 from progress_window import ProgressWindow
 
 
@@ -104,6 +106,9 @@ if __name__ == "__main__":
     app.setWindowIcon(QIcon(":/image/icon.ico"))
     app.setOrganizationName(ORGANIZATION)
     app.setApplicationName(APPLICATION)
+    # initialize default settings
+    if not os.path.exists(get_settings().fileName()):
+        shutil.copy(os.path.join(os.path.dirname(__file__), "presets", "default.ini"), get_settings().fileName())
     widget = MainWindow()
     widget.show()
     sys.exit(app.exec_())

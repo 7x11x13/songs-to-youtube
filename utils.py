@@ -148,7 +148,7 @@ def get_all_fields(obj: QObject):
     """Returns all the input widget children of the given object as InputFields"""
     for widget in get_all_children(obj):
         class_name = widget.metaObject().className()
-        if class_name in WIDGET_FUNCTIONS and widget.objectName() != "qt_spinbox_lineedit":
+        if class_name in WIDGET_FUNCTIONS and widget.objectName() != "qt_spinbox_lineedit" and "NOFIELD" not in widget.objectName():
             yield InputField(widget)
 
 def get_all_visible_fields(obj: QObject):
@@ -156,7 +156,7 @@ def get_all_visible_fields(obj: QObject):
     for widget in get_all_children(obj):
         if isinstance(widget, QWidget) and widget.isVisible():
             class_name = widget.metaObject().className()
-            if class_name in WIDGET_FUNCTIONS and widget.objectName() != "qt_spinbox_lineedit":
+            if class_name in WIDGET_FUNCTIONS and widget.objectName() != "qt_spinbox_lineedit" and "NOFIELD" not in widget.objectName():
                 yield InputField(widget)
 
 def find_ancestor(obj: QObject, type: str="", name: str=""):

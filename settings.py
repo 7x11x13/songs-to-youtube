@@ -24,6 +24,15 @@ def get_setting(setting: str, settings=get_settings()):
         return None
     return settings.value(setting, SETTINGS_DEFAULTS[setting])
 
+def load_combobox_data_from_settings(field, settings):
+    widget = field.widget
+    widget.clear()
+    size = settings.beginReadArray("{}Data".format(field.name))
+    for i in range(size):
+        settings.setArrayIndex(i)
+        widget.addItem(settings.value("text"), settings.value("data"))
+    settings.endArray()
+
 
 class SettingCheckBox(QCheckBox):
     def __init__(self, *args):
@@ -175,11 +184,25 @@ class SettingsWindow(QDialog):
 
     def set_fields_from_settings(self, settings):
         for field in get_all_fields(self.ui):
-            field.set(get_setting(field.name, settings))
+            # load combobox data
+            if field.name.startswith("SAVE"):
+                load_combobox_data_from_settings(field, settings)
+            else:
+                field.set(get_setting(field.name, settings))
 
     def save_settings_from_fields(self, settings):
         for field in get_all_fields(self.ui):
-            settings.setValue(field.name, field.get())
+            # save combobox data
+            if field.name.startswith("SAVE"):
+                widget = field.widget
+                settings.beginWriteArray("{}Data".format(field.name))
+                for i in range(widget.count()):
+                    settings.setArrayIndex(i)
+                    settings.setValue("text", widget.itemText(i))
+                    settings.setValue("data", widget.itemData(i))
+                settings.endArray()
+            else:
+                settings.setValue(field.name, field.get())
 
     def on_login(self, success, username):
         self.ui.setEnabled(True)
@@ -194,8 +217,8 @@ class SettingsWindow(QDialog):
             self.login_thread = LoginThread(self.on_login)
             self.login_thread.start()
             QMessageBox.information(self, "Add new user",
-                                             "Please log in to your YouTube account. "
-                                             "The window will close automatically when you log in.")
+                                    "Please log in to your YouTube account. "
+                                    "The window will close automatically when you log in.")
 
     def remove_user(self):
         combo_box = self.ui.username
@@ -208,8 +231,38 @@ class SettingsWindow(QDialog):
         file = QFileDialog.getOpenFileName(self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER)[0]
         self.ui.coverArt.set(file)
 
-    def reset_ffmpeg_command(self):
-        self.ui.commandString.setPlainText(SETTINGS_DEFAULTS["commandString"])
+    def ffmpeg_command_changed(self, index):
+        name = self.ui.SAVEcommandString.itemText(index)
+        self.ui.NOFIELDcommandStringName.setText(name)
+        command_string = self.ui.SAVEcommandString.itemData(index)
+        self.ui.commandString.setPlainText(command_string)
+
+    def save_ffmpeg_command(self):
+        # if name is different, delete old item
+        # and create new one with new name (rename)
+        # otherwise, just update the item data
+        command_select = self.ui.SAVEcommandString
+        index = command_select.currentIndex()
+        new_name = self.ui.NOFIELDcommandStringName.text()
+        old_name = command_select.currentText()
+        new_text = self.ui.commandString.toPlainText()
+        if new_name != old_name:
+            command_select.removeItem(index)
+            command_select.addItem(new_name, new_text)
+            command_select.setCurrentText(new_name)
+        else:
+            command_select.setItemData(index, new_text)
+
+    def add_ffmpeg_command(self):
+        command_select = self.ui.SAVEcommandString
+        i = 1
+        while command_select.findText(name := "New command {}".format(i)) != -1:
+            i += 1
+        command_select.addItem(name, "ffmpeg -loglevel error -progress pipe:1 -y -r {inputFrameRate} -loop 1 -i \"{coverArt}\" -i \"{song_path}\" -r 30 -shortest \"{tempFileOutput}\"")
+        command_select.setCurrentText(name)
+
+    def remove_ffmpeg_command(self):
+        self.ui.SAVEcommandString.removeItem(self.ui.SAVEcommandString.currentIndex())
 
     def show(self):
         self.ui.show()
@@ -222,4 +275,7 @@ class SettingsWindow(QDialog):
         self.ui.coverArtButton.clicked.connect(self.change_cover_art)
         self.ui.addNewUserButton.clicked.connect(self.add_new_user)
         self.ui.removeUserButton.clicked.connect(self.remove_user)
-        self.ui.resetCommandString.clicked.connect(self.reset_ffmpeg_command)
+        self.ui.addCommandString.clicked.connect(self.add_ffmpeg_command)
+        self.ui.removeCommandString.clicked.connect(self.remove_ffmpeg_command)
+        self.ui.saveCommandString.clicked.connect(self.save_ffmpeg_command)
+        self.ui.SAVEcommandString.currentIndexChanged.connect(self.ffmpeg_command_changed)

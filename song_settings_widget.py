@@ -1,9 +1,9 @@
 # This Python file uses the following encoding: utf-8
 from PySide6.QtCore import Qt, QPersistentModelIndex
-from PySide6.QtWidgets import QWidget, QCheckBox, QDialogButtonBox, QGroupBox, QPushButton, QFileDialog, QComboBox, QLabel
+from PySide6.QtWidgets import *
 from PySide6.QtGui import QPixmap
 
-from settings import SETTINGS_VALUES, SettingCheckBox, CoverArtDisplay, SettingsScrollArea
+from settings import *
 from utils import load_ui, get_all_fields, get_all_visible_fields, get_field
 from const import SUPPORTED_IMAGE_FILTER, CustomDataRole
 from song_tree_widget_item import *
@@ -78,6 +78,18 @@ class SongSettingsWidget(QWidget):
         self.findChild(QGroupBox, "youtubeSettingsAlbum").setEnabled(enabled)
 
     def on_field_updated(self, field, current_value):
+        if field.startswith("SAVE"):
+            # SAVE field updated, update linked text edit
+            if field not in self.field_original_values:
+                self.field_original_values[field] = current_value
+            if not current_value:
+                return
+            if self.field_original_values[field] != current_value:
+                text_edit = get_field(self, field[4:])
+                SAVE = get_field(self, field)
+                text_edit.set(SAVE.widget.currentData())
+                self.field_original_values[field] = current_value
+            return
         if field not in self.field_original_values:
             # just loaded field, set original value to loaded value
             self.field_original_values[field] = current_value
@@ -100,6 +112,8 @@ class SongSettingsWidget(QWidget):
         self.set_button_box_enabled(False)
         for data in {i.data(CustomDataRole.ITEMDATA) for i in self.tree_indexes}:  
             for field in get_all_visible_fields(self):
+                if field.name.startswith("SAVE"):
+                    continue
                 value = field.get()
                 if value != SETTINGS_VALUES.MULTIPLE_VALUES:
                     data.set_value(field.name, value)
@@ -121,6 +135,11 @@ class SongSettingsWidget(QWidget):
         items = [i.data(CustomDataRole.ITEMDATA).to_dict() for i in self.tree_indexes]
         # set settings based on selected items
         for field in get_all_visible_fields(self):
+            # reset SAVE combobox
+            if field.name.startswith("SAVE"):
+                field.set("")
+                self.field_original_values[field.name] = value
+                continue
             values = {dict(i)[field.name] for i in items if field.name in i}
             if len(values) == 0:
                 continue
@@ -148,4 +167,10 @@ class SongSettingsWidget(QWidget):
                 # guaranteed by our selection model
                 self.item_type = index.data(CustomDataRole.ITEMTYPE)
                 break
+            # load combobox data
+            for field in get_all_visible_fields(self):
+                if field.name.startswith("SAVE"):
+                    load_combobox_data_from_settings(field, get_settings())
+                    field.widget.addItem("", "")
+                    continue
             self.load_settings()
