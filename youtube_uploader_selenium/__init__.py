@@ -131,7 +131,9 @@ class YouTubeUploader:
     def __find_playlist_checkbox_no_search(self, name):
         for element in self.browser.find_all(By.XPATH, Constant.PLAYLIST_LABEL):
             name_element = element.find_element_by_xpath(".//span/span[@class='label label-text style-scope ytcp-checkbox-group']")
-            if name_element.text == name:
+            # if playlist has zero width space, this will not find the checkbox
+            # might also need to replace u200c
+            if name_element.text == name.replace('\u200b', ''):
                 return element.find_element_by_xpath(".//ytcp-checkbox-lit")
         return None
 
