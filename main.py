@@ -108,7 +108,9 @@ if __name__ == "__main__":
     app.setApplicationName(APPLICATION)
     # initialize default settings
     if not os.path.exists(get_settings().fileName()):
-        shutil.copy(os.path.join(os.path.dirname(__file__), "presets", "default.ini"), get_settings().fileName())
+        settings_path = get_settings().fileName()
+        os.makedirs(os.path.dirname(settings_path), exist_ok=True)
+        shutil.copy(os.path.join(os.path.dirname(__file__), "presets", "default.ini"), settings_path)
     widget = MainWindow()
     widget.show()
     sys.exit(app.exec_())
