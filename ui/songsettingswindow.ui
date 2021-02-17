@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-187</y>
+        <y>0</y>
         <width>405</width>
-        <height>1415</height>
+        <height>1339</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -180,13 +180,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="commandString">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QComboBox" name="SAVEcommandString"/>
           </item>
          </layout>
@@ -200,18 +193,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="albumPlaylist">
-         <item>
-          <property name="text">
-           <string>Multiple videos</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Single video</string>
-          </property>
-         </item>
-        </widget>
+        <widget class="QComboBox" name="albumPlaylist"/>
        </item>
        <item>
         <widget class="QGroupBox" name="ffmpegSettingsAlbum">
@@ -319,18 +301,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="videoVisibility">
-            <item>
-             <property name="text">
-              <string>PUBLIC</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>UNLISTED</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QComboBox" name="videoVisibility"/>
           </item>
          </layout>
         </widget>
@@ -389,18 +360,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="videoVisibilityAlbum">
-            <item>
-             <property name="text">
-              <string>PUBLIC</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>UNLISTED</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QComboBox" name="videoVisibilityAlbum"/>
           </item>
          </layout>
         </widget>

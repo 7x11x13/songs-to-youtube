@@ -72,7 +72,7 @@ class RenderSongWorker(QObject):
 
     def run(self):
         try:
-            command_str = (self.song.get("commandString")).format(**self.song.to_dict())
+            command_str = (self.song.get("SAVEcommandString")).format(**self.song.to_dict())
             handler = ProcessHandler()
             handler.stderr.connect(self.error.emit)
             handler.stdout.connect(self.progress.emit)

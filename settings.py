@@ -149,6 +149,7 @@ class SettingsWindow(QDialog):
         # rename default buttons
         self.ui.buttonBox.addButton(SettingsWindow.SAVE_PRESET_TEXT, QDialogButtonBox.ApplyRole)
         self.ui.buttonBox.addButton(SettingsWindow.LOAD_PRESET_TEXT, QDialogButtonBox.ApplyRole)
+        SettingsWindow.init_combo_boxes(self.ui)
         self.connect_actions()
         self.load_settings()
         self.login_thread = None
@@ -178,7 +179,7 @@ class SettingsWindow(QDialog):
 
     def load_settings(self):
         for username in YouTubeLogin.get_all_usernames():
-            self.ui.username.addItem(username)
+            self.ui.username.addItem(username, username)
         settings = get_settings()
         self.set_fields_from_settings(settings)
 
@@ -187,8 +188,7 @@ class SettingsWindow(QDialog):
             # load combobox data
             if field.name.startswith("SAVE"):
                 load_combobox_data_from_settings(field, settings)
-            else:
-                field.set(get_setting(field.name, settings))
+            field.set(get_setting(field.name, settings))
 
     def save_settings_from_fields(self, settings):
         for field in get_all_fields(self.ui):
@@ -201,8 +201,7 @@ class SettingsWindow(QDialog):
                     settings.setValue("text", widget.itemText(i))
                     settings.setValue("data", widget.itemData(i))
                 settings.endArray()
-            else:
-                settings.setValue(field.name, field.get())
+            settings.setValue(field.name, field.get())
 
     def on_login(self, success, username):
         self.ui.setEnabled(True)
@@ -235,7 +234,7 @@ class SettingsWindow(QDialog):
         name = self.ui.SAVEcommandString.itemText(index)
         self.ui.NOFIELDcommandStringName.setText(name)
         command_string = self.ui.SAVEcommandString.itemData(index)
-        self.ui.commandString.setPlainText(command_string)
+        self.ui.NOFIELDcommandString.setPlainText(command_string)
 
     def save_ffmpeg_command(self):
         # if name is different, delete old item
@@ -245,7 +244,7 @@ class SettingsWindow(QDialog):
         index = command_select.currentIndex()
         new_name = self.ui.NOFIELDcommandStringName.text()
         old_name = command_select.currentText()
-        new_text = self.ui.commandString.toPlainText()
+        new_text = self.ui.NOFIELDcommandString.toPlainText()
         if new_name != old_name:
             command_select.removeItem(index)
             command_select.addItem(new_name, new_text)
@@ -266,6 +265,17 @@ class SettingsWindow(QDialog):
 
     def show(self):
         self.ui.show()
+
+    @staticmethod
+    def init_combo_boxes(window):
+        for child in get_all_children(window):
+            if child.metaObject().className() == "QComboBox":
+                name = child.objectName()
+                # do not init combo boxes with dynamic contents
+                if not name.startswith("SAVE"):
+                    if name in SETTINGS_VALUES.COMBO_BOX_VALUES:
+                        for value in SETTINGS_VALUES.COMBO_BOX_VALUES[name]:
+                            child.addItem(value, value)
 
     def connect_actions(self):
         self.ui.buttonBox.accepted.connect(self.save_settings)

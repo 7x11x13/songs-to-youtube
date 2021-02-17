@@ -32,7 +32,17 @@
    <string>Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="2" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
     <widget class="SettingsScrollArea" name="scrollArea">
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -44,7 +54,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-497</y>
+        <y>-573</y>
         <width>433</width>
         <height>1804</height>
        </rect>
@@ -88,18 +98,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="dragAndDropBehavior">
-            <item>
-             <property name="text">
-              <string>Album mode</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Song mode</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QComboBox" name="dragAndDropBehavior"/>
           </item>
           <item>
            <widget class="QLabel" name="label_2">
@@ -109,33 +108,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="logLevel">
-            <item>
-             <property name="text">
-              <string>DEBUG</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>INFO</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>WARNING</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>ERROR</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>CRITICAL</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QComboBox" name="logLevel"/>
           </item>
           <item>
            <widget class="QLabel" name="label_3">
@@ -372,7 +345,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="commandString"/>
+           <widget class="QPlainTextEdit" name="NOFIELDcommandString"/>
           </item>
           <item>
            <widget class="QLabel" name="label_14">
@@ -452,18 +425,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="albumPlaylist">
-            <item>
-             <property name="text">
-              <string>Multiple videos</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Single video</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QComboBox" name="albumPlaylist"/>
           </item>
           <item>
            <widget class="QLabel" name="label_8">
@@ -562,18 +524,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="videoVisibility">
-            <item>
-             <property name="text">
-              <string>PUBLIC</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>UNLISTED</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QComboBox" name="videoVisibility"/>
           </item>
          </layout>
         </widget>
@@ -629,34 +580,13 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="videoVisibilityAlbum">
-            <item>
-             <property name="text">
-              <string>PUBLIC</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>UNLISTED</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QComboBox" name="videoVisibilityAlbum"/>
           </item>
          </layout>
         </widget>
        </item>
       </layout>
      </widget>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
     </widget>
    </item>
   </layout>

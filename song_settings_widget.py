@@ -30,6 +30,7 @@ class SongSettingsWidget(QWidget):
 
         super().__init__(*args)
         load_ui("songsettingswindow.ui", (SettingCheckBox, CoverArtDisplay, SettingsScrollArea), self)
+        SettingsWindow.init_combo_boxes(self)
         self.setVisible(False)
         self.connect_actions()
 
@@ -47,7 +48,7 @@ class SongSettingsWidget(QWidget):
             field.on_update(lambda text, field_name=field.name: self.on_field_updated(field_name, text))
             if field.name == "albumPlaylist":
                 # disable album settings whenever album mode is set to multiple values
-                field.on_update(lambda text: self.set_album_enabled(text != SETTINGS_VALUES.AlbumPlaylist.MULTIPLE))
+                field.on_update(lambda data: self.set_album_enabled(data != SETTINGS_VALUES.AlbumPlaylist.MULTIPLE))
             elif field.name == "uploadYouTube":
                 # disable youtube settings whenever 'upload to youtube' is unchecked
                 field.on_update(lambda text: self.set_youtube_enabled(text != SETTINGS_VALUES.CheckBox.UNCHECKED))
@@ -78,18 +79,6 @@ class SongSettingsWidget(QWidget):
         self.findChild(QGroupBox, "youtubeSettingsAlbum").setEnabled(enabled)
 
     def on_field_updated(self, field, current_value):
-        if field.startswith("SAVE"):
-            # SAVE field updated, update linked text edit
-            if field not in self.field_original_values:
-                self.field_original_values[field] = current_value
-            if not current_value:
-                return
-            if self.field_original_values[field] != current_value:
-                text_edit = get_field(self, field[4:])
-                SAVE = get_field(self, field)
-                text_edit.set(SAVE.widget.currentData())
-                self.field_original_values[field] = current_value
-            return
         if field not in self.field_original_values:
             # just loaded field, set original value to loaded value
             self.field_original_values[field] = current_value
@@ -112,8 +101,6 @@ class SongSettingsWidget(QWidget):
         self.set_button_box_enabled(False)
         for data in {i.data(CustomDataRole.ITEMDATA) for i in self.tree_indexes}:  
             for field in get_all_visible_fields(self):
-                if field.name.startswith("SAVE"):
-                    continue
                 value = field.get()
                 if value != SETTINGS_VALUES.MULTIPLE_VALUES:
                     data.set_value(field.name, value)
@@ -135,11 +122,6 @@ class SongSettingsWidget(QWidget):
         items = [i.data(CustomDataRole.ITEMDATA).to_dict() for i in self.tree_indexes]
         # set settings based on selected items
         for field in get_all_visible_fields(self):
-            # reset SAVE combobox
-            if field.name.startswith("SAVE"):
-                field.set("")
-                self.field_original_values[field.name] = value
-                continue
             values = {dict(i)[field.name] for i in items if field.name in i}
             if len(values) == 0:
                 continue
@@ -147,11 +129,11 @@ class SongSettingsWidget(QWidget):
             value = values.pop() if not has_multiple_values else SETTINGS_VALUES.MULTIPLE_VALUES
             if field.class_name == "QComboBox":
                 # add <<Multiple values>> to combobox as necessary
-                multiple_values_index = field.widget.findText(SETTINGS_VALUES.MULTIPLE_VALUES)
+                multiple_values_index = field.widget.findData(SETTINGS_VALUES.MULTIPLE_VALUES)
                 if not has_multiple_values and multiple_values_index != -1:
                     field.widget.removeItem(multiple_values_index)
                 if has_multiple_values and multiple_values_index == -1:
-                    field.widget.addItem(SETTINGS_VALUES.MULTIPLE_VALUES)
+                    field.widget.addItem(SETTINGS_VALUES.MULTIPLE_VALUES, SETTINGS_VALUES.MULTIPLE_VALUES)
             field.set(value)
             self.field_original_values[field.name] = value
 
@@ -171,6 +153,5 @@ class SongSettingsWidget(QWidget):
             for field in get_all_visible_fields(self):
                 if field.name.startswith("SAVE"):
                     load_combobox_data_from_settings(field, get_settings())
-                    field.widget.addItem("", "")
                     continue
             self.load_settings()

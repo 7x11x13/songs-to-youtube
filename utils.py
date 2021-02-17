@@ -66,7 +66,6 @@ def checkstate_to_str(state):
     }
     return CHECKSTATE_TO_STR[state]
 
-
 # methods for various QWidgets
 # all getters return values as strings
 # all setters take in values as strings
@@ -78,9 +77,9 @@ WIDGET_FUNCTIONS = {
         "on_update": lambda widget, cb: widget.textChanged.connect(lambda: cb(widget.toPlainText()))
     },
     "QComboBox": {
-        "getter": lambda widget: widget.currentText(),
-        "setter": lambda widget, text: widget.setCurrentText(text),
-        "on_update": lambda widget, cb: widget.currentTextChanged.connect(cb)
+        "getter": lambda widget: widget.currentData(),
+        "setter": lambda widget, data: widget.setCurrentIndex(widget.findData(data)),
+        "on_update": lambda widget, cb: widget.currentIndexChanged.connect(lambda: cb(widget.currentData()))
     },
     "SettingCheckBox": {
         "getter": lambda widget: checkstate_to_str(widget.checkState()),

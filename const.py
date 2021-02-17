@@ -25,6 +25,8 @@ class SETTINGS_VALUES:
     MULTIPLE_VALUES = "<<Multiple values>>"
     MULTIPLE_VALUES_IMG = ":/image/multiple-values.png"
 
+    # combo box values
+
     class DragAndDrop(str, Enum):
         ALBUM_MODE = "Album mode"
         SONG_MODE = "Song mode"
@@ -43,6 +45,14 @@ class SETTINGS_VALUES:
     class VideoVisibility(str, Enum):
         PUBLIC = "PUBLIC"
         UNLISTED = "UNLISTED"
+
+    COMBO_BOX_VALUES = {
+        "dragAndDropBehavior": [item.value for item in DragAndDrop],
+        "logLevel": [item.value for item in LogLevel],
+        "albumPlaylist": [item.value for item in AlbumPlaylist],
+        "videoVisibility": [item.value for item in VideoVisibility],
+        "videoVisibilityAlbum": [item.value for item in VideoVisibility]
+    }
 
     class CheckBox(str, Enum):
         UNCHECKED = "PySide2.QtCore.Qt.CheckState.Unchecked"
@@ -77,14 +87,13 @@ SETTINGS_DEFAULTS = {
     "videoVisibilityAlbum": SETTINGS_VALUES.VideoVisibility.PUBLIC,
     "inputFrameRate": "1",
     "username": "",
-    "SAVEcommandString": "",
-    "commandString": ""
+    "SAVEcommandString": ""
 }
 
 SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',
                    'uploadYouTube', 'coverArt', 'videoDescription', 'videoTags',
                    'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName',
-                   'playlistName', 'commandString'))
+                   'playlistName', 'SAVEcommandString'))
 ALBUM_FIELDS = set(('albumPlaylist', 'fileOutputDirAlbum', 'fileOutputNameAlbum',
                     'uploadYouTube', 'videoDescriptionAlbum', 'videoTagsAlbum', 'videoTitleAlbum',
                     'videoVisibilityAlbum'))
