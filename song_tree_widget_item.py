@@ -122,7 +122,11 @@ class TreeWidgetItemData:
     def get_track_number(self):
         if 'tags.tracknumber' in self.metadata:
             try:
-                return int(self.metadata['tags.tracknumber'])
+                tracknumber = self.metadata['tags.tracknumber']
+                if "/" in tracknumber:
+                    # sometimes track number is represented as a fraction
+                    tracknumber = tracknumber[:tracknumber.index("/")]
+                return int(tracknumber)
             except:
                 logging.warning("Could not convert {} to int".format(self.metadata['tags.tracknumber']))
                 return 0
