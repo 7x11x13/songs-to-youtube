@@ -109,6 +109,13 @@ class TreeWidgetItemData:
     def set_value(self, field, value):
         # replace {variable} with value from metadata
         value = SettingTemplate(value).safe_substitute(**self.to_dict())
+
+        if field in ("videoDescription", "videoDescriptionAlbum",
+                     "videoTitle", "videoTitleAlbum"):
+            # youtube does not allow < and > symbols in title/description
+            # replace with fullwidth version
+            value = value.replace("<", "＜").replace(">", "＞")
+
         self.dict[field] = value
 
     def get_duration_ms(self):
