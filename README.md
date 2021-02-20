@@ -36,11 +36,12 @@ If you have issues running the exectuable, you can try running the program from 
 
 ## Notes
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
+- The language of your YouTube must be English
 - You can drag and drop songs on the main window to add them to the queue. The order in which they are uploaded goes from top to bottom
 - You can also drag and drop images onto a song's current album art to change it
 - You probably shouldn't change the output file extension from .avi
-- You can use `acodec copy` in the FFmpeg command to avoid re-encoding audio, but beware that it will cause weird errors for certain audio codecs, including FLAC
-- YouTube titles and descriptions do not allow angled brackets in them
+- You can use `acodec copy` in the FFmpeg command to avoid re-encoding audio, but beware that it will cause errors for certain audio codecs, including FLAC
+- The characters < and > will be replaced with fullwidth version in titles and descriptions, as YouTube does not allow these symbols
 
 ### Template strings
 Write `~{key}` in any text field and it will be replaced with an appropriate value. To see the available keys, right click on an album or song and select "View metadata."
@@ -52,10 +53,12 @@ Here are some useful values:
 - `~{tags.artist}` - name of the song's artist
 - `~{tags.title}` - name of the song
 - `~{tags.date}` - year of release
-- `~{tags.comment.text}` - comment used by bandcamp to link to the artist's page
+- `~{tags.comment.text}` - comment
+- `~{tags.comment}` - comment
+- `~{tags.WOAR}` - artist URL
 #### Album metadata
 - `~{album_dir}` - directory of the album
-- `~{timestamps}` - special key that generates timestamps based on song lengths
-- `~{song.tags.artist}` - name of the album's artist (usually)
+- `~{timestamps}` - special key that generates timestamps based on song lengths. they will only be generated after concatenating songs into a single video
+- `~{song.tags.albumartist}` - name of the album's artist (usually)
 
 The first song of an album can have its keys accessed by the album by prefixing the key with `song.`
