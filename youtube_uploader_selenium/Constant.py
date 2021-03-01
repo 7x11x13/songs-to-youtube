@@ -9,8 +9,7 @@ class Constant:
     VIDEO_DESCRIPTION = 'description'
     PLAYLIST = 'playlist'
     TAGS = 'tags'
-    DESCRIPTION_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/' \
-                            'ytcp-uploads-details/div/ytcp-uploads-basics/ytcp-mention-textbox[2]'
+    DESCRIPTION_CONTAINER = '//*[@label="Description"]'
     MORE_OPTIONS_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/' \
                              'ytcp-uploads-details/div/div/ytcp-button/div'
     PLAYLIST_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/' \
