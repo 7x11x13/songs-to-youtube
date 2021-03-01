@@ -30,9 +30,11 @@ Download the latest release for your platform [here](https://github.com/7x11x13/
 
 ### Run from source
 If you have issues running the exectuable, you can try running the program from the source code:
-1. Download the source code
-2. Install required Python modules with `python3 -m pip install -r requirements.txt`
-3. Run the program with `python3 main.py`
+
+1. Make sure you have Python version 3.8+ installed
+2. Download the source code
+3. Install required Python modules with `python3 -m pip install -r requirements.txt`
+4. Run the program with `python3 main.py`
 
 ## Notes
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
