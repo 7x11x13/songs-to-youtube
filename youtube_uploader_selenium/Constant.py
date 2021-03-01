@@ -10,27 +10,22 @@ class Constant:
     PLAYLIST = 'playlist'
     TAGS = 'tags'
     DESCRIPTION_CONTAINER = '//*[@label="Description"]'
-    MORE_OPTIONS_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/' \
-                             'ytcp-uploads-details/div/div/ytcp-button/div'
-    PLAYLIST_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/' \
-                         'ytcp-uploads-details/div/ytcp-uploads-basics/ytcp-video-metadata-playlists/' \
-                         'ytcp-text-dropdown-trigger/ytcp-dropdown-trigger/div'
+    MORE_OPTIONS_CONTAINER = '//*[text() = "More options"]'
+    PLAYLIST_CONTAINER = '//*[@label="Playlists"]'
     PLAYLIST_SEARCH = '//*[@id="search-input"]'
-    PLAYLIST_SEARCH_CLEAR_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[1]/ytcp-icon-button'
-    PLAYLIST_NEW_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/ytcp-button[1]/div'
-    PLAYLIST_NEW_TITLE = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/div[1]/ytcp-form-textarea/div/textarea'
-    PLAYLIST_DONE_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/ytcp-button[3]/div'
-    PLAYLIST_CREATE_BUTTON = '/html/body/ytcp-playlist-dialog/paper-dialog/div[3]/ytcp-button[2]/div'
-    PLAYLIST_VISIBILITY_DROPDOWN = '/html/body/ytcp-playlist-dialog/paper-dialog/div[2]/div[2]/ytcp-text-dropdown-trigger'
+    PLAYLIST_SEARCH_CLEAR_BUTTON = '//*[@class="style-scope ytcp-playlist-dialog"]/iron-icon[@class="remove-defaults style-scope ytcp-icon-button"]'
+    PLAYLIST_NEW_BUTTON = '//*[text() = "New playlist"]'
+    PLAYLIST_NEW_TITLE = '//div[@id="create-playlist-form"]/div/ytcp-form-textarea/div/textarea'
+    PLAYLIST_DONE_BUTTON = '//*[@class="done-button action-button style-scope ytcp-playlist-dialog"]/*[text() = "Done"]'
+    PLAYLIST_CREATE_BUTTON = '//*[@class="create-playlist-button action-button style-scope ytcp-playlist-dialog"][@label="Create"]'
+    PLAYLIST_VISIBILITY_DROPDOWN = '//*[@class="input-container visibility style-scope ytcp-playlist-dialog"]'
     PLAYLIST_LABEL = "//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group']]"
     TOOLTIP = '//ytcp-paper-tooltip'
-    TAGS_TEXT_INPUT = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[1]/ytcp-uploads-details/div/' \
-                       'ytcp-uploads-advanced/ytcp-form-input-container/div[1]/div[2]/ytcp-free-text-chip-bar/ytcp-chip-bar/div/input'
+    TAGS_TEXT_INPUT = '//input[@aria-label="Tags"]'
     TEXTBOX = 'textbox'
     TEXT_INPUT = 'text-input'
     RADIO_LABEL = 'radioLabel'
-    STATUS_CONTAINER = '/html/body/ytcp-uploads-dialog/paper-dialog/div/ytcp-animatable[2]/' \
-                       'div/div[1]/ytcp-video-upload-progress/span'
+    STATUS_CONTAINER = '//*[@class="progress-label style-scope ytcp-video-upload-progress"]'
     NOT_MADE_FOR_KIDS_LABEL = 'NOT_MADE_FOR_KIDS'
     NEXT_BUTTON = 'next-button'
     VIDEO_URL_CONTAINER = "//span[@class='video-url-fadeable style-scope ytcp-video-info']"
