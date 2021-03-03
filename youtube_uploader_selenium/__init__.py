@@ -101,6 +101,11 @@ class YouTubeUploader:
             self.logger.warning("Truncating tags to {} characters".format(Constant.MAX_TAGS_LENGTH))
             self.metadata_dict[Constant.TAGS] = tags[:Constant.MAX_TAGS_LENGTH]
 
+        # youtube does not allow < and > symbols in title/description
+        # replace with fullwidth version
+        self.metadata_dict[Constant.VIDEO_TITLE] = self.metadata_dict[Constant.VIDEO_TITLE].replace("<", "＜").replace(">", "＞")
+        self.metadata_dict[Constant.VIDEO_DESCRIPTION] = self.metadata_dict[Constant.VIDEO_DESCRIPTION].replace("<", "＜").replace(">", "＞")
+
     def upload(self, video_path, metadata) -> (bool, Optional[str]):
         try:
             self.video_path = video_path
