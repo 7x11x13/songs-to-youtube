@@ -13,7 +13,7 @@ class Constant:
     MORE_OPTIONS_CONTAINER = '//*[text() = "More options"]'
     PLAYLIST_CONTAINER = '//*[@label="Playlists"]'
     PLAYLIST_SEARCH = '//*[@id="search-input"]'
-    PLAYLIST_SEARCH_CLEAR_BUTTON = '//*[@class="style-scope ytcp-playlist-dialog"]/iron-icon[@class="remove-defaults style-scope ytcp-icon-button"]'
+    PLAYLIST_SEARCH_CLEAR_BUTTON = '//*[@class="style-scope ytcp-playlist-dialog"]/tp-yt-iron-icon[@class="remove-defaults style-scope ytcp-icon-button"]'
     PLAYLIST_NEW_BUTTON = '//*[text() = "New playlist"]'
     PLAYLIST_NEW_TITLE = '//div[@id="create-playlist-form"]/div/ytcp-form-textarea/div/textarea'
     PLAYLIST_DONE_BUTTON = '//*[@class="done-button action-button style-scope ytcp-playlist-dialog"]/*[text() = "Done"]'
