@@ -277,6 +277,11 @@ class YouTubeUploader:
         self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
         self.logger.debug('Clicked {}'.format(Constant.NEXT_BUTTON))
 
+        # Video elements
+        self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
+        self.logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
+
+        # Checks
         self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
         self.logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
 
