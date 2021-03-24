@@ -117,7 +117,7 @@ class TreeWidgetItemData:
         else:
             logging.error("Could not find duration of file {}".format(self.dict['song_path']))
             logging.debug(self.metadata)
-            return 180 * 1000
+            return 999999999
 
     def get_track_number(self):
         if 'tags.tracknumber' in self.metadata:
