@@ -51,7 +51,14 @@ class YouTubeLogin:
         time.sleep(Constant.USER_WAITING_TIME)
         while (avatar := self.browser.find(By.XPATH, Constant.USER_AVATAR_XPATH)) is None:
             time.sleep(1)
-        avatar.click()
+        while True:
+            try:
+                avatar = self.browser.find(By.XPATH, Constant.USER_AVATAR_XPATH)
+                avatar.click()
+                break
+            except Exception as e:
+                self.logger.debug(e)
+                time.sleep(1)
         username_div = self.browser.find(By.ID, Constant.USERNAME_ID, timeout=30)
         username = username_div.text
         logging.info("Logged in as {}".format(username))

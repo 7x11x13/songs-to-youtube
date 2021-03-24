@@ -4,7 +4,7 @@ class Constant:
     YOUTUBE_STUDIO_URL = 'https://studio.youtube.com'
     YOUTUBE_UPLOAD_URL = 'https://www.youtube.com/upload'
     USER_WAITING_TIME = 1
-    USER_AVATAR_XPATH = '//img[@id="img"][@alt="Avatar image"]'
+    USER_AVATAR_XPATH = '//button[@id="avatar-btn"]/yt-img-shadow/img[@id="img"][@alt="Avatar image"]'
     VIDEO_TITLE = 'title'
     VIDEO_DESCRIPTION = 'description'
     PLAYLIST = 'playlist'
