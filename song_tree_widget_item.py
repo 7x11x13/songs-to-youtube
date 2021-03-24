@@ -3,7 +3,6 @@ from PySide6.QtCore import QByteArray, QTemporaryFile, QIODevice, QFileInfo, QDi
 from PySide6.QtGui import QStandardItem
 
 from enum import IntEnum
-import audio_metadata
 import logging
 import os
 import datetime
@@ -13,6 +12,7 @@ from string import Template
 from const import *
 from settings import get_setting
 from utils import flatten_metadata
+from metadata import Metadata
 
 class SettingTemplate(Template):
     # template placeholders are of the form
@@ -30,8 +30,7 @@ class TreeWidgetItemData:
     def __init__(self, item_type, songs=None, **kwargs):
 
         # metadata values
-        # can be any type
-        self.metadata = {}
+        self.metadata = None
 
         # application values
         # always strings
@@ -54,20 +53,11 @@ class TreeWidgetItemData:
         # add song metadata
         if item_type == TreeWidgetType.SONG:
             try:
-                metadata = audio_metadata.load(self.dict['song_path'])
+                self.metadata = Metadata(self.dict['song_path'])
 
                 if get_setting('extractCoverArt') == SETTINGS_VALUES.CheckBox.CHECKED:
-                    # extract cover art if it exists
-                    if metadata.pictures and len(metadata.pictures) > 0:
-                        bytes = QByteArray(metadata.pictures[0].data)
-                        cover = QTemporaryFile(os.path.join(QDir().tempPath(), APPLICATION, "XXXXXX.cover"))
-                        cover.setAutoRemove(False)
-                        cover.open(QIODevice.WriteOnly)
-                        cover.write(bytes)
-                        cover.close()
-                        self.set_value('coverArt', cover.fileName())
-
-                self.metadata = flatten_metadata(metadata)
+                    if (cover_path := self.metadata.get_cover_art()) is not None:
+                        self.set_value('coverArt', cover_path)
 
             except Exception as e:
                 logging.warning(e)
@@ -75,18 +65,17 @@ class TreeWidgetItemData:
         else:
             # album gets metadata from children
             # song metadata is stored as song.<key>
-            # e.g. song.tags.album would be the album name
+            # e.g. song.album would be the album name
             #
             # we will only get metadata from one song
             # because the album shouldn't care about
             # the varying metadata values for the songs
             # such as title or track number
             for song in songs:
-                if song.has_metadata():
-                    for key, value in song.to_dict().items():
-                        key = "song.{}".format(key)
-                        self.metadata[key] = value
-                    break
+                for key, value in song.to_dict().items():
+                    key = "song.{}".format(key)
+                    self.dict[key] = value
+                break
 
         self.update_fields()
 
@@ -95,15 +84,15 @@ class TreeWidgetItemData:
             self.set_value(field, value)
 
     def to_dict(self):
-        dict = {**self.dict, **self.metadata}
+        dict = {**self.dict, **(self.metadata.get_tags() if self.metadata is not None else {})}
         return dict
 
     def get_value(self, field):
         return self.dict[field]
 
     def get_metadata_value(self, key):
-        if key in self.metadata:
-            return self.metadata[key]
+        if key in self.metadata.get_tags():
+            return self.metadata.get_tags()[key]
         return None
 
     def set_value(self, field, value):
@@ -112,23 +101,23 @@ class TreeWidgetItemData:
         self.dict[field] = value
 
     def get_duration_ms(self):
-        if 'streaminfo.duration' in self.metadata:
-            return self.metadata['streaminfo.duration'] * 1000
+        if 'length' in self.metadata.get_tags():
+            return float(self.metadata.get_tags()['length']) * 1000
         else:
             logging.error("Could not find duration of file {}".format(self.dict['song_path']))
-            logging.debug(self.metadata)
+            logging.debug(self.metadata.get_tags())
             return 999999999
 
     def get_track_number(self):
-        if 'tags.tracknumber' in self.metadata:
+        if 'tracknumber' in self.metadata.get_tags():
             try:
-                tracknumber = self.metadata['tags.tracknumber']
+                tracknumber = self.metadata.get_tags()['tracknumber']
                 if "/" in tracknumber:
                     # sometimes track number is represented as a fraction
                     tracknumber = tracknumber[:tracknumber.index("/")]
                 return int(tracknumber)
             except:
-                logging.warning("Could not convert {} to int".format(self.metadata['tags.tracknumber']))
+                logging.warning("Could not convert {} to int".format(self.metadata.get_tags()['tracknumber']))
                 return 0
         return 0
 
@@ -149,9 +138,6 @@ class SongTreeWidgetItem(QStandardItem):
                         song_dir=info.path(),
                         song_file=info.fileName()),
                      CustomDataRole.ITEMDATA)
-
-    def has_metadata(self):
-        return len(self.data(CustomDataRole.ITEMDATA).metadata) > 0
 
     def get(self, field):
         return self.data(CustomDataRole.ITEMDATA).get_value(field)

@@ -1,0 +1,65 @@
+from PySide6.QtCore import *
+
+import os
+import mutagen
+from mutagen.easyid3 import EasyID3
+from mutagen.easymp4 import EasyMP4
+
+from utils import make_value_qt_safe
+from const import *
+
+# can expand these if wanted
+EasyMP4.RegisterTextKey("url", "purl")
+
+class Metadata:
+    def __init__(self, song_path):
+        self.pictures = []
+        self.path = song_path
+        self.tags = {}
+        self.load_song(song_path)
+
+    def load_song(self, path):
+        f = mutagen.File(path, easy=True)
+        if f.info:
+            for key, value in vars(f.info).items():
+                self.tags[key] = make_value_qt_safe(value)
+        if f.tags:
+            for key, value in f.tags.items():
+                self.tags[key] = make_value_qt_safe(value)
+
+            if isinstance(f.tags, mutagen.easyid3.EasyID3):
+                f = mutagen.File(path)
+                for key in f:
+                    if key.startswith("COMM"):
+                        # load comment data here since comment frame keys have
+                        # language suffix we can't just register text key COMM
+                        self.tags["comment"] = make_value_qt_safe(f[key])
+                    if key.startswith("APIC"):
+                        # get cover art
+                        self.pictures.append(f[key].data)
+            elif isinstance(f.tags, mutagen.easymp4.EasyMP4Tags):
+                f = mutagen.File(path)
+                if "covr" in f:
+                    for art in f["covr"]:
+                        self.pictures.append(bytes(art))
+            elif isinstance(f, mutagen.flac.FLAC):
+                for picture in f.pictures:
+                    self.pictures.append(picture.data)
+
+
+
+
+    def get_cover_art(self):
+        # extract cover art if it exists
+        if len(self.pictures) > 0:
+            bytes = QByteArray(self.pictures[0])
+            cover = QTemporaryFile(os.path.join(QDir().tempPath(), APPLICATION, "XXXXXX.cover"))
+            cover.setAutoRemove(False)
+            cover.open(QIODevice.WriteOnly)
+            cover.write(bytes)
+            cover.close()
+            return cover.fileName()
+        return None
+
+    def get_tags(self):
+        return self.tags

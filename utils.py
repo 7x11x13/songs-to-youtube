@@ -193,6 +193,13 @@ def get_image_from_mimedata(data):
             return url.toLocalFile()
     return None
 
+def make_value_qt_safe(value):
+    if isinstance(value, list):
+        if len(value) > 0:
+            return str(value[0])
+        else:
+            return ""
+    return str(value)
 
 # Other utils
 

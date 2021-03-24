@@ -51,16 +51,16 @@ Here are some useful values:
 #### Song metadata
 - `~{song_dir}` - directory of the input audio file
 - `~{song_file}` - file name of the input audio
-- `~{tags.album}` - name of the song's album
-- `~{tags.artist}` - name of the song's artist
-- `~{tags.title}` - name of the song
-- `~{tags.date}` - year of release
-- `~{tags.comment.text}` - comment
-- `~{tags.comment}` - comment
-- `~{tags.WOAR}` - artist URL
+- `~{album}`
+- `~{artist}`
+- `~{title}`
+- `~{date}`
+- `~{comment}`
+- `~{description}`
+- `~{WOAR}` - artist URL
 #### Album metadata
 - `~{album_dir}` - directory of the album
-- `~{timestamps}` - special key that generates timestamps based on song lengths. they will only be generated after concatenating songs into a single video
-- `~{song.tags.albumartist}` - name of the album's artist (usually)
+- `~{timestamps}` - special key that generates timestamps based on song lengths. they will only be generated when concatenating songs into a single video
+- `~{song.albumartist}` - name of the album's artist (usually)
 
 The first song of an album can have its keys accessed by the album by prefixing the key with `song.`

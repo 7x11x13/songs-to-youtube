@@ -65,7 +65,7 @@ SETTINGS_DEFAULTS = {
     "fileOutputDir": "~{song_dir}",
     "fileOutputName": "~{song_file}.avi",
     "fileOutputDirAlbum": "~{album_dir}",
-    "fileOutputNameAlbum": "~{song.tags.album}.avi",
+    "fileOutputNameAlbum": "~{song.album}.avi",
     "coverArt": ":/image/default.jpg",
     "extractCoverArt": SETTINGS_VALUES.CheckBox.CHECKED,
     "backgroundColor": "black",
@@ -78,11 +78,11 @@ SETTINGS_DEFAULTS = {
     "albumPlaylist": SETTINGS_VALUES.AlbumPlaylist.MULTIPLE,
     "videoDescription": "Uploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTags": "",
-    "playlistName": "[~{tags.date}] ~{tags.artist} - ~{tags.album}",
-    "videoTitle": "~{tags.artist} - ~{tags.title}",
+    "playlistName": "[~{date}] ~{artist} - ~{album}",
+    "videoTitle": "~{artist} - ~{title}",
     "videoDescriptionAlbum": "~{timestamps}\nUploaded with https://github.com/7x11x13/songs-to-youtube",
     "videoTagsAlbum": "",
-    "videoTitleAlbum": "[~{song.tags.date}] ~{song.tags.artist} - ~{song.tags.album}",
+    "videoTitleAlbum": "[~{song.date}] ~{song.artist} - ~{song.album}",
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC,
     "videoVisibilityAlbum": SETTINGS_VALUES.VideoVisibility.PUBLIC,
     "inputFrameRate": "1",
@@ -111,7 +111,6 @@ for qrc, file in QRC_TO_FILE_PATH.items():
 # clear temp dir on exit
 def clean_up_images():
     temp_dir = QDir("{}/{}".format(QDir().tempPath(), APPLICATION))
-    temp_dir.setNameFilters(["*.cover"])
     for file in temp_dir.entryList():
         temp_dir.remove(file)
 
