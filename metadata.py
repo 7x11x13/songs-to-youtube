@@ -2,6 +2,7 @@ from PySide6.QtCore import *
 
 import os
 import mutagen
+import logging
 from mutagen.easyid3 import EasyID3
 from mutagen.easymp4 import EasyMP4
 
@@ -24,19 +25,28 @@ class Metadata:
             for key, value in vars(f.info).items():
                 self.tags[key] = make_value_qt_safe(value)
         if f.tags:
+            logging.debug(f"Tags: {f.keys()}")
             for key, value in f.tags.items():
                 self.tags[key] = make_value_qt_safe(value)
 
-            if isinstance(f.tags, mutagen.easyid3.EasyID3):
-                f = mutagen.File(path)
+            if isinstance(f.tags, mutagen.easyid3.EasyID3) or isinstance(f.tags, mutagen.id3.ID3):
+                if isinstance(f.tags, mutagen.easyid3.EasyID3):
+                    f = mutagen.File(path)
                 for key in f:
-                    if key.startswith("COMM"):
+                    if key.startswith("COM"):
                         # load comment data here since comment frame keys have
                         # language suffix we can't just register text key COMM
                         self.tags["comment"] = make_value_qt_safe(f[key])
-                    if key.startswith("APIC"):
+                    if key.startswith("APIC") or key.startswith("PIC"):
                         # get cover art
                         self.pictures.append(f[key].data)
+                if isinstance(f.tags, mutagen.id3.ID3):
+                    for key, getter in EasyID3.Get.items():
+                        try:
+                            value = getter(f.tags, key)
+                            self.tags[key] = make_value_qt_safe(value)
+                        except:
+                            pass
             elif isinstance(f.tags, mutagen.easymp4.EasyMP4Tags):
                 f = mutagen.File(path)
                 if "covr" in f:
