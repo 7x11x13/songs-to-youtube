@@ -25,7 +25,8 @@ class YouTubeLogin:
 
     """Let user login to YouTube and save the cookies"""
     def __init__(self):
-        self.browser = Firefox(full_screen=False)
+        temp_cookies_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+        self.browser = Firefox(full_screen=False, cookies_folder_path=temp_cookies_path)
         self.logger = logging.getLogger()
 
     @staticmethod
@@ -59,17 +60,14 @@ class YouTubeLogin:
                 avatar.click()
                 break
             except Exception as e:
-                self.logger.debug(e)
-                time.sleep(1)
+                time.sleep(3)
         username_div = self.browser.find(By.ID, Constant.USERNAME_ID, timeout=30)
         username = username_div.text
         logging.info("Logged in as {}".format(username))
         self.browser.get(Constant.YOUTUBE_URL)
         time.sleep(Constant.USER_WAITING_TIME)
 
-        self.browser.cookies_folder_path = self.get_cookie_path_from_username(username)
-        os.makedirs(self.browser.cookies_folder_path, exist_ok=True)
-        self.browser.save_cookies()
+        self.browser.save_cookies(folder_path=self.get_cookie_path_from_username(username))
         self.browser.driver.quit()
 
         return username

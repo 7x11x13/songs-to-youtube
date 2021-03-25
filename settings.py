@@ -120,13 +120,13 @@ class SettingsScrollArea(QScrollArea):
 
 class LoginThread(Thread):
 
-    def __init__(self, callback=lambda: None):
+    def __init__(self, browser, callback=lambda: None):
         super().__init__()
         self.callback = callback
+        self.login = browser
 
     def run(self):
         try:
-            self.login = YouTubeLogin()
             time.sleep(5)
             username = self.login.get_login()
             self.callback(True, username)
@@ -213,7 +213,7 @@ class SettingsWindow(QDialog):
     def add_new_user(self):
         if self.login_thread is None:
             self.ui.setEnabled(False)
-            self.login_thread = LoginThread(self.on_login)
+            self.login_thread = LoginThread(YouTubeLogin(), self.on_login)
             self.login_thread.start()
             QMessageBox.information(self, "Add new user",
                                     "Please log in to your YouTube account. "
