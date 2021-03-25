@@ -171,10 +171,6 @@ class YouTubeUploader:
                 time.sleep(Constant.USER_WAITING_TIME)
                 search.send_keys(phrases[-1])
                 checkbox = self.__find_playlist_checkbox_no_search(name)
-                # clear search so we can create new playlist
-                self.browser.find(By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON).click()
-
-
             return checkbox
 
         except Exception as e:
@@ -226,6 +222,10 @@ class YouTubeUploader:
             checkbox = self.__find_playlist_checkbox(playlist)
             if checkbox is None:
                 self.logger.info("Could not find playlist checkbox, attempting to create new playlist")
+                # clear search so we can create new playlist
+                time.sleep(Constant.USER_WAITING_TIME)
+                self.browser.find(By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON).click()
+                time.sleep(Constant.USER_WAITING_TIME)
                 playlist_new_button = self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON)
                 self.browser.move_to_element(playlist_new_button)
                 time.sleep(Constant.USER_WAITING_TIME)
