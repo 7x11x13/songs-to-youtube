@@ -85,6 +85,8 @@ SETTINGS_DEFAULTS = {
     "videoTitleAlbum": "[~{song.date}] ~{song.artist} - ~{song.album}",
     "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC,
     "videoVisibilityAlbum": SETTINGS_VALUES.VideoVisibility.PUBLIC,
+    "notifySubsAlbum": SETTINGS_VALUES.CheckBox.CHECKED,
+    "notifySubs": SETTINGS_VALUES.CheckBox.CHECKED,
     "inputFrameRate": "1",
     "username": "",
     "SAVEcommandString": ""
@@ -93,10 +95,10 @@ SETTINGS_DEFAULTS = {
 SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',
                    'uploadYouTube', 'coverArt', 'videoDescription', 'videoTags',
                    'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName',
-                   'playlistName', 'SAVEcommandString'))
+                   'playlistName', 'SAVEcommandString', 'notifySubs'))
 ALBUM_FIELDS = set(('albumPlaylist', 'fileOutputDirAlbum', 'fileOutputNameAlbum',
                     'uploadYouTube', 'videoDescriptionAlbum', 'videoTagsAlbum', 'videoTitleAlbum',
-                    'videoVisibilityAlbum'))
+                    'videoVisibilityAlbum', 'notifySubsAlbum'))
 
 
 QDir.temp().mkdir(APPLICATION)

@@ -9,8 +9,9 @@ class Constant:
     VIDEO_DESCRIPTION = 'description'
     PLAYLIST = 'playlist'
     TAGS = 'tags'
+    NOTIFY_SUBS = 'notify_subs'
     DESCRIPTION_CONTAINER = '//*[@label="Description"]'
-    MORE_OPTIONS_CONTAINER = '//*[text() = "More options"]'
+    MORE_OPTIONS_CONTAINER = '//*[text() = "Show more"]'
     PLAYLIST_CONTAINER = '//*[@label="Playlists"]'
     PLAYLIST_SEARCH = '//*[@id="search-input"]'
     PLAYLIST_SEARCH_CLEAR_BUTTON = '//*[@class="style-scope ytcp-playlist-dialog"]/tp-yt-iron-icon[@class="remove-defaults style-scope ytcp-icon-button"]'
@@ -22,6 +23,7 @@ class Constant:
     PLAYLIST_LABEL = "//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group']]"
     TOOLTIP = '//ytcp-paper-tooltip'
     TAGS_TEXT_INPUT = '//input[@aria-label="Tags"]'
+    NOTIFY_SUBSCRIBERS_CHECKBOX = '//ytcp-checkbox-lit[@id="notify-subscribers"]/div'
     TEXTBOX = 'textbox'
     TEXT_INPUT = 'text-input'
     RADIO_LABEL = 'radioLabel'

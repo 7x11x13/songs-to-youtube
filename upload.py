@@ -11,6 +11,7 @@ import time
 from youtube_uploader_selenium import YouTubeUploader
 from song_tree_widget_item import *
 from settings import get_setting
+from const import *
 
 class UploadThread(Thread):
 
@@ -80,7 +81,8 @@ class Uploader(QObject):
                     metadata = {'title': album.get('videoTitleAlbum'),
                                 'description': album.get('videoDescriptionAlbum'),
                                 'tags': album.get('videoTagsAlbum'),
-                                'visibility': album.get('videoVisibilityAlbum')}
+                                'visibility': album.get('videoVisibilityAlbum'),
+                                'notify_subs': album.get('notifySubsAlbum') == SETTINGS_VALUES.CheckBox.CHECKED}
                     self._upload(file, metadata)
         elif album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.MULTIPLE:
             for song in album.getChildren():
@@ -95,7 +97,8 @@ class Uploader(QObject):
                             'description': song.get('videoDescription'),
                             'tags': song.get('videoTags'),
                             'playlist': song.get('playlistName'),
-                            'visibility': song.get('videoVisibility')}
+                            'visibility': song.get('videoVisibility'),
+                            'notify_subs': song.get('notifySubs') == SETTINGS_VALUES.CheckBox.CHECKED}
                 self._upload(file, metadata)
 
     def is_uploading(self):

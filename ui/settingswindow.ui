@@ -54,9 +54,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-573</y>
+        <y>-1380</y>
         <width>433</width>
-        <height>1804</height>
+        <height>1854</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -526,6 +526,13 @@
           <item>
            <widget class="QComboBox" name="videoVisibility"/>
           </item>
+          <item>
+           <widget class="SettingCheckBox" name="notifySubs">
+            <property name="text">
+             <string>Notify subscribers?</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -581,6 +588,13 @@
           </item>
           <item>
            <widget class="QComboBox" name="videoVisibilityAlbum"/>
+          </item>
+          <item>
+           <widget class="SettingCheckBox" name="notifySubsAlbum">
+            <property name="text">
+             <string>Notify subscribers?</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

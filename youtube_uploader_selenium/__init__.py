@@ -85,6 +85,8 @@ class YouTubeUploader:
         self.logger = logging.getLogger()
 
     def __validate_inputs(self):
+        if Constant.NOTIFY_SUBS not in self.metadata_dict:
+            self.metadata_dict[Constant.NOTIFY_SUBS] = True
         if Constant.VIDEO_TITLE not in self.metadata_dict:
             self.logger.warning("The video title was not found in metadata")
             self.metadata_dict[Constant.VIDEO_TITLE] = Path(self.video_path).stem
@@ -205,6 +207,7 @@ class YouTubeUploader:
         video_description = self.metadata_dict[Constant.VIDEO_DESCRIPTION]
         tags = self.metadata_dict[Constant.TAGS]
         playlist = self.metadata_dict[Constant.PLAYLIST]
+        notify_subs = self.metadata_dict[Constant.NOTIFY_SUBS]
         if video_description:
             description_container = self.browser.find(By.XPATH,
                                                       Constant.DESCRIPTION_CONTAINER)
@@ -268,11 +271,15 @@ class YouTubeUploader:
             for element in tooltips:
                 self.browser.execute_script_on_element("arguments[0].style.display = 'none'", element)
 
-        if tags:
+        if tags or not notify_subs:
             self.browser.find(By.XPATH, Constant.MORE_OPTIONS_CONTAINER).click()
             time.sleep(Constant.USER_WAITING_TIME)
-            self.browser.find(By.XPATH, Constant.TAGS_TEXT_INPUT).send_keys(tags)
-            time.sleep(Constant.USER_WAITING_TIME)
+            if tags:
+                self.browser.find(By.XPATH, Constant.TAGS_TEXT_INPUT).send_keys(tags)
+                time.sleep(Constant.USER_WAITING_TIME)
+            if not notify_subs:
+                self.browser.find(By.XPATH, Constant.NOTIFY_SUBSCRIBERS_CHECKBOX).click()
+                time.sleep(Constant.USER_WAITING_TIME)
 
         time.sleep(Constant.USER_WAITING_TIME)
         kids_section = self.browser.find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
