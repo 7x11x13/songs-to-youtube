@@ -143,7 +143,7 @@ class SongTreeWidget(QTreeView):
 
         # if all children of an album are removed,
         # remove the album as well
-        for item in self._get_all_items():
+        for item in list(self._get_all_items())[::-1]:
             if item.item_type() == TreeWidgetType.ALBUM:
                 if item.childCount() == 0:
                     self.model().removeRow(item.row(), item.index().parent())
