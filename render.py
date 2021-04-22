@@ -41,8 +41,13 @@ class ProcessHandler(QObject):
             queue.put((None, None))
 
     def run(self, command):
-        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             creationflags=subprocess.CREATE_NO_WINDOW)
+
+        if os.name == "nt":
+            p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                 creationflags=subprocess.CREATE_NO_WINDOW)
+        else:
+            p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
         PROCESSES.append(p)
         q = Queue()
         Thread(target=self.read_pipe, args=[p.stdout, q]).start()
