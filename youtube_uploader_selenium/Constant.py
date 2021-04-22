@@ -12,7 +12,7 @@ class Constant:
     NOTIFY_SUBS = 'notify_subs'
     DESCRIPTION_CONTAINER = '//*[@label="Description"]'
     MORE_OPTIONS_CONTAINER = '//*[text() = "Show more"]'
-    PLAYLIST_CONTAINER = '//*[@label="Playlists"]'
+    PLAYLIST_CONTAINER = '//span[@class="dropdown-trigger-text style-scope ytcp-text-dropdown-trigger"][text()[contains(.,"Select")]]'
     PLAYLIST_SEARCH = '//*[@id="search-input"]'
     PLAYLIST_SEARCH_CLEAR_BUTTON = '//*[@class="style-scope ytcp-playlist-dialog"]/tp-yt-iron-icon[@class="remove-defaults style-scope ytcp-icon-button"]'
     PLAYLIST_NEW_BUTTON = '//*[text() = "New playlist"]'
