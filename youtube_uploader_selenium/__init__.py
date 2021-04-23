@@ -269,7 +269,10 @@ class YouTubeUploader:
         tooltips = self.browser.find_all(By.XPATH, Constant.TOOLTIP)
         if tooltips is not None:
             for element in tooltips:
-                self.browser.execute_script_on_element("arguments[0].style.display = 'none'", element)
+                try:
+                    self.browser.execute_script_on_element("arguments[0].style.display = 'none'", element)
+                except:
+                    pass
 
         if tags or not notify_subs:
             self.browser.find(By.XPATH, Constant.MORE_OPTIONS_CONTAINER).click()
