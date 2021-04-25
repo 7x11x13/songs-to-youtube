@@ -82,14 +82,6 @@ class RenderSongWorker(QObject):
             handler.stderr.connect(self.error.emit)
             handler.stdout.connect(self.progress.emit)
             errors = handler.run(command_str)
-            if not errors:
-                # cut video to exact length of song
-                handler = ProcessHandler()
-                handler.stderr.connect(self.error.emit)
-                handler.stdout.connect(self.progress.emit)
-                command_str = 'ffmpeg -loglevel error -progress pipe:1 -y -i "{tempFileOutput}" -t {songDuration} -acodec copy -vcodec copy "{fileOutput}"'.format(**self.song.to_dict())
-                errors = handler.run(command_str)
-                os.remove(self.song.get("tempFileOutput"))
             self.finished.emit(not errors)
         except Exception as e:
             self.error.emit(traceback.format_exc())

@@ -14,6 +14,7 @@ Convert audio files to videos and upload them to YouTube automatically.
 - Encodes multiple videos in parallel
 - Supports multiple users, multiple presets
 - Does not use YouTube API; upload up to 50-100 videos per day
+- Does not re-encode audio before uploading
 
 ## Pre-installation
 - [FFmpeg](https://ffmpeg.org/download.html) binary is required to convert songs into videos
@@ -41,9 +42,8 @@ If you have issues running the exectuable, you can try running the program from 
 - The language of your YouTube must be English
 - You can drag and drop songs on the main window to add them to the queue. The order in which they are uploaded goes from top to bottom
 - You can also drag and drop images onto a song's current album art to change it
-- You probably shouldn't change the output file extension from .avi
-- You can use `acodec copy` in the FFmpeg command to avoid re-encoding audio, but beware that it will cause errors for certain audio codecs, including FLAC
-- The characters < and > will be replaced with fullwidth version in titles and descriptions, as YouTube does not allow these symbols
+- You probably shouldn't change the output file extension from .mkv
+- The characters < and > will be replaced with fullwidth versions in titles and descriptions, as YouTube does not allow these symbols
 
 ### Template strings
 Write `~{key}` in any text field and it will be replaced with an appropriate value. To see the available keys, right click on an album or song and select "View metadata."

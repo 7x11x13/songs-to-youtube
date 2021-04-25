@@ -156,12 +156,6 @@ class SongTreeWidgetItem(QStandardItem):
 
     def before_render(self):
         self.set("fileOutput", os.path.join(self.get("fileOutputDir"), self.get("fileOutputName")))
-        # create temporary file name guaranteed to be unique
-        temp_file = QTemporaryFile(os.path.join(QDir().tempPath(), APPLICATION, "XXXXXX.{}".format(self.get("fileOutputName"))))
-        temp_file.setAutoRemove(False)
-        temp_file.open(QIODevice.WriteOnly)
-        temp_file.close()
-        self.set("tempFileOutput", temp_file.fileName())
         self.set("songDuration", str(self.get_duration_ms() / 1000))
 
     def before_upload(self):

@@ -63,9 +63,9 @@ class SETTINGS_VALUES:
 SETTINGS_DEFAULTS = {
     "deleteAfterUploading": SETTINGS_VALUES.CheckBox.CHECKED,
     "fileOutputDir": "~{song_dir}",
-    "fileOutputName": "~{song_file}.avi",
+    "fileOutputName": "~{song_file}.mkv",
     "fileOutputDirAlbum": "~{album_dir}",
-    "fileOutputNameAlbum": "~{song.album}.avi",
+    "fileOutputNameAlbum": "~{song.album}.mkv",
     "coverArt": ":/image/default.jpg",
     "extractCoverArt": SETTINGS_VALUES.CheckBox.CHECKED,
     "backgroundColor": "black",
