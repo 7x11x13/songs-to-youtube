@@ -13,7 +13,7 @@ import shutil
 import resource
 
 from utils import load_ui
-from const import SETTINGS_VALUES, APPLICATION, ORGANIZATION
+from const import SETTINGS_VALUES, APPLICATION, ORGANIZATION, VERSION
 
 # Custom widgets
 from song_settings_widget import SongSettingsWidget
@@ -89,10 +89,14 @@ class MainWindow(QMainWindow):
         window.settings_changed.connect(self.ui.logWindow.update_settings)
         window.show()
 
+    def about(self):
+        QMessageBox.about(self, APPLICATION, f"{VERSION}\nMade by {ORGANIZATION}")
+
     def show(self):
         self.ui.show()
 
     def connect_actions(self):
+        self.ui.actionAbout.triggered.connect(self.about)
         self.ui.actionAlbums.triggered.connect(self.load_albums)
         self.ui.actionSongs.triggered.connect(self.load_songs)
         self.ui.actionSettings.triggered.connect(self.open_settings)

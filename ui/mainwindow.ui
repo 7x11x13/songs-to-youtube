@@ -172,6 +172,7 @@
     </widget>
     <addaction name="menuImport"/>
     <addaction name="actionSettings"/>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -189,6 +190,11 @@
   <action name="actionSongs">
    <property name="text">
     <string>Songs</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>
