@@ -59,39 +59,6 @@ class SETTINGS_VALUES:
         PARTIALLY_CHECKED = "PySide2.QtCore.Qt.CheckState.PartiallyChecked"
         CHECKED = "PySide2.QtCore.Qt.CheckState.Checked"
 
-
-SETTINGS_DEFAULTS = {
-    "deleteAfterUploading": SETTINGS_VALUES.CheckBox.CHECKED,
-    "fileOutputDir": "~{song_dir}",
-    "fileOutputName": "~{song_file}.mkv",
-    "fileOutputDirAlbum": "~{album_dir}",
-    "fileOutputNameAlbum": "~{song.album}.mkv",
-    "coverArt": ":/image/default.jpg",
-    "extractCoverArt": SETTINGS_VALUES.CheckBox.CHECKED,
-    "backgroundColor": "black",
-    "dragAndDropBehavior": SETTINGS_VALUES.DragAndDrop.ALBUM_MODE,
-    "maxProcesses": "8",
-    "logLevel": SETTINGS_VALUES.LogLevel.ERROR,
-    "videoHeight": "720",
-    "videoWidth": "1280",
-    "uploadYouTube": SETTINGS_VALUES.CheckBox.CHECKED,
-    "albumPlaylist": SETTINGS_VALUES.AlbumPlaylist.MULTIPLE,
-    "videoDescription": "Uploaded with https://github.com/7x11x13/songs-to-youtube",
-    "videoTags": "",
-    "playlistName": "[~{date}] ~{artist} - ~{album}",
-    "videoTitle": "~{artist} - ~{title}",
-    "videoDescriptionAlbum": "~{timestamps}\nUploaded with https://github.com/7x11x13/songs-to-youtube",
-    "videoTagsAlbum": "",
-    "videoTitleAlbum": "[~{song.date}] ~{song.artist} - ~{song.album}",
-    "videoVisibility": SETTINGS_VALUES.VideoVisibility.PUBLIC,
-    "videoVisibilityAlbum": SETTINGS_VALUES.VideoVisibility.PUBLIC,
-    "notifySubsAlbum": SETTINGS_VALUES.CheckBox.CHECKED,
-    "notifySubs": SETTINGS_VALUES.CheckBox.CHECKED,
-    "inputFrameRate": "1",
-    "username": "",
-    "SAVEcommandString": ""
-}
-
 SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',
                    'uploadYouTube', 'coverArt', 'videoDescription', 'videoTags',
                    'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName',

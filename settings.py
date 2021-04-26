@@ -19,10 +19,7 @@ def get_settings():
 
 def get_setting(setting: str, settings=get_settings()):
     """Returns the value of the given setting (as a string) or None if it has no value"""
-    if setting not in SETTINGS_DEFAULTS:
-        logging.warning("Setting {} is not recognized".format(setting))
-        return None
-    return settings.value(setting, SETTINGS_DEFAULTS[setting])
+    return settings.value(setting, None)
 
 def load_combobox_data_from_settings(field, settings):
     widget = field.widget
