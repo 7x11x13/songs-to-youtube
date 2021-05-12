@@ -74,6 +74,7 @@ class SongSettingsWidget(QWidget):
 
     def set_album_enabled(self, enabled):
         self.findChild(QGroupBox, "ffmpegSettingsAlbum").setEnabled(enabled)
+        self.findChild(SettingCheckBox, "uploadYouTube").setEnabled(enabled)
         # if youtube settings are disabled, we can't enable them
         enabled = enabled and (get_field(self, "uploadYouTube").get() != SETTINGS_VALUES.CheckBox.UNCHECKED)
         self.findChild(QGroupBox, "youtubeSettingsAlbum").setEnabled(enabled)
@@ -130,6 +131,12 @@ class SongSettingsWidget(QWidget):
                 continue
             has_multiple_values = (len(values) > 1)
             value = values.pop() if not has_multiple_values else SETTINGS_VALUES.MULTIPLE_VALUES
+            if field.name == "albumPlaylist":
+                # show album settings when at least one single video album is selected
+                self.set_album_enabled(value != SETTINGS_VALUES.AlbumPlaylist.MULTIPLE)
+            elif field.name == "uploadYouTube":
+                # show youtube settings when at least one song is to be uploaded is unchecked
+                self.set_youtube_enabled(value != SETTINGS_VALUES.CheckBox.UNCHECKED)
             if field.class_name == "QComboBox" or field.class_name == "FileComboBox":
                 if field.class_name == "FileComboBox":
                     field.widget.reload()
