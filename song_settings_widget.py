@@ -29,7 +29,7 @@ class SongSettingsWidget(QWidget):
         self.item_type = TreeWidgetType.ALBUM
 
         super().__init__(*args)
-        load_ui("songsettingswindow.ui", (SettingCheckBox, CoverArtDisplay, SettingsScrollArea), self)
+        load_ui("songsettingswindow.ui", (SettingCheckBox, CoverArtDisplay, SettingsScrollArea, FileComboBox), self)
         SettingsWindow.init_combo_boxes(self)
         self.setVisible(False)
         self.connect_actions()
@@ -103,7 +103,10 @@ class SongSettingsWidget(QWidget):
             for field in get_all_visible_fields(self):
                 value = field.get()
                 if value != SETTINGS_VALUES.MULTIPLE_VALUES:
-                    data.set_value(field.name, value)
+                    try:
+                        data.set_value(field.name, value)
+                    except:
+                        logging.error(f"Error while setting {field.name} with value {value}")
                 self.field_original_values[field.name] = value
         self.load_settings()
 
@@ -127,7 +130,9 @@ class SongSettingsWidget(QWidget):
                 continue
             has_multiple_values = (len(values) > 1)
             value = values.pop() if not has_multiple_values else SETTINGS_VALUES.MULTIPLE_VALUES
-            if field.class_name == "QComboBox":
+            if field.class_name == "QComboBox" or field.class_name == "FileComboBox":
+                if field.class_name == "FileComboBox":
+                    field.widget.reload()
                 # add <<Multiple values>> to combobox as necessary
                 multiple_values_index = field.widget.findData(SETTINGS_VALUES.MULTIPLE_VALUES)
                 if not has_multiple_values and multiple_values_index != -1:

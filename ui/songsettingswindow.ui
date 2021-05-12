@@ -38,9 +38,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-921</y>
+        <y>0</y>
         <width>405</width>
-        <height>1389</height>
+        <height>1388</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -136,23 +136,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_26">
-            <property name="text">
-             <string>Input frame rate (keep this at 1 unless you experience problems):</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSpinBox" name="inputFrameRate">
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>1000</number>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="label_6">
             <property name="text">
              <string>Output file directory:</string>
@@ -175,12 +158,12 @@
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Command string:</string>
+             <string>Render command:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="SAVEcommandString"/>
+           <widget class="FileComboBox" name="commandName"/>
           </item>
          </layout>
         </widget>
@@ -223,6 +206,16 @@
           </item>
           <item>
            <widget class="QLineEdit" name="fileOutputNameAlbum"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Concatenation command name:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="FileComboBox" name="concatCommandName"/>
           </item>
          </layout>
         </widget>
@@ -408,6 +401,11 @@
    <extends>QScrollArea</extends>
    <header>settings_scroll_area.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FileComboBox</class>
+   <extends>QComboBox</extends>
+   <header>file_combo_box.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

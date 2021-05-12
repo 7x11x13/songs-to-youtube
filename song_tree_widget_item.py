@@ -157,6 +157,13 @@ class SongTreeWidgetItem(QStandardItem):
     def before_render(self):
         self.set("fileOutput", os.path.join(self.get("fileOutputDir"), self.get("fileOutputName")))
         self.set("songDuration", str(self.get_duration_ms() / 1000))
+        command_path = os.path.join(os.path.dirname(__file__), "commands", "render", self.get("commandName") + ".command")
+        try:
+            with open(command_path, 'r') as f:
+                command = f.read().strip()
+                self.set("commandString", command)
+        except:
+            raise Exception(f"Could not read command from {command_path}")
 
     def before_upload(self):
         pass
@@ -196,6 +203,9 @@ class AlbumTreeWidgetItem(QStandardItem):
     def get(self, field):
         return self.data(CustomDataRole.ITEMDATA).get_value(field)
 
+    def set(self, field, value):
+        self.data(CustomDataRole.ITEMDATA).set_value(field, value)
+
     def item_type(self):
         return self.data(CustomDataRole.ITEMTYPE)
 
@@ -226,7 +236,15 @@ class AlbumTreeWidgetItem(QStandardItem):
         return sum(song.get_duration_ms() for song in self.getChildren())
 
     def before_render(self):
+        self.data(CustomDataRole.ITEMDATA).set_value("albumDuration", str(self.get_duration_ms() / 1000))
         self.data(CustomDataRole.ITEMDATA).set_value("fileOutput", os.path.join(self.get("fileOutputDirAlbum"), self.get("fileOutputNameAlbum")))
+        command_path = os.path.join(os.path.dirname(__file__), "commands", "concat", self.get("concatCommandName") + ".command")
+        try:
+            with open(command_path, 'r') as f:
+                command = f.read().strip()
+                self.set("concatCommandString", command)
+        except:
+            raise Exception(f"Could not read command from {command_path}")
 
     def before_upload(self):
         # generate timestamps
@@ -234,7 +252,7 @@ class AlbumTreeWidgetItem(QStandardItem):
         timestamp_str = ""
         for song in self.getChildren():
             timestamp_str += "{} {}\n".format(datetime.timedelta(seconds=int(timestamp)), song.get("videoTitle"))
-            timestamp += float(song.get("realVideoLength"))
+            timestamp += song.get_duration_ms() / 1000
         data = self.data(CustomDataRole.ITEMDATA)
         data.set_value("timestamps", timestamp_str)
         data.update_fields()

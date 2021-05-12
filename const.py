@@ -17,7 +17,8 @@ class CustomDataRole(IntEnum):
 
 ORGANIZATION = "7x11x13"
 APPLICATION = "songs-to-youtube"
-VERSION = "v0.6.1"
+VERSION = "v0.7"
+SETTINGS_FILENAME = "v0.7settings"
 
 SUPPORTED_IMAGE_FILTER = "Images (*.bmp *.cur *.gif *.icns *.ico *.jpeg *.jpg *.pbm *.pgm *.png *.ppm *.svg *.svgz *.tga *.tif *.tiff *.wbmp *.webp *.xbm *.xpm)"
 
@@ -56,17 +57,17 @@ class SETTINGS_VALUES:
     }
 
     class CheckBox(str, Enum):
-        UNCHECKED = "PySide2.QtCore.Qt.CheckState.Unchecked"
-        PARTIALLY_CHECKED = "PySide2.QtCore.Qt.CheckState.PartiallyChecked"
-        CHECKED = "PySide2.QtCore.Qt.CheckState.Checked"
+        UNCHECKED = "PySide6.QtCore.Qt.CheckState.Unchecked"
+        PARTIALLY_CHECKED = "PySide6.QtCore.Qt.CheckState.PartiallyChecked"
+        CHECKED = "PySide6.QtCore.Qt.CheckState.Checked"
 
-SONG_FIELDS = set(('inputFrameRate', 'backgroundColor', 'videoHeight', 'videoWidth',
+SONG_FIELDS = set(('backgroundColor', 'videoHeight', 'videoWidth',
                    'uploadYouTube', 'coverArt', 'videoDescription', 'videoTags',
                    'videoTitle', 'videoVisibility', 'fileOutputDir', 'fileOutputName',
-                   'playlistName', 'SAVEcommandString', 'notifySubs'))
+                   'playlistName', 'commandName', 'notifySubs'))
 ALBUM_FIELDS = set(('albumPlaylist', 'fileOutputDirAlbum', 'fileOutputNameAlbum',
                     'uploadYouTube', 'videoDescriptionAlbum', 'videoTagsAlbum', 'videoTitleAlbum',
-                    'videoVisibilityAlbum', 'notifySubsAlbum'))
+                    'videoVisibilityAlbum', 'notifySubsAlbum', 'concatCommandName'))
 
 
 QDir.temp().mkdir(APPLICATION)

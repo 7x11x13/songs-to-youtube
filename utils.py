@@ -54,7 +54,8 @@ def str_to_checkstate(s):
         SETTINGS_VALUES.MULTIPLE_VALUES: Qt.PartiallyChecked
     }
     if s not in STR_TO_CHECKSTATE:
-        logging.error("String {} is not a valid CheckState".format(s))
+        raise Exception(f"String {s} is not a valid CheckState")
+        #logging.error("String {} is not a valid CheckState".format(s))
         return Qt.Checked
     return STR_TO_CHECKSTATE[s]
 
@@ -77,6 +78,11 @@ WIDGET_FUNCTIONS = {
         "on_update": lambda widget, cb: widget.textChanged.connect(lambda: cb(widget.toPlainText()))
     },
     "QComboBox": {
+        "getter": lambda widget: widget.currentData(),
+        "setter": lambda widget, data: widget.setCurrentIndex(widget.findData(data)),
+        "on_update": lambda widget, cb: widget.currentIndexChanged.connect(lambda: cb(widget.currentData()))
+    },
+    "FileComboBox": {
         "getter": lambda widget: widget.currentData(),
         "setter": lambda widget, data: widget.setCurrentIndex(widget.findData(data)),
         "on_update": lambda widget, cb: widget.currentIndexChanged.connect(lambda: cb(widget.currentData()))

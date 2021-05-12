@@ -20,7 +20,10 @@ PROCESSES = []
 # if we close the application
 def clean_up():
     for p in PROCESSES:
-        p.kill()
+        try:
+            p.kill()
+        except:
+            pass
 
 atexit.register(clean_up)
 
@@ -44,9 +47,9 @@ class ProcessHandler(QObject):
 
         if os.name == "nt":
             p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                 creationflags=subprocess.CREATE_NO_WINDOW)
+                                 creationflags=subprocess.CREATE_NO_WINDOW, shell=True)
         else:
-            p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
         PROCESSES.append(p)
         q = Queue()
@@ -64,6 +67,7 @@ class ProcessHandler(QObject):
             else:
                 errors = True
                 self.stderr.emit(line)
+        PROCESSES.remove(p)
         return errors
 
 class RenderSongWorker(QObject):
@@ -77,7 +81,7 @@ class RenderSongWorker(QObject):
 
     def run(self):
         try:
-            command_str = (self.song.get("SAVEcommandString")).format(**self.song.to_dict())
+            command_str = (self.song.get("commandString")).format(**self.song.to_dict())
             handler = ProcessHandler()
             handler.stderr.connect(self.error.emit)
             handler.stdout.connect(self.progress.emit)
@@ -109,8 +113,7 @@ class CombineSongWorker(QObject):
             for song in self.album.getChildren():
                 song_list.write(QByteArray("file 'file:{}'\n".format(song.get("fileOutput").replace("'", "'\\''"))))
             song_list.close()
-            command_str = ("ffmpeg -loglevel error -progress pipe:1 -y -f concat "
-                           "-safe 0 -i \"{input_file_list}\" -c copy \"{fileOutputPath}\"").format(
+            command_str = self.album.get("concatCommandString").format(
                                 input_file_list=song_list.fileName(),
                                 fileOutputPath=self.album.get("fileOutput"))
             handler = ProcessHandler()
@@ -118,16 +121,7 @@ class CombineSongWorker(QObject):
             handler.stdout.connect(self.progress.emit)
             errors = handler.run(command_str)
             for song in self.album.getChildren():
-                try:
-                    song_length = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
-                                                        "format=duration", "-of",
-                                                        "default=noprint_wrappers=1:nokey=1", song.get("fileOutput")],
-                                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT).stdout
-                    song.set("realVideoLength", song_length.decode('utf-8'))
-                    os.remove(song.get("fileOutput"))
-                except Exception as e:
-                    logging.error("Could not get duration of video: {}".format(song.get("fileOutput")))
-                    raise
+                os.remove(song.get("fileOutput"))
             self.finished.emit(not errors)
         except Exception as e:
             self.error.emit(traceback.format_exc())
