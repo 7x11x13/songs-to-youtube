@@ -20,6 +20,11 @@ Convert audio files to videos and upload them to YouTube automatically.
 - [FFmpeg](https://ffmpeg.org/download.html) binary is required to convert songs into videos
 - [Firefox](https://www.mozilla.org/firefox/new/) and [geckodriver](https://github.com/mozilla/geckodriver/releases) binaries are required to upload to YouTube
 - Make sure FFmpeg and geckodriver are both in your PATH environment variable
+- If you have a package manager you can install through that instead. e.g. with [Chocolatey](https://chocolatey.org/):
+```
+choco install ffmpeg
+choco install selenium-gecko-driver
+```
 
 ## Installation
 
@@ -57,7 +62,6 @@ Here are some useful values:
 - `~{date}`
 - `~{comment}`
 - `~{description}`
-- `~{WOAR}` - artist URL
 #### Album metadata
 - `~{album_dir}` - directory of the album
 - `~{timestamps}` - special key that generates timestamps based on song lengths. they will only be generated when concatenating songs into a single video
