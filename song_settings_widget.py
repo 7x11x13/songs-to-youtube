@@ -143,10 +143,15 @@ class SongSettingsWidget(QWidget):
                 # add <<Multiple values>> to combobox as necessary
                 multiple_values_index = field.widget.findData(SETTINGS_VALUES.MULTIPLE_VALUES)
                 if not has_multiple_values and multiple_values_index != -1:
+                    field.set(value)
                     field.widget.removeItem(multiple_values_index)
-                if has_multiple_values and multiple_values_index == -1:
+                elif has_multiple_values and multiple_values_index == -1:
                     field.widget.addItem(SETTINGS_VALUES.MULTIPLE_VALUES, SETTINGS_VALUES.MULTIPLE_VALUES)
-            field.set(value)
+                    field.set(value)
+                else:
+                    field.set(value)
+            else:
+                field.set(value)
             self.field_original_values[field.name] = value
 
     def song_tree_selection_changed(self, selected, deselected):
