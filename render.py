@@ -8,6 +8,7 @@ import time
 import traceback
 import atexit
 import os
+import psutil
 from threading import Thread
 from queue import Queue
 
@@ -21,7 +22,10 @@ PROCESSES = []
 def clean_up():
     for p in PROCESSES:
         try:
-            p.kill()
+            process = psutil.Process(p.pid)
+            for proc in process.children(recursive=True):
+                proc.kill()
+            process.kill()
         except:
             pass
 
@@ -189,6 +193,8 @@ class Renderer(QObject):
     worker_done = Signal(str, bool)
 
     def __init__(self):
+        super().__init__()
+
         # threads to be worked on
         self.threads = []
 
@@ -203,7 +209,8 @@ class Renderer(QObject):
         self.results = {}
 
         self.working = False
-        super().__init__()
+
+        self.cancelled = False
 
     def _worker_progress(self, worker, progress):
         try:
@@ -218,30 +225,32 @@ class Renderer(QObject):
 
 
     def worker_finished(self, worker, thread, success):
-        self.worker_done.emit(str(worker), success)
         self.results[str(worker)] = success
-        thread.quit()
-        worker.deleteLater()
-        logging.debug("{} finished, success: {}".format(str(worker), success))
+        if not self.cancelled:
+            self.worker_done.emit(str(worker), success)
+            thread.quit()
+            worker.deleteLater()
+            logging.debug("{} finished, success: {}".format(str(worker), success))
 
     def thread_finished(self, thread):
-        thread.deleteLater()
-        if thread in self.threads:
-            self.threads.remove(thread)
-        for w, t in self.workers.items():
-            if t == thread:
-                del self.workers[w]
-                break
-        if len(self.threads) == 0:
-            self.working = False
-        if len(self.workers) == 0:
-            self.finished.emit(self.results)
-        # find first unstarted thread and start it
-        for thread in self.threads:
-            if not thread.isRunning():
-                thread.start()
-                self.working = True
-                break
+        if not self.cancelled:
+            thread.deleteLater()
+            if thread in self.threads:
+                self.threads.remove(thread)
+            for w, t in self.workers.items():
+                if t == thread:
+                    del self.workers[w]
+                    break
+            if len(self.threads) == 0:
+                self.working = False
+            if len(self.workers) == 0:
+                self.finished.emit(self.results)
+            # find first unstarted thread and start it
+            for thread in self.threads:
+                if not thread.isRunning():
+                    thread.start()
+                    self.working = True
+                    break
 
     def start_worker(self, worker_name):
         # manually start a worker that wasn't created
@@ -303,3 +312,11 @@ class Renderer(QObject):
             self.finished.emit(self.results)
         for i in range(min(int(get_setting("maxProcesses")), len(self.threads))):
             self.threads[i].start()
+
+    def cancel(self):
+        clean_up()
+        self.cancelled = True
+        for worker in self.workers:
+            if str(worker) not in self.results:
+                self.results[str(worker)] = False
+        self.finished.emit(self.results)

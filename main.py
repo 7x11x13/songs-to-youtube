@@ -27,8 +27,12 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = load_ui("mainwindow.ui", (SongSettingsWidget, SongTreeWidget, LogWidget, ProgressWindow))
+        self.ui.cancelButton.setVisible(False)
         self.connect_actions()
         self.setAcceptDrops(True)
+        self.renderer = None
+        self.uploader = None
+        self.cancelled = False
 
     def load_albums(self):
         file_dialog = QFileDialog(self, "Import Albums")
@@ -49,35 +53,63 @@ class MainWindow(QMainWindow):
                 self.ui.treeWidget.addAlbum(album)
 
     def on_upload_finished(self, results):
-        logging.success("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
-        self.ui.splitter.setEnabled(True)
-        del self.uploader
-        if get_setting("deleteAfterUploading") == SETTINGS_VALUES.CheckBox.CHECKED:
-            for path, success in results.items():
-                if success:
+        self.ui.treeWidget.setEnabled(True)
+        self.ui.cancelButton.setVisible(False)
+        self.ui.renderButton.setVisible(True)
+        if self.cancelled:
+            logging.error("Upload cancelled")
+            # delete rendered/partially-rendered videos
+            for path in results:
+                try:
                     os.remove(path)
-        # remove successful uploads
-        self.ui.treeWidget.remove_by_file_paths({path for path in results if results[path]})
+                except:
+                    pass
+            self.cancelled = False
+        else:
+            logging.success("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
+            self.uploader = None
+            if get_setting("deleteAfterUploading") == SETTINGS_VALUES.CheckBox.CHECKED:
+                for path, success in results.items():
+                    if success:
+                        os.remove(path)
+            # remove successful uploads
+            self.ui.treeWidget.remove_by_file_paths({path for path in results if results[path]})
 
 
     def on_render_finished(self, results):
-        logging.success("{}/{} renders successful".format(sum(int(s) for s in results.values()),len(results)))
-        # remove successful renders that will not be uploaded
-        self.ui.treeWidget.remove_by_file_paths({path for path in results if results[path]}, False)
-        # upload to youtube
-        self.uploader = self.ui.treeWidget.get_uploader(results)
-        self.uploader.finished.connect(self.on_upload_finished)
-        if not self.uploader.is_uploading():
-            # no upload jobs, we are finished
-            self.on_upload_finished({})
-        del self.renderer
+        if self.cancelled:
+            logging.error("Render cancelled")
+            self.on_upload_finished(results)
+        else:
+            logging.success("{}/{} renders successful".format(sum(int(s) for s in results.values()),len(results)))
+            # remove successful renders that will not be uploaded
+            self.ui.treeWidget.remove_by_file_paths({path for path in results if results[path]}, False)
+            # upload to youtube
+            self.uploader = self.ui.treeWidget.get_uploader(results)
+            self.uploader.finished.connect(self.on_upload_finished)
+            if not self.uploader.is_uploading():
+                # no upload jobs, we are finished
+                self.on_upload_finished({})
+        self.renderer = None
 
     def render(self):
-        self.ui.splitter.setEnabled(False)
+        self.ui.treeWidget.setEnabled(False)
+        self.ui.cancelButton.setVisible(True)
+        self.ui.renderButton.setVisible(False)
         self.renderer = self.ui.treeWidget.get_renderer()
         self.renderer.finished.connect(self.on_render_finished)
         self.ui.progressWindow.on_render_start(self.renderer)
         self.renderer.render()
+
+    def cancel(self):
+        self.cancelled = True
+        if self.renderer:
+            self.renderer.cancel()
+            self.ui.treeWidget.setEnabled(True)
+            self.ui.cancelButton.setVisible(False)
+            self.ui.renderButton.setVisible(True)
+        if self.uploader:
+            self.uploader.cancel()
 
     def load_songs(self):
         file_names = QFileDialog.getOpenFileNames(self, "Import Songs")[0]
@@ -102,6 +134,7 @@ class MainWindow(QMainWindow):
         self.ui.actionSettings.triggered.connect(self.open_settings)
         self.ui.treeWidget.selectionModel().selectionChanged.connect(self.ui.songSettingsWindow.song_tree_selection_changed)
         self.ui.renderButton.clicked.connect(self.render)
+        self.ui.cancelButton.clicked.connect(self.cancel)
 
 
 if __name__ == "__main__":

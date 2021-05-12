@@ -7,6 +7,7 @@ from threading import Thread
 import logging
 import traceback
 import time
+import atexit
 
 from youtube_uploader_selenium import YouTubeUploader
 from song_tree_widget_item import *
@@ -31,10 +32,11 @@ class UploadThread(Thread):
                 logging.error("Could not upload {}".format(self.file_path))
             self.callback(success, self)
         except Exception as e:
-            logging.error("Error while uploading {}".format(self.file_path))
-            logging.error(traceback.format_exc())
-            logging.error(e)
-            self.callback(False, self)
+            if not self.uploader.cancelled:
+                logging.error("Error while uploading {}".format(self.file_path))
+                logging.error(traceback.format_exc())
+                logging.error(e)
+                self.callback(False, self)
 
 
 class Uploader(QObject):
@@ -47,21 +49,24 @@ class Uploader(QObject):
         self.threads = []
         self.results = {}
         self.render_results = render_results
+        self.cancelled = False
 
     def on_done_uploading(self, success, thread):
-        self.uploading = False
-        self.threads.remove(thread)
-        self.results[thread.file_path] = success
-        if len(self.threads) == 0:
-            self.uploader.quit()
-            self.finished.emit(self.results)
-        else:
-            self.uploading = True
-            self.threads[0].start()
+        if not self.cancelled:
+            self.uploading = False
+            self.threads.remove(thread)
+            self.results[thread.file_path] = success
+            if len(self.threads) == 0:
+                self.uploader.quit()
+                self.finished.emit(self.results)
+            else:
+                self.uploading = True
+                self.threads[0].start()
 
     def _upload(self, file_path, metadata):
         if self.uploader is None:
             self.uploader = YouTubeUploader(get_setting('username'))
+            atexit.register(self.uploader.quit)
         if self.uploader.username == "":
             raise Exception("No user selected to upload to")
         thread = UploadThread(self.uploader, file_path, metadata, self.on_done_uploading)
@@ -69,6 +74,14 @@ class Uploader(QObject):
         if not self.uploading:
             self.uploading = True
             thread.start()
+
+    def cancel(self):
+        self.cancelled = True
+        self.uploader.quit()
+        for thread in self.threads:
+            if thread.file_path not in self.results:
+                self.results[thread.file_path] = False
+        self.finished.emit(self.results)
 
     def add_upload_album_job(self, album: AlbumTreeWidgetItem):
         if album.childCount() == 0:
