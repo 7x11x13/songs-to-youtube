@@ -120,6 +120,9 @@ class SongSettingsWidget(QWidget):
         for widget in self.ALBUM_ONLY_WIDGETS:
             self.findChild(*widget).setVisible(self.item_type == TreeWidgetType.ALBUM)
 
+        if self.item_type == TreeWidgetType.SONG:
+            self.findChild(SettingCheckBox, "uploadYouTube").setEnabled(True)
+
         self.fields_updated = set()
         self.field_original_values = {}
         self.set_button_box_enabled(False)
