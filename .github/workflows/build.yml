@@ -24,7 +24,8 @@ jobs:
           python -m pip install -r requirements.txt
       - name: Install PyInstaller
         run: |
-          git clone https://github.com/pyinstaller/pyinstaller
+          python -m pip install wheel
+          git clone https://github.com/pyinstaller/pyinstaller --branch master
           cd pyinstaller/bootloader
           python ./waf distclean all
           cd ..
