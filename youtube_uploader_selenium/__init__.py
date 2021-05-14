@@ -83,6 +83,7 @@ class YouTubeUploader:
         self.username = username
         self.browser = Firefox(full_screen=False, cookies_folder_path=cookies_path, default_find_func_timeout=10)
         self.logger = logging.getLogger()
+        self.cancelled = False
 
     def __validate_inputs(self):
         if Constant.NOTIFY_SUBS not in self.metadata_dict:

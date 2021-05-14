@@ -77,6 +77,7 @@ class Uploader(QObject):
 
     def cancel(self):
         self.cancelled = True
+        self.uploader.cancelled = True
         self.uploader.quit()
         for thread in self.threads:
             if thread.file_path not in self.results:
