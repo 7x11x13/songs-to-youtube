@@ -137,24 +137,6 @@ class SettingsScrollArea(QScrollArea):
         super().resizeEvent(event)
         self.findChild(CoverArtDisplay).scroll_area_width_resized(event.size().width())
 
-class LoginThread(Thread):
-
-    def __init__(self, browser, callback=lambda: None):
-        super().__init__()
-        self.callback = callback
-        self.login = browser
-
-    def run(self):
-        try:
-            time.sleep(5)
-            username = self.login.get_login()
-            self.callback(True, username)
-        except Exception as e:
-            logging.error("Error while getting login")
-            logging.error(traceback.format_exc())
-            logging.error(e)
-            self.callback(False, None)
-
 class SettingsWindow(QDialog):
 
     settings_changed = Signal()
@@ -171,7 +153,17 @@ class SettingsWindow(QDialog):
         SettingsWindow.init_combo_boxes(self.ui)
         self.connect_actions()
         self.load_settings()
-        self.login_thread = None
+
+    def add_new_user(self):
+        msg_box = QMessageBox()
+        msg_box.setTextFormat(Qt.RichText)
+        msg_box.setWindowTitle("Add new user")
+        msg_box.setText("To add a new user, you must first log in to youtube, then save your browser cookies for youtube to<br><br>"
+                        f"{os.path.join(YouTubeLogin.get_cookie_path_from_username('(username)'), 'youtube.com.json')}<br><br>"
+                        "To save the cookies after logging in, you can use a"
+                        " <a href='https://github.com/ktty1220/export-cookie-for-puppeteer'>browser extension.</a> Make sure you "
+                        "name the file youtube.com.json")
+        msg_box.exec()
 
     def save_preset(self):
         presets_dir = os.path.join(os.path.dirname(__file__), "config")
@@ -210,29 +202,6 @@ class SettingsWindow(QDialog):
         for field in get_all_fields(self.ui):
             settings.setValue(field.name, field.get())
 
-    def on_login(self, success, username):
-        self.ui.setEnabled(True)
-        self.login_thread = None
-        if success:
-            self.ui.username.addItem(username)
-            self.ui.username.setCurrentText(username)
-
-    def add_new_user(self):
-        if self.login_thread is None:
-            self.ui.setEnabled(False)
-            self.login_thread = LoginThread(YouTubeLogin(), self.on_login)
-            self.login_thread.start()
-            QMessageBox.information(self, "Add new user",
-                                    "Please log in to your YouTube account. "
-                                    "The window will close automatically when you log in.")
-
-    def remove_user(self):
-        combo_box = self.ui.username
-        username = combo_box.currentText()
-        if username != "":
-            combo_box.removeItem(combo_box.currentIndex())
-            YouTubeLogin.remove_user_cookies(username)
-
     def change_cover_art(self):
         file = QFileDialog.getOpenFileName(self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER)[0]
         self.ui.coverArt.set(file)
@@ -256,4 +225,3 @@ class SettingsWindow(QDialog):
         find_child_text(self.ui.buttonBox, SettingsWindow.LOAD_PRESET_TEXT).clicked.connect(self.load_preset)
         self.ui.coverArtButton.clicked.connect(self.change_cover_art)
         self.ui.addNewUserButton.clicked.connect(self.add_new_user)
-        self.ui.removeUserButton.clicked.connect(self.remove_user)

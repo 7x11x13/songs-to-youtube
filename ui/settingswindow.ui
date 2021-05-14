@@ -54,7 +54,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-489</y>
+        <y>0</y>
         <width>433</width>
         <height>1701</height>
        </rect>
@@ -175,7 +175,7 @@
               </property>
              </spacer>
             </item>
-            <item alignment="Qt::AlignLeft">
+            <item>
              <widget class="QPushButton" name="addNewUserButton">
               <property name="minimumSize">
                <size>
@@ -190,26 +190,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Add new user...</string>
-              </property>
-             </widget>
-            </item>
-            <item alignment="Qt::AlignLeft">
-             <widget class="QPushButton" name="removeUserButton">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>25</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>100</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Remove user</string>
+               <string>Add new user</string>
               </property>
              </widget>
             </item>

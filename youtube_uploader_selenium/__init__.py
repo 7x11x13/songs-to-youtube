@@ -145,7 +145,10 @@ class YouTubeUploader:
             raise Exception("Could not find cookies at path {}".format(self.browser.cookies_folder_path))
 
     def __find_playlist_checkbox_no_search(self, name):
-        for element in self.browser.find_all(By.XPATH, Constant.PLAYLIST_LABEL):
+        labels = self.browser.find_all(By.XPATH, Constant.PLAYLIST_LABEL)
+        if not labels:
+            return None
+        for element in labels:
             name_element = element.find_element_by_xpath(".//span/span[@class='label label-text style-scope ytcp-checkbox-group']")
             # if playlist has zero width space, this will not find the checkbox
             # might also need to replace u200c
@@ -161,6 +164,10 @@ class YouTubeUploader:
                 # sometimes a newly created playlist will not show up in the list of playlists
                 # we can search for it to update the list
                 search = self.browser.find(By.XPATH, Constant.PLAYLIST_SEARCH)
+
+                if not search:
+                    # we do not have a search bar, meaning all the playlists are loaded
+                    return None
 
                 # search behaves weird with opening brackets / parentheses,
                 # possibly other characters as well
