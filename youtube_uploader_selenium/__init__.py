@@ -201,7 +201,7 @@ class YouTubeUploader:
         time.sleep(Constant.USER_WAITING_TIME)
         absolute_video_path = str(Path.cwd() / self.video_path)
         self.__find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(absolute_video_path)
-        self.logger.debug('Attached video {}'.format(self.video_path))
+        self.logger.info('Attached video {}'.format(self.video_path))
         time.sleep(Constant.USER_WAITING_TIME)
         title_field = self.__find(By.ID, Constant.TEXTBOX, timeout=30)
         title_field.click()
@@ -214,7 +214,7 @@ class YouTubeUploader:
             title_field.send_keys(Keys.CONTROL + 'a')
         time.sleep(Constant.USER_WAITING_TIME)
         title_field.send_keys(self.metadata_dict[Constant.VIDEO_TITLE])
-        self.logger.debug('The video title was set to \"{}\"'.format(self.metadata_dict[Constant.VIDEO_TITLE]))
+        self.logger.info('The video title was set to \"{}\"'.format(self.metadata_dict[Constant.VIDEO_TITLE]))
 
         video_description = self.metadata_dict[Constant.VIDEO_DESCRIPTION]
         tags = self.metadata_dict[Constant.TAGS]
@@ -228,7 +228,7 @@ class YouTubeUploader:
             description_field.clear()
             time.sleep(Constant.USER_WAITING_TIME)
             description_field.send_keys(video_description)
-            self.logger.debug(
+            self.logger.info(
                 'The video description was set to \"{}\"'.format(video_description))
         if playlist:
             self.__find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
@@ -301,27 +301,33 @@ class YouTubeUploader:
         self.browser.scroll_to_element(kids_section)
         time.sleep(Constant.USER_WAITING_TIME)
         self.__find(By.ID, Constant.RADIO_LABEL, kids_section).click()
-        self.logger.debug('Selected \"{}\"'.format(Constant.NOT_MADE_FOR_KIDS_LABEL))
+        self.logger.info('Selected \"{}\"'.format(Constant.NOT_MADE_FOR_KIDS_LABEL))
+        time.sleep(Constant.USER_WAITING_TIME)
 
         self.__find(By.ID, Constant.NEXT_BUTTON).click()
-        self.logger.debug('Clicked {}'.format(Constant.NEXT_BUTTON))
+        self.logger.info('Clicked {}'.format(Constant.NEXT_BUTTON))
+        time.sleep(Constant.USER_WAITING_TIME)
 
         # Video elements
         self.__find(By.ID, Constant.NEXT_BUTTON).click()
-        self.logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
+        self.logger.info('Clicked another {}'.format(Constant.NEXT_BUTTON))
+        time.sleep(Constant.USER_WAITING_TIME)
 
         # Checks
         self.__find(By.ID, Constant.NEXT_BUTTON).click()
-        self.logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
+        self.logger.info('Clicked another {}'.format(Constant.NEXT_BUTTON))
+        time.sleep(Constant.USER_WAITING_TIME)
 
         visibility_button = self.browser.find(By.NAME, self.metadata_dict['visibility'])
         self.browser.find(By.ID, Constant.RADIO_LABEL, visibility_button).click()
-        self.logger.debug('Made the video {}'.format(self.metadata_dict['visibility']))
+        self.logger.info('Made the video {}'.format(self.metadata_dict['visibility']))
+        time.sleep(Constant.USER_WAITING_TIME)
 
         video_id = self.__get_video_id()
 
-        status_container = self.__find(By.XPATH, Constant.STATUS_CONTAINER)
         while True:
+            status_container = self.browser.find(By.XPATH, Constant.STATUS_CONTAINER)
+            self.logger.info(f"status: {status_container.text}")
             in_process = status_container.text.find(Constant.UPLOADED) != -1
             if in_process:
                 time.sleep(Constant.USER_WAITING_TIME)
@@ -338,7 +344,7 @@ class YouTubeUploader:
             return False, None
 
         done_button.click()
-        self.logger.debug("Published the video with video_id = {}".format(video_id))
+        self.logger.info("Published the video with video_id = {}".format(video_id))
         # wait for youtube to save the video info
         while self.__find(By.XPATH, Constant.VIDEO_PUBLISHED_DIALOG) is None:
             time.sleep(1)
