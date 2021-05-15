@@ -52,16 +52,16 @@ class YouTubeLogin:
 
         self.browser.get(Constant.YOUTUBE_URL)
         time.sleep(Constant.USER_WAITING_TIME)
-        while (avatar := self.browser.find(By.XPATH, Constant.USER_AVATAR_XPATH)) is None:
+        while (avatar := self.__find(By.XPATH, Constant.USER_AVATAR_XPATH)) is None:
             time.sleep(1)
         while True:
             try:
-                avatar = self.browser.find(By.XPATH, Constant.USER_AVATAR_XPATH)
+                avatar = self.__find(By.XPATH, Constant.USER_AVATAR_XPATH)
                 avatar.click()
                 break
             except Exception as e:
                 time.sleep(3)
-        username_div = self.browser.find(By.ID, Constant.USERNAME_ID, timeout=30)
+        username_div = self.__find(By.ID, Constant.USERNAME_ID, timeout=30)
         username = username_div.text
         logging.info("Logged in as {}".format(username))
         self.browser.get(Constant.YOUTUBE_URL)
@@ -163,7 +163,7 @@ class YouTubeUploader:
             if not checkbox:
                 # sometimes a newly created playlist will not show up in the list of playlists
                 # we can search for it to update the list
-                search = self.browser.find(By.XPATH, Constant.PLAYLIST_SEARCH)
+                search = self.__find(By.XPATH, Constant.PLAYLIST_SEARCH)
 
                 if not search:
                     # we do not have a search bar, meaning all the playlists are loaded
@@ -188,6 +188,11 @@ class YouTubeUploader:
             logging.error(e)
             return None
 
+    def __find(self, by, constant, *args, **kwargs):
+        element = self.browser.find(by, constant, *args, **kwargs)
+        if not element:
+            raise Exception(f"Could not find {Constant.lookup(constant)}")
+        return element
 
     def __upload(self) -> (bool, Optional[str]):
         self.browser.get(Constant.YOUTUBE_URL)
@@ -195,12 +200,10 @@ class YouTubeUploader:
         self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
         time.sleep(Constant.USER_WAITING_TIME)
         absolute_video_path = str(Path.cwd() / self.video_path)
-        self.browser.find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(absolute_video_path)
+        self.__find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(absolute_video_path)
         self.logger.debug('Attached video {}'.format(self.video_path))
         time.sleep(Constant.USER_WAITING_TIME)
-        if (title_field := self.browser.find(By.ID, Constant.TEXTBOX, timeout=30)) is None:
-            self.logger.error('Could not find title field')
-            return False, None
+        title_field = self.__find(By.ID, Constant.TEXTBOX, timeout=30)
         title_field.click()
         time.sleep(Constant.USER_WAITING_TIME)
         title_field.clear()
@@ -218,9 +221,8 @@ class YouTubeUploader:
         playlist = self.metadata_dict[Constant.PLAYLIST]
         notify_subs = self.metadata_dict[Constant.NOTIFY_SUBS]
         if video_description:
-            description_container = self.browser.find(By.XPATH,
-                                                      Constant.DESCRIPTION_CONTAINER)
-            description_field = self.browser.find(By.ID, Constant.TEXTBOX, element=description_container)
+            description_container = self.__find(By.XPATH, Constant.DESCRIPTION_CONTAINER)
+            description_field = self.__find(By.ID, Constant.TEXTBOX, element=description_container)
             description_field.click()
             time.sleep(Constant.USER_WAITING_TIME)
             description_field.clear()
@@ -229,31 +231,32 @@ class YouTubeUploader:
             self.logger.debug(
                 'The video description was set to \"{}\"'.format(video_description))
         if playlist:
-            self.browser.find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
+            self.__find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
             time.sleep(Constant.USER_WAITING_TIME)
             checkbox = self.__find_playlist_checkbox(playlist)
             if checkbox is None:
                 self.logger.info("Could not find playlist checkbox, attempting to create new playlist")
                 # clear search so we can create new playlist
+                try:
+                    time.sleep(Constant.USER_WAITING_TIME)
+                    self.__(By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON).click()
+                except:
+                    # we don't have a search bar for playlists, so just ignore
+                    pass
                 time.sleep(Constant.USER_WAITING_TIME)
-                self.browser.find(By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON).click()
-                time.sleep(Constant.USER_WAITING_TIME)
-                playlist_new_button = self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON)
+                playlist_new_button = self.__find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON)
                 self.browser.move_to_element(playlist_new_button)
                 time.sleep(Constant.USER_WAITING_TIME)
                 playlist_new_button.click()
                 time.sleep(Constant.USER_WAITING_TIME)
-                playlist_title = self.browser.find(By.XPATH, Constant.PLAYLIST_NEW_TITLE)
-                if playlist_title is None:
-                    logging.error("Could not find playlist title field")
-                    return False, None
+                playlist_title = self.__find(By.XPATH, Constant.PLAYLIST_NEW_TITLE)
                 playlist_title.click()
                 time.sleep(Constant.USER_WAITING_TIME)
                 playlist_title.send_keys(playlist)
                 time.sleep(Constant.USER_WAITING_TIME)
 
                 # Set playlist visibility
-                self.browser.find(By.XPATH, Constant.PLAYLIST_VISIBILITY_DROPDOWN).click()
+                self.__find(By.XPATH, Constant.PLAYLIST_VISIBILITY_DROPDOWN).click()
                 time.sleep(Constant.USER_WAITING_TIME)
                 playlist_visibility = self.browser.find(By.XPATH, '//*[@test-id="{}"]'.format(self.metadata_dict['visibility']))
                 if playlist_visibility is None:
@@ -262,7 +265,7 @@ class YouTubeUploader:
                 playlist_visibility.click()
                 time.sleep(Constant.USER_WAITING_TIME)
 
-                self.browser.find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
+                self.__find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
                 time.sleep(Constant.USER_WAITING_TIME)
                 checkbox = self.__find_playlist_checkbox(playlist)
             if checkbox is None:
@@ -271,7 +274,7 @@ class YouTubeUploader:
             else:
                 checkbox.click()
                 time.sleep(Constant.USER_WAITING_TIME)
-                self.browser.find(By.XPATH, Constant.PLAYLIST_DONE_BUTTON).click()
+                self.__find(By.XPATH, Constant.PLAYLIST_DONE_BUTTON).click()
                 time.sleep(Constant.USER_WAITING_TIME)
 
         # hide tooltips which can obscure buttons
@@ -284,31 +287,31 @@ class YouTubeUploader:
                     pass
 
         if tags or not notify_subs:
-            self.browser.find(By.XPATH, Constant.MORE_OPTIONS_CONTAINER).click()
+            self.__find(By.XPATH, Constant.MORE_OPTIONS_CONTAINER).click()
             time.sleep(Constant.USER_WAITING_TIME)
             if tags:
-                self.browser.find(By.XPATH, Constant.TAGS_TEXT_INPUT).send_keys(tags)
+                self.__find(By.XPATH, Constant.TAGS_TEXT_INPUT).send_keys(tags)
                 time.sleep(Constant.USER_WAITING_TIME)
             if not notify_subs:
-                self.browser.find(By.XPATH, Constant.NOTIFY_SUBSCRIBERS_CHECKBOX).click()
+                self.__find(By.XPATH, Constant.NOTIFY_SUBSCRIBERS_CHECKBOX).click()
                 time.sleep(Constant.USER_WAITING_TIME)
 
         time.sleep(Constant.USER_WAITING_TIME)
-        kids_section = self.browser.find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
+        kids_section = self.__find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
         self.browser.scroll_to_element(kids_section)
         time.sleep(Constant.USER_WAITING_TIME)
-        self.browser.find(By.ID, Constant.RADIO_LABEL, kids_section).click()
+        self.__find(By.ID, Constant.RADIO_LABEL, kids_section).click()
         self.logger.debug('Selected \"{}\"'.format(Constant.NOT_MADE_FOR_KIDS_LABEL))
 
-        self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
+        self.__find(By.ID, Constant.NEXT_BUTTON).click()
         self.logger.debug('Clicked {}'.format(Constant.NEXT_BUTTON))
 
         # Video elements
-        self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
+        self.__find(By.ID, Constant.NEXT_BUTTON).click()
         self.logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
 
         # Checks
-        self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
+        self.__find(By.ID, Constant.NEXT_BUTTON).click()
         self.logger.debug('Clicked another {}'.format(Constant.NEXT_BUTTON))
 
         visibility_button = self.browser.find(By.NAME, self.metadata_dict['visibility'])
@@ -317,8 +320,7 @@ class YouTubeUploader:
 
         video_id = self.__get_video_id()
 
-        status_container = self.browser.find(By.XPATH,
-                                             Constant.STATUS_CONTAINER)
+        status_container = self.__find(By.XPATH, Constant.STATUS_CONTAINER)
         while True:
             in_process = status_container.text.find(Constant.UPLOADED) != -1
             if in_process:
@@ -326,28 +328,27 @@ class YouTubeUploader:
             else:
                 break
 
-        done_button = self.browser.find(By.ID, Constant.DONE_BUTTON)
+        done_button = self.__find(By.ID, Constant.DONE_BUTTON)
 
         # Catch such error as
         # "File is a duplicate of a video you have already uploaded"
         if done_button.get_attribute('aria-disabled') == 'true':
-            error_message = self.browser.find(By.XPATH,
-                                              Constant.ERROR_CONTAINER).text
+            error_message = self.__find(By.XPATH, Constant.ERROR_CONTAINER).text
             self.logger.error(error_message)
             return False, None
 
         done_button.click()
         self.logger.debug("Published the video with video_id = {}".format(video_id))
         # wait for youtube to save the video info
-        while self.browser.find(By.XPATH, Constant.VIDEO_PUBLISHED_DIALOG) is None:
+        while self.__find(By.XPATH, Constant.VIDEO_PUBLISHED_DIALOG) is None:
             time.sleep(1)
         return True, video_id
 
     def __get_video_id(self) -> Optional[str]:
         video_id = None
         try:
-            video_url_container = self.browser.find(By.XPATH, Constant.VIDEO_URL_CONTAINER)
-            video_url_element = self.browser.find(By.XPATH, Constant.VIDEO_URL_ELEMENT,
+            video_url_container = self.__find(By.XPATH, Constant.VIDEO_URL_CONTAINER)
+            video_url_element = self.__find(By.XPATH, Constant.VIDEO_URL_ELEMENT,
                                                   element=video_url_container)
             video_id = video_url_element.get_attribute(Constant.HREF).split('/')[-1]
         except:

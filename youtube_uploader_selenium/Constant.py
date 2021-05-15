@@ -15,7 +15,7 @@ class Constant:
     PLAYLIST_CONTAINER = '//span[@class="dropdown-trigger-text style-scope ytcp-text-dropdown-trigger"][text()[contains(.,"Select")]]'
     PLAYLIST_SEARCH = '//*[@id="search-input"]'
     PLAYLIST_SEARCH_CLEAR_BUTTON = '//*[@class="style-scope ytcp-playlist-dialog"]/tp-yt-iron-icon[@class="remove-defaults style-scope ytcp-icon-button"]'
-    PLAYLIST_NEW_BUTTON = '//*[text() = "New playlist"]'
+    PLAYLIST_NEW_BUTTON = '/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[2]/ytcp-button[1]/div'
     PLAYLIST_NEW_TITLE = '//div[@id="create-playlist-form"]/div/ytcp-form-textarea/div/textarea'
     PLAYLIST_DONE_BUTTON = '//*[@class="done-button action-button style-scope ytcp-playlist-dialog"]/*[text() = "Done"]'
     PLAYLIST_CREATE_BUTTON = '//*[@class="create-playlist-button action-button style-scope ytcp-playlist-dialog"][@label="Create"]'
@@ -44,3 +44,14 @@ class Constant:
     MAX_TITLE_LENGTH = 100
     MAX_DESCRIPTION_LENGTH = 5000
     MAX_TAGS_LENGTH = 500
+
+    @staticmethod
+    def lookup(s):
+        print("looking up")
+        print(s)
+        for name, value in vars(Constant).items():
+            if s == value:
+                print(name)
+                return name
+        print(value)
+        return value
