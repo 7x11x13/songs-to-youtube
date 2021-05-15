@@ -239,7 +239,7 @@ class YouTubeUploader:
                 # clear search so we can create new playlist
                 try:
                     time.sleep(Constant.USER_WAITING_TIME)
-                    self.__(By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON).click()
+                    self.__find(By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON).click()
                 except:
                     # we don't have a search bar for playlists, so just ignore
                     pass
