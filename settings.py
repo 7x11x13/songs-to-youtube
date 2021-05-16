@@ -22,7 +22,11 @@ def get_settings():
 def get_setting(setting: str, settings=get_settings()):
     """Returns the value of the given setting"""
     if not settings.contains(setting):
-        raise Exception(f"Setting {setting} does not exist")
+        # try to load from default settings
+        defaults = QSettings(os.path.join(os.path.dirname(__file__), "config", "default.ini"), QSettings.IniFormat)
+        if not defaults.contains(setting):
+            raise Exception(f"Setting {setting} does not exist")
+        return defaults.value(setting)
     return settings.value(setting)
 
 class FileComboBox(QComboBox):
