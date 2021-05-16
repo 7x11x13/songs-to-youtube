@@ -56,7 +56,7 @@
         <x>0</x>
         <y>0</y>
         <width>433</width>
-        <height>1701</height>
+        <height>1726</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -137,6 +137,13 @@
             </property>
             <property name="text">
              <string>Extract cover art from metadata?</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="SettingCheckBox" name="preferCoverArtFile">
+            <property name="text">
+             <string>Prefer cover art file over embedded art?</string>
             </property>
            </widget>
           </item>

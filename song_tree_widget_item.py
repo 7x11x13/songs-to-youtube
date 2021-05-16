@@ -55,11 +55,33 @@ class TreeWidgetItemData:
             try:
                 self.metadata = Metadata(self.dict['song_path'])
 
+                cover_exts = {'.jpg', '.jpeg', '.bmp', '.gif', '.png'}
+                cover_names = {'cover', 'folder', 'front', os.path.splitext(self.dict['song_file'])[0]}
+                cover_file = None
+                for file in os.listdir(self.dict['song_dir']):
+                    path = os.path.join(self.dict['song_dir'], file)
+                    name, ext = os.path.splitext(file)
+                    if os.path.isfile(path) and name.lower() in cover_names and ext.lower() in cover_exts:
+                        logging.info(f"Found cover file {path}")
+                        cover_file = path
+                        break
+
+                if get_setting('preferCoverArtFile') == SETTINGS_VALUES.CheckBox.CHECKED:
+                    if cover_file is not None:
+                        self.set_value('coverArt', cover_file)
+                        return
+
                 if get_setting('extractCoverArt') == SETTINGS_VALUES.CheckBox.CHECKED:
                     if (cover_path := self.metadata.get_cover_art()) is not None:
                         self.set_value('coverArt', cover_path)
+                        return
+
+                if cover_file is not None:
+                    self.set_value('coverArt', cover_file)
+
 
             except Exception as e:
+                logging.warning("Error while getting cover art")
                 logging.warning(e)
                 logging.warning(self.dict['song_path'])
         else:
