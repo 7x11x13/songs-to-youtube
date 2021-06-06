@@ -59,7 +59,6 @@ class ProcessHandler(QObject):
         q = Queue()
         Thread(target=self.read_pipe, args=[p.stdout, q]).start()
         Thread(target=self.read_pipe, args=[p.stderr, q]).start()
-        errors = False
         while True:
             while q.empty() or (item := q.get_nowait()) is None:
                 time.sleep(0.01)
@@ -69,10 +68,10 @@ class ProcessHandler(QObject):
             if pipe == p.stdout:
                 self.stdout.emit(line)
             else:
-                errors = True
                 self.stderr.emit(line)
+        error = p.wait() != 0
         PROCESSES.remove(p)
-        return errors
+        return error
 
 class RenderSongWorker(QObject):
     finished = Signal(bool)
