@@ -1,4 +1,4 @@
-<img align="left" width="100" height="100" src="https://raw.githubusercontent.com/7x11x13/songs-to-youtube/master/image/icon.ico" alt="icon">
+<img align="left" width="100" height="100" src="https://raw.githubusercontent.com/7x11x13/songs-to-youtube/master/src/image/icon.ico" alt="icon">
 
 # songs-to-youtube
 
