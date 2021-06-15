@@ -87,9 +87,7 @@ class MainWindow(QMainWindow):
             # upload to youtube
             self.uploader = self.ui.treeWidget.get_uploader(results)
             self.uploader.finished.connect(self.on_upload_finished)
-            if not self.uploader.is_uploading():
-                # no upload jobs, we are finished
-                self.on_upload_finished({})
+            self.uploader.upload()
         self.renderer = None
 
     def render(self):

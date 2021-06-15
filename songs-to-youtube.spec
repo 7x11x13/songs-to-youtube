@@ -21,13 +21,13 @@ else:
 block_cipher = None
 
 
-a = Analysis(['main.py'],
+a = Analysis(['src/main.py'],
              pathex=[SHIBOKEN_PATH, '.'],
              binaries=binaries,
-             datas=[('ui/*.ui', 'ui'),
-                    ('config/*.ini', 'config'),
-                    ('commands/concat/*.command', 'commands/concat'),
-                    ('commands/render/*.command', 'commands/render')],
+             datas=[('src/ui/*.ui', 'ui'),
+                    ('src/config/*.ini', 'config'),
+                    ('src/commands/concat/*.command', 'commands/concat'),
+                    ('src/commands/render/*.command', 'commands/render')],
              hiddenimports=['PySide6.QtXml'],
              hookspath=[],
              runtime_hooks=[],
@@ -48,7 +48,7 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           console=False,
-          icon='image/icon.ico')
+          icon='src/image/icon.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

@@ -6,6 +6,7 @@ from PySide6.QtGui import QColor
 import logging
 import sys
 import traceback
+from const import APPLICATION
 
 from settings import get_setting
 
@@ -100,16 +101,18 @@ class LogWidget(QTextEdit):
     def __init__(self, *args):
         super().__init__(*args)
 
+        self.logger = logging.getLogger(APPLICATION)
+
         log_handler = LogWidgetLogger(self)
         log_handler.setFormatter(LogWidgetFormatter("[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S"))
-        logging.getLogger().addHandler(log_handler)
-        logging.getLogger().setLevel(logging.INFO)
+        self.logger.addHandler(log_handler)
+        self.logger.setLevel(logging.INFO)
         sys.excepthook = self.exception_handler
         self.update_settings()
 
     def exception_handler(self, type, value, trace):
-        logging.error("".join(traceback.format_tb(trace)))
-        logging.error("Uncaught exception: {0}".format(value))
+        self.logger.error("".join(traceback.format_tb(trace)))
+        self.logger.error(f"Uncaught exception: {value}")
         sys.__excepthook__(type, value, trace)
 
     def update_settings(self):
@@ -117,4 +120,4 @@ class LogWidget(QTextEdit):
             new_level = convert_log_level(get_setting("logLevel"))
         except:
             new_level = logging.ERROR
-        logging.getLogger().setLevel(new_level)
+        self.logger.setLevel(new_level)
