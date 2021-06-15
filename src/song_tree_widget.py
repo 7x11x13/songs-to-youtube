@@ -202,7 +202,7 @@ class SongTreeWidget(QTreeView):
 
                 info = QFileInfo(url.toLocalFile())
                 if not info.isReadable():
-                    logging.warning("File {} is not readable".format(info.filePath()))
+                    logger.warning("File {} is not readable".format(info.filePath()))
                     continue
                 if info.isDir():
                     if get_setting("dragAndDropBehavior") == SETTINGS_VALUES.DragAndDrop.ALBUM_MODE:
@@ -218,7 +218,7 @@ class SongTreeWidget(QTreeView):
         for file_path in files_in_directory(dir_path):
             info = QFileInfo(file_path)
             if not info.isReadable():
-                logging.warning("File {} is not readable".format(file_path))
+                logger.warning("File {} is not readable".format(file_path))
                 continue
             if info.isDir():
                 self.addAlbum(file_path)
@@ -233,7 +233,7 @@ class SongTreeWidget(QTreeView):
 
     def addSong(self, path: str):
         if not file_is_audio(path):
-            logging.info("File {} is not audio".format(path))
+            logger.info("File {} is not audio".format(path))
             return
         item = self._create_song_item(path)
         item.setText(QFileInfo(path).fileName())

@@ -47,11 +47,7 @@ class Constant:
 
     @staticmethod
     def lookup(s):
-        print("looking up")
-        print(s)
         for name, value in vars(Constant).items():
             if s == value:
-                print(name)
                 return name
-        print(value)
         return value

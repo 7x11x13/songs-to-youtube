@@ -4,12 +4,13 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QPixmap
 
-from const import SETTINGS_VALUES
+from const import SETTINGS_VALUES, APPLICATION
 
 import logging
 import os
 import sys
 
+logger = logging.getLogger(APPLICATION)
 
 # File utils
 
@@ -29,7 +30,7 @@ def files_in_directory_and_subdirectories(dir_path: str):
 def file_is_x(file_path: str, mime_prefix: str):
     info = QFileInfo(file_path)
     if not info.isReadable():
-        logging.info("File {} is not readable".format(info.filePath()))
+        logger.info("File {} is not readable".format(info.filePath()))
         return False
     db = QMimeDatabase()
     mime_type = db.mimeTypeForFile(info)
@@ -55,7 +56,7 @@ def str_to_checkstate(s):
     }
     if s not in STR_TO_CHECKSTATE:
         raise Exception(f"String {s} is not a valid CheckState")
-        #logging.error("String {} is not a valid CheckState".format(s))
+        #logger.error("String {} is not a valid CheckState".format(s))
         return Qt.Checked
     return STR_TO_CHECKSTATE[s]
 
@@ -146,7 +147,7 @@ def get_field(obj: QObject, field):
         obj_name = widget.objectName()
         if field == obj_name and class_name in WIDGET_FUNCTIONS:
             return InputField(widget)
-    logging.warning("Could not find field {}".format(field))
+    logger.warning("Could not find field {}".format(field))
     return None
 
 def get_all_fields(obj: QObject):
@@ -182,7 +183,7 @@ def load_ui(name, custom_widgets=[], parent=None):
     path = os.path.join(os.path.dirname(__file__), "ui", name)
     ui_file = QFile(path)
     if not ui_file.open(QFile.ReadOnly):
-        logging.critical("Cannot open {}: {}".format(path, ui_file.errorString()))
+        logger.error("Cannot open {}: {}".format(path, ui_file.errorString()))
         sys.exit(-1)
     ui = loader.load(ui_file, parent)
     ui_file.close()

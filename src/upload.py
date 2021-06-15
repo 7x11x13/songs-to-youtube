@@ -10,6 +10,8 @@ from song_tree_widget_item import *
 from settings import get_setting
 from const import *
 
+logger = logging.getLogger(APPLICATION)
+
 class UploadWorker(QObject):
 
     upload_finished = Signal(str, bool) # file_path, success
@@ -31,7 +33,7 @@ class UploadWorker(QObject):
             self.uploader.upload_finished.connect(lambda file_path, success: self.upload_finished.emit(file_path, success))
             self.uploader.log_message.connect(lambda message, level: self.log_message.emit(message, level))
             self.uploader.upload_all()
-        except Exception as e:
+        except Exception:
             if not self.cancelled:
                 self.log_message.emit(traceback.format_exc(), logging.ERROR)
         finally:
@@ -111,7 +113,6 @@ class Uploader(QObject):
         self.finished.emit(self.results)
 
     def upload(self):
-        print(len(self.jobs))
         if len(self.jobs) == 0:
             self.finished.emit({})
             return
@@ -125,6 +126,6 @@ class Uploader(QObject):
         self.thread.started.connect(self.worker.run)
         self.worker.finished.connect(lambda: self.worker_finished())
         self.thread.finished.connect(lambda: self.thread.deleteLater())
-        self.worker.log_message.connect(lambda message, level: logging.log(level, message))
+        self.worker.log_message.connect(lambda message, level: logger.log(level, message))
         self.worker.upload_finished.connect(self.upload_finished)
         self.thread.start()

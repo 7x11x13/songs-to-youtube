@@ -5,8 +5,10 @@ from PySide6.QtGui import QPixmap
 
 from settings import *
 from utils import load_ui, get_all_fields, get_all_visible_fields, get_field
-from const import SUPPORTED_IMAGE_FILTER, CustomDataRole
+from const import SUPPORTED_IMAGE_FILTER, CustomDataRole, APPLICATION
 from song_tree_widget_item import *
+
+logger = logging.getLogger(APPLICATION)
 
 
 class SongSettingsWidget(QWidget):
@@ -107,7 +109,7 @@ class SongSettingsWidget(QWidget):
                     try:
                         data.set_value(field.name, value)
                     except:
-                        logging.error(f"Error while setting {field.name} with value {value}")
+                        logger.error(f"Error while setting {field.name} with value {value}")
                 self.field_original_values[field.name] = value
         self.load_settings()
 
@@ -169,9 +171,4 @@ class SongSettingsWidget(QWidget):
                 # guaranteed by our selection model
                 self.item_type = index.data(CustomDataRole.ITEMTYPE)
                 break
-            # load combobox data
-            for field in get_all_visible_fields(self):
-                if field.name.startswith("SAVE"):
-                    load_combobox_data_from_settings(field, get_settings())
-                    continue
             self.load_settings()

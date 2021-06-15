@@ -13,7 +13,9 @@ from threading import Thread
 from queue import Queue
 
 from song_tree_widget_item import *
-from const import QRC_TO_FILE_PATH
+from const import APPLICATION
+
+logger = logging.getLogger(APPLICATION)
 
 PROCESSES = []
 
@@ -220,7 +222,7 @@ class Renderer(QObject):
                 progress = max(0, min(int((current_time_ms / total_time_ms) * 100), 100))
                 self.worker_progress.emit(str(worker), progress)
         except:
-            logging.warning("Could not parse worker_progress line: {}".format(progress))
+            logger.warning("Could not parse worker_progress line: {}".format(progress))
 
 
     def worker_finished(self, worker, thread, success):
@@ -229,7 +231,7 @@ class Renderer(QObject):
             self.worker_done.emit(str(worker), success)
             thread.quit()
             worker.deleteLater()
-            logging.debug("{} finished, success: {}".format(str(worker), success))
+            logger.debug("{} finished, success: {}".format(str(worker), success))
 
     def thread_finished(self, thread):
         if not self.cancelled:

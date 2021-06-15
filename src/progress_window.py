@@ -3,10 +3,12 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QProgressBar, QLabel, QVBoxLayout, QSizePolicy
 
 import logging
+from const import APPLICATION
 
 from render import Renderer
 from utils import find_ancestor
 
+logger = logging.getLogger(APPLICATION)
 
 class WorkerProgress(QWidget):
     def __init__(self, worker_name, *args):
@@ -41,19 +43,19 @@ class ProgressWindow(QWidget):
         if worker_name not in self.workers:
             self.init_worker_progress(worker_name)
         worker = self.workers[worker_name]
-        logging.debug("{} - {}% done".format(worker_name, progress))
+        logger.debug("{} - {}% done".format(worker_name, progress))
         worker.progress.setValue(progress)
 
     def worker_error(self, worker_name, error):
         if worker_name not in self.workers:
             self.init_worker_progress(worker_name)
-        logging.error("{} - {}".format(worker_name, error))
+        logger.error("{} - {}".format(worker_name, error))
 
     def worker_done(self, worker_name, success):
         if success:
-            logging.success("{} - Done rendering".format(worker_name))
+            logger.success("{} - Done rendering".format(worker_name))
         else:
-            logging.error("{} - Error while rendering".format(worker_name))
+            logger.error("{} - Error while rendering".format(worker_name))
         worker = self.workers.pop(worker_name, None)
         if worker:
             worker.setVisible(False)

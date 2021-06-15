@@ -12,6 +12,8 @@ from const import *
 # can expand these if wanted
 EasyMP4.RegisterTextKey("url", "purl")
 
+logger = logging.getLogger(APPLICATION)
+
 class Metadata:
     def __init__(self, song_path):
         self.pictures = []
@@ -25,7 +27,7 @@ class Metadata:
             for key, value in vars(f.info).items():
                 self.tags[key] = make_value_qt_safe(value)
         if f.tags:
-            logging.debug(f"Tags: {f.keys()}")
+            logger.debug(f"Tags: {f.keys()}")
             for key, value in f.tags.items():
                 self.tags[key] = make_value_qt_safe(value)
 

@@ -3,6 +3,7 @@
     Based on https://github.com/linouk23/youtube_uploader_selenium"""
 
 import atexit
+import traceback
 from PySide6.QtCore import QObject, Signal
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -107,9 +108,10 @@ class YouTubeUploader(QObject):
     def upload_all(self):
         try:
             for job in self.jobs:
-                self.upload(job['file_path'], job)
-        except Exception as e:
-            self.log_message.emit(f"Fatal error: {type(e)} {e}", logging.ERROR)
+                success = self.upload(job['file_path'], job)
+                self.upload_finished.emit(job['file_path'], success)
+        except Exception:
+            self.log_message.emit(traceback.format_exc(), logging.ERROR)
             self.__quit()
         finally:
             self.__quit()
@@ -252,7 +254,6 @@ class YouTubeUploader(QObject):
                     pass
                 self.__wait()
                 playlist_new_button = self.__find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON)
-                self.browser.move_to_element(playlist_new_button)
                 self.__wait()
                 playlist_new_button.click()
                 self.__wait()
@@ -267,8 +268,7 @@ class YouTubeUploader(QObject):
                 self.__wait()
                 playlist_visibility = self.browser.find_element_by_xpath('//*[@test-id="{}"]'.format(metadata_dict['visibility']))
                 if playlist_visibility is None:
-                    self.log_message.emit("Could not find playlist visibility option {}".format(metadata_dict['visibility']), logging.ERROR)
-                    return False, None
+                    raise Exception(f"Could not find playlist visibility option {metadata_dict['visibility']}")
                 playlist_visibility.click()
                 self.__wait()
 
@@ -276,8 +276,7 @@ class YouTubeUploader(QObject):
                 self.__wait()
                 checkbox = self.__find_playlist_checkbox(playlist)
             if checkbox is None:
-                self.log_message.emit("Could not find playlist: {}".format(playlist), logging.ERROR)
-                return False, None
+                raise Exception(f"Could not find playlist: {playlist}")
             else:
                 checkbox.click()
                 self.__wait()
@@ -305,7 +304,7 @@ class YouTubeUploader(QObject):
 
         self.__wait()
         kids_section = self.__find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
-        self.browser.scroll_to_element(kids_section)
+        self.browser.execute_script('arguments[0].scrollIntoView({block: "center", inline: "center"});', kids_section)
         self.__wait()
         self.__find(By.ID, Constant.RADIO_LABEL, kids_section).click()
         self.log_message.emit('Selected \"{}\"'.format(Constant.NOT_MADE_FOR_KIDS_LABEL), logging.INFO)
@@ -325,12 +324,10 @@ class YouTubeUploader(QObject):
         self.log_message.emit('Clicked another {}'.format(Constant.NEXT_BUTTON), logging.INFO)
         self.__wait()
 
-        visibility_button = self.browser.find(By.NAME, metadata_dict['visibility'])
-        self.browser.find(By.ID, Constant.RADIO_LABEL, visibility_button).click()
+        visibility_button = self.browser.find_element(By.NAME, metadata_dict['visibility'])
+        visibility_button.find_element(By.ID, Constant.RADIO_LABEL).click()
         self.log_message.emit('Made the video {}'.format(metadata_dict['visibility']), logging.INFO)
         self.__wait()
-
-        video_id = self.__get_video_id()
 
         while True:
             status_container = self.browser.find_element_by_xpath(Constant.STATUS_CONTAINER)
@@ -347,28 +344,16 @@ class YouTubeUploader(QObject):
         # "File is a duplicate of a video you have already uploaded"
         if done_button.get_attribute('aria-disabled') == 'true':
             error_message = self.__find(By.XPATH, Constant.ERROR_CONTAINER).text
-            self.log_message.emit(error_message, logging.ERROR)
-            return False, None
+            self.log_message(error_message, logging.ERROR)
+            return False
 
         done_button.click()
-        self.log_message.emit("Published the video with video_id = {}".format(video_id), logging.SUCCESS)
-        self.upload_finished.emit()
+        self.log_message.emit(f"Uploaded video {video_path}", logging.SUCCESS)
         # wait for youtube to save the video info
         while self.__find(By.XPATH, Constant.VIDEO_PUBLISHED_DIALOG) is None:
             time.sleep(1)
-        return True, video_id
 
-    def __get_video_id(self) -> Optional[str]:
-        video_id = None
-        try:
-            video_url_container = self.__find(By.XPATH, Constant.VIDEO_URL_CONTAINER)
-            video_url_element = self.__find(By.XPATH, Constant.VIDEO_URL_ELEMENT,
-                                                  element=video_url_container)
-            video_id = video_url_element.get_attribute(Constant.HREF).split('/')[-1]
-        except:
-            self.log_message.emit(Constant.VIDEO_NOT_FOUND_ERROR, logging.WARNING)
-            pass
-        return video_id
+        return True
 
     def __quit(self):
         self.browser.quit()

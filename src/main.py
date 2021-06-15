@@ -22,6 +22,8 @@ from log import LogWidget, addLoggingLevel
 from settings import SettingsWindow, get_setting, get_settings
 from progress_window import ProgressWindow
 
+logger = logging.getLogger(APPLICATION)
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -57,7 +59,7 @@ class MainWindow(QMainWindow):
         self.ui.cancelButton.setVisible(False)
         self.ui.renderButton.setVisible(True)
         if self.cancelled:
-            logging.error("Upload cancelled")
+            logger.error("Upload cancelled")
             # delete rendered/partially-rendered videos
             for path in results:
                 try:
@@ -66,7 +68,7 @@ class MainWindow(QMainWindow):
                     pass
             self.cancelled = False
         else:
-            logging.success("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
+            logger.success("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
             self.uploader = None
             if get_setting("deleteAfterUploading") == SETTINGS_VALUES.CheckBox.CHECKED:
                 for path, success in results.items():
@@ -78,10 +80,10 @@ class MainWindow(QMainWindow):
 
     def on_render_finished(self, results):
         if self.cancelled:
-            logging.error("Render cancelled")
+            logger.error("Render cancelled")
             self.on_upload_finished(results)
         else:
-            logging.success("{}/{} renders successful".format(sum(int(s) for s in results.values()),len(results)))
+            logger.success("{}/{} renders successful".format(sum(int(s) for s in results.values()),len(results)))
             # remove successful renders that will not be uploaded
             self.ui.treeWidget.remove_by_file_paths({path for path in results if results[path]}, False)
             # upload to youtube

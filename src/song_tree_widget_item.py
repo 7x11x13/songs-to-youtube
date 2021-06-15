@@ -14,6 +14,8 @@ from settings import get_setting
 from utils import flatten_metadata
 from metadata import Metadata
 
+logger = logging.getLogger(APPLICATION)
+
 class SettingTemplate(Template):
     # template placeholders are of the form
     # ~{key}
@@ -62,7 +64,7 @@ class TreeWidgetItemData:
                     path = os.path.join(self.dict['song_dir'], file)
                     name, ext = os.path.splitext(file)
                     if os.path.isfile(path) and name.lower() in cover_names and ext.lower() in cover_exts:
-                        logging.info(f"Found cover file {path}")
+                        logger.info(f"Found cover file {path}")
                         cover_file = path
                         break
 
@@ -76,9 +78,9 @@ class TreeWidgetItemData:
 
 
             except Exception as e:
-                logging.warning("Error while getting cover art")
-                logging.warning(e)
-                logging.warning(self.dict['song_path'])
+                logger.warning("Error while getting cover art")
+                logger.warning(e)
+                logger.warning(self.dict['song_path'])
         else:
             # album gets metadata from children
             # song metadata is stored as song.<key>
@@ -121,8 +123,8 @@ class TreeWidgetItemData:
         if 'length' in self.metadata.get_tags():
             return float(self.metadata.get_tags()['length']) * 1000
         else:
-            logging.error("Could not find duration of file {}".format(self.dict['song_path']))
-            logging.debug(self.metadata.get_tags())
+            logger.error("Could not find duration of file {}".format(self.dict['song_path']))
+            logger.debug(self.metadata.get_tags())
             return 999999999
 
     def get_track_number(self):
@@ -134,7 +136,7 @@ class TreeWidgetItemData:
                     tracknumber = tracknumber[:tracknumber.index("/")]
                 return int(tracknumber)
             except:
-                logging.warning("Could not convert {} to int".format(self.metadata.get_tags()['tracknumber']))
+                logger.warning("Could not convert {} to int".format(self.metadata.get_tags()['tracknumber']))
                 return 0
         return 0
 
