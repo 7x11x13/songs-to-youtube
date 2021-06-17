@@ -51,7 +51,7 @@ If you have issues running the exectuable, you can try running the program from 
 - The characters < and > will be replaced with fullwidth versions in titles and descriptions, as YouTube does not allow these symbols
 
 ### Template strings
-Write `~{key}` in any text field and it will be replaced with an appropriate value. To see the available keys, right click on an album or song and select "View metadata."
+Write `~{key}` in any text field and it will be replaced with an appropriate value. If no value exists for that key, it will not be replaced. To see the available keys, right click on an album or song and select "View metadata."
 Here are some useful values:
 #### Song metadata
 - `~{song_dir}` - directory of the input audio file
@@ -66,5 +66,11 @@ Here are some useful values:
 - `~{album_dir}` - directory of the album
 - `~{timestamps}` - special key that generates timestamps based on song lengths. they will only be generated when concatenating songs into a single video
 - `~{song.albumartist}` - name of the album's artist (usually)
-
 The first song of an album can have its keys accessed by the album by prefixing the key with `song.`
+#### Operators
+##### Optional keys / preference ordering
+A template string of the form `~{a|b|c}` will be replaced with the value of `a` if it exists, otherwise the value of `b` if it exists, and so on. Keys may not contain the character `|`
+##### String literals
+A template string of the form `~{a|"hello"}` will be replaced with the value for `a` if it exists, otherwise it will be replaced with `hello`. String literals may not contain the character `|`. They may contain `"` though, e.g. `~{""hello""}` will be replaced with `"hello"`
+##### Safe filenames
+Any key can be surrounded by `<` and `>` and the value of that key will be made safe to use as a filename. e.g. `~{<song.album>}.mkv` where `song.album` is `~{:¬Þ}` will be replaced with `____Þ_.mkv`

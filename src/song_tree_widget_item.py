@@ -1,32 +1,18 @@
 # This Python file uses the following encoding: utf-8
-from PySide6.QtCore import QByteArray, QTemporaryFile, QIODevice, QFileInfo, QDir
+from PySide6.QtCore import QFileInfo
 from PySide6.QtGui import QStandardItem
 
-from enum import IntEnum
 import logging
 import os
 import datetime
-import subprocess
-from string import Template
+from template import SettingTemplate
 
 from const import *
 from settings import get_setting
-from utils import flatten_metadata
 from metadata import Metadata
 
 logger = logging.getLogger(APPLICATION)
 
-class SettingTemplate(Template):
-    # template placeholders are of the form
-    # ~{key}
-    # can be escaped by writing ~~{key}
-    delimiter = "~"
-
-    # placeholder must be surrounded by braces
-    idpattern = None
-
-    # key can be anything
-    braceidpattern = r"[^{}]*"
 
 class TreeWidgetItemData:
     def __init__(self, item_type, songs=None, **kwargs):
