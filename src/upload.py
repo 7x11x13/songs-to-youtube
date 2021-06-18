@@ -113,8 +113,9 @@ class Uploader(QObject):
         self.finished.emit(self.results)
 
     def upload(self):
+        self.results = {job['file_path']: False for job in self.jobs}
         if len(self.jobs) == 0:
-            self.finished.emit({})
+            self.finished.emit(self.results)
             return
         self.thread = QThread()
         username = get_setting('username')
