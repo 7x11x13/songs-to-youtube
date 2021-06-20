@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide6.QtCore import QThread, Signal, QObject, QTemporaryFile, QIODevice
+from PySide6.QtCore import QThread, Signal, QObject, QTemporaryFile, QIODevice, QByteArray
 
 import subprocess
 import logging
