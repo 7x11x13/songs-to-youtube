@@ -215,8 +215,6 @@ class YouTubeUploader(QObject):
         title_field = self.__find(By.ID, Constant.TEXTBOX)
         title_field.click()
         self.__wait()
-        title_field.clear()
-        self.__wait()
         if sys.platform == 'darwin':
             title_field.send_keys(Keys.COMMAND + 'a')
         else:

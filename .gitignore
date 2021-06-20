@@ -8,3 +8,4 @@ test*
 audio
 *.user
 pyvenv.cfg
+.qt_for_python
