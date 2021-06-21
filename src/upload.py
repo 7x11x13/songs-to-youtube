@@ -26,7 +26,7 @@ class UploadWorker(QObject):
 
     def run(self):
         try:
-            self.uploader = YouTubeUploader(self.username, self.jobs)
+            self.uploader = YouTubeUploader(self.username, self.jobs, get_setting("headlessBrowser") == SETTINGS_VALUES.CheckBox.CHECKED)
             self.uploader.upload_finished.connect(lambda file_path, success: self.upload_finished.emit(file_path, success))
             self.uploader.log_message.connect(lambda message, level: self.log_message.emit(message, level))
             self.uploader.on_progress.connect(lambda job_name, progress: self.on_progress.emit(job_name, progress))

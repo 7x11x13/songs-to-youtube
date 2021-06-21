@@ -51,7 +51,7 @@ class YouTubeUploader(QObject):
     log_message = Signal(str, int) # message, loglevel
     on_progress = Signal(str, int) # job filename, percent done
 
-    def __init__(self, username, jobs, cookies_path="") -> None:
+    def __init__(self, username, jobs, headless, cookies_path="") -> None:
         super().__init__()
         self.cookies_paths = []
         # Optional cookies path to override username
@@ -69,6 +69,7 @@ class YouTubeUploader(QObject):
         self.username = username
         self.jobs = jobs
         options = Options()
+        options.headless = headless
         self.browser = webdriver.Firefox(firefox_options=options, service_log_path=os.devnull)
         atexit.register(self.quit)
         self.browser.implicitly_wait(30)
@@ -396,7 +397,7 @@ class YouTubeUploader(QObject):
             else:
                 break
             
-        self.log_message.emit(f"Video fully uploaded")
+        self.log_message.emit(f"Video fully uploaded", logging.INFO)
         self.on_progress.emit(video_path, 95)
 
         done_button = self.__find(By.ID, Constant.DONE_BUTTON)

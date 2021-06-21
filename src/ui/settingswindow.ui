@@ -56,7 +56,7 @@
         <x>0</x>
         <y>0</y>
         <width>433</width>
-        <height>1726</height>
+        <height>1751</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -151,6 +151,13 @@
            <widget class="SettingCheckBox" name="deleteAfterUploading">
             <property name="text">
              <string>Delete videos after uploading?</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="SettingCheckBox" name="headlessBrowser">
+            <property name="text">
+             <string>Hide browser while uploading?</string>
             </property>
            </widget>
           </item>
