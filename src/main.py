@@ -89,6 +89,7 @@ class MainWindow(QMainWindow):
             # upload to youtube
             self.uploader = self.ui.treeWidget.get_uploader(results)
             self.uploader.finished.connect(self.on_upload_finished)
+            self.ui.progressWindow.on_upload_start(self.uploader)
             self.uploader.upload()
         self.renderer = None
 

@@ -53,7 +53,7 @@ class ProcessHandler(QObject):
 
         if os.name == "nt":
             p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                 creationflags=subprocess.CREATE_NO_WINDOW, shell=False)
+                                 creationflags=subprocess.CREATE_NO_WINDOW, shell=True)
         else:
             p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 

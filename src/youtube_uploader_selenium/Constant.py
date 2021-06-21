@@ -1,3 +1,5 @@
+import re
+
 class Constant:
     """A class for storing constants for YoutubeUploader class"""
     YOUTUBE_URL = 'https://www.youtube.com'
@@ -40,6 +42,8 @@ class Constant:
     INPUT_FILE_VIDEO = "//input[@type='file']"
     USERNAME_ID = "account-name"
     VIDEO_PUBLISHED_DIALOG = '//*[@id="dialog-title"]'
+    
+    PROGRESS_REGEX = re.compile(r"Uploading (?P<progress>\d+)%.*")
 
     MAX_TITLE_LENGTH = 100
     MAX_DESCRIPTION_LENGTH = 5000

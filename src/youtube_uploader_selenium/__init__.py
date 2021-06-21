@@ -49,6 +49,7 @@ class YouTubeUploader(QObject):
     
     upload_finished = Signal(str, bool) # file path, success
     log_message = Signal(str, int) # message, loglevel
+    on_progress = Signal(str, int) # job filename, percent done
 
     def __init__(self, username, jobs, cookies_path="") -> None:
         super().__init__()
@@ -108,18 +109,30 @@ class YouTubeUploader(QObject):
     def upload_all(self):
         try:
             for job in self.jobs:
-                success = self.upload(job['file_path'], job)
-                self.upload_finished.emit(job['file_path'], success)
+                file = job['file_path']
+                
+                self.log_message.emit(f"Starting upload of {file}", logging.INFO)
+                self.on_progress.emit(file, 0)
+                
+                success = self.upload(file, job)
+                self.upload_finished.emit(file, success)
         except Exception:
             self.log_message.emit(traceback.format_exc(), logging.ERROR)
-            self.__quit()
         finally:
             self.__quit()
 
 
     def upload(self, video_path, metadata):
         self.__validate_inputs(video_path, metadata)
+        
+        self.log_message.emit(f"Validated inputs successfully", logging.INFO)
+        self.on_progress.emit(video_path, 5)
+        
         self.__login()
+        
+        self.log_message.emit(f"Logged in as {self.username}", logging.INFO)
+        self.on_progress.emit(video_path, 10)
+        
         return self.__upload(video_path, metadata)
 
 
@@ -210,7 +223,10 @@ class YouTubeUploader(QObject):
         self.__wait()
         absolute_video_path = str(Path.cwd() / video_path)
         self.__find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(absolute_video_path)
-        self.log_message.emit('Attached video {}'.format(video_path), logging.INFO)
+        
+        self.log_message.emit(f"Uploaded video file", logging.INFO)
+        self.on_progress.emit(video_path, 15)
+        
         self.__wait()
         title_field = self.__find(By.ID, Constant.TEXTBOX)
         title_field.click()
@@ -221,12 +237,15 @@ class YouTubeUploader(QObject):
             title_field.send_keys(Keys.CONTROL + 'a')
         self.__wait()
         title_field.send_keys(metadata_dict[Constant.VIDEO_TITLE])
-        self.log_message.emit('The video title was set to \"{}\"'.format(metadata_dict[Constant.VIDEO_TITLE]), logging.INFO)
+        
+        self.log_message.emit(f"Set video title to {metadata_dict[Constant.VIDEO_TITLE]}", logging.INFO)
+        self.on_progress.emit(video_path, 20)
 
         video_description = metadata_dict[Constant.VIDEO_DESCRIPTION]
         tags = metadata_dict[Constant.TAGS]
         playlist = metadata_dict[Constant.PLAYLIST]
         notify_subs = metadata_dict[Constant.NOTIFY_SUBS]
+        
         if video_description:
             description_container = self.__find(By.XPATH, Constant.DESCRIPTION_CONTAINER)
             description_field = self.__find(By.ID, Constant.TEXTBOX, parent=description_container)
@@ -235,8 +254,11 @@ class YouTubeUploader(QObject):
             description_field.clear()
             self.__wait()
             description_field.send_keys(video_description)
-            self.log_message.emit(
-                'The video description was set to \"{}\"'.format(video_description), logging.INFO)
+
+            self.log_message.emit(f"Set video description to {video_description}", logging.INFO)
+            
+        self.on_progress.emit(video_path, 25)
+            
         if playlist:
             self.__find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
             self.__wait()
@@ -271,14 +293,24 @@ class YouTubeUploader(QObject):
                 self.__wait()
 
                 self.__find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
+                
+                self.log_message.emit(f"Created new playlist {playlist}", logging.INFO)
+                
                 self.__wait()
                 checkbox = self.__find_playlist_checkbox(playlist)
+                
+            self.on_progress.emit(video_path, 30)
+            
             if checkbox is None:
                 raise Exception(f"Could not find playlist: {playlist}")
             else:
                 checkbox.click()
                 self.__wait()
                 self.__find(By.XPATH, Constant.PLAYLIST_DONE_BUTTON).click()
+                
+                self.log_message.emit(f"Selected playlist {playlist}", logging.INFO)
+                self.on_progress.emit(video_path, 35)
+                
                 self.__wait()
 
         # hide tooltips which can obscure buttons
@@ -291,50 +323,81 @@ class YouTubeUploader(QObject):
                     pass
 
         if tags or not notify_subs:
+            self.log_message.emit(f"Setting extra options", logging.INFO)
             self.__find(By.XPATH, Constant.MORE_OPTIONS_CONTAINER).click()
             self.__wait()
             if tags:
                 self.__find(By.XPATH, Constant.TAGS_TEXT_INPUT).send_keys(tags)
                 self.__wait()
+                
+                self.log_message.emit(f"Set tags playlist {tags}", logging.INFO)
+                
+            self.on_progress.emit(video_path, 40)
+            
             if not notify_subs:
                 self.__find(By.XPATH, Constant.NOTIFY_SUBSCRIBERS_CHECKBOX).click()
                 self.__wait()
+                
+                self.log_message.emit(f"Disabled subscriber notifications", logging.INFO)
+            
+            self.on_progress.emit(video_path, 45)
 
         self.__wait()
         kids_section = self.__find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
         self.browser.execute_script('arguments[0].scrollIntoView({block: "center", inline: "center"});', kids_section)
         self.__wait()
         self.__find(By.ID, Constant.RADIO_LABEL, kids_section).click()
-        self.log_message.emit('Selected \"{}\"'.format(Constant.NOT_MADE_FOR_KIDS_LABEL), logging.INFO)
+        
+        self.log_message.emit(f"Selected not made for kids label", logging.INFO)
+        self.on_progress.emit(video_path, 50)
         self.__wait()
 
         self.__find(By.ID, Constant.NEXT_BUTTON).click()
-        self.log_message.emit('Clicked {}'.format(Constant.NEXT_BUTTON), logging.INFO)
+        
+        self.log_message.emit(f"Clicked next", logging.INFO)
+        self.on_progress.emit(video_path, 55)
         self.__wait()
 
         # Video elements
         self.__find(By.ID, Constant.NEXT_BUTTON).click()
-        self.log_message.emit('Clicked another {}'.format(Constant.NEXT_BUTTON), logging.INFO)
+        
+        self.log_message.emit(f"Clicked next", logging.INFO)
+        self.on_progress.emit(video_path, 60)
         self.__wait()
 
         # Checks
         self.__find(By.ID, Constant.NEXT_BUTTON).click()
-        self.log_message.emit('Clicked another {}'.format(Constant.NEXT_BUTTON), logging.INFO)
+        
+        self.log_message.emit(f"Clicked next", logging.INFO)
+        self.on_progress.emit(video_path, 65)
         self.__wait()
 
         visibility_button = self.browser.find_element(By.NAME, metadata_dict['visibility'])
         visibility_button.find_element(By.ID, Constant.RADIO_LABEL).click()
-        self.log_message.emit('Made the video {}'.format(metadata_dict['visibility']), logging.INFO)
+        
+        self.log_message.emit(f"Made the video {metadata_dict['visibility']}", logging.INFO)
+        self.on_progress.emit(video_path, 70)
         self.__wait()
 
         while True:
             status_container = self.browser.find_element_by_xpath(Constant.STATUS_CONTAINER)
-            self.log_message.emit(f"status: {status_container.text}", logging.INFO)
-            in_process = status_container.text.find(Constant.UPLOADED) != -1
+            self.log_message.emit(f"Upload status: {status_container.text}", logging.INFO)
+            progress = status_container.text
+            in_process = progress.find(Constant.UPLOADED) != -1
             if in_process:
+                match = Constant.PROGRESS_REGEX.match(progress)
+                if match:
+                    percent = match.group("progress")
+                    if not percent:
+                        self.log_message.emit(f"Could not find progress in string {progress}", logging.WARNING)
+                    else:
+                        self.on_progress.emit(video_path, 70 + int((95 - 70) * int(percent) / 100))
                 self.__wait()
             else:
                 break
+            
+        self.log_message.emit(f"Video fully uploaded")
+        self.on_progress.emit(video_path, 95)
 
         done_button = self.__find(By.ID, Constant.DONE_BUTTON)
 
@@ -349,7 +412,9 @@ class YouTubeUploader(QObject):
         self.log_message.emit(f"Uploaded video {video_path}", logging.SUCCESS)
         # wait for youtube to save the video info
         while self.__find(By.XPATH, Constant.VIDEO_PUBLISHED_DIALOG) is None:
-            time.sleep(1)
+            self.__wait()
+
+        self.on_progress.emit(video_path, 100)
 
         return True
 

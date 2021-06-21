@@ -16,6 +16,7 @@ class UploadWorker(QObject):
 
     upload_finished = Signal(str, bool) # file_path, success
     log_message = Signal(str, int) # message, loglevel
+    on_progress = Signal(str, int) # job name, percent done
     finished = Signal()
 
     def __init__(self, username, jobs):
@@ -23,27 +24,32 @@ class UploadWorker(QObject):
         self.jobs = jobs
         self.username = username
 
-    def cancel(self):
-        self.cancelled = True
-        self.uploader.quit()
-
     def run(self):
         try:
             self.uploader = YouTubeUploader(self.username, self.jobs)
             self.uploader.upload_finished.connect(lambda file_path, success: self.upload_finished.emit(file_path, success))
             self.uploader.log_message.connect(lambda message, level: self.log_message.emit(message, level))
+            self.uploader.on_progress.connect(lambda job_name, progress: self.on_progress.emit(job_name, progress))
             self.uploader.upload_all()
         except Exception:
-            if not self.cancelled:
-                self.log_message.emit(traceback.format_exc(), logging.ERROR)
+            self.log_message.emit(traceback.format_exc(), logging.ERROR)
         finally:
             self.finished.emit()
 
 
 class Uploader(QObject):
 
+    # dict of worker name and worker success
     finished = Signal(dict)
-    cancel_sig = Signal()
+    
+    # worker name, worker progress (percentage)
+    worker_progress = Signal(str, int)
+
+    # not used
+    worker_error = Signal(str, str)
+
+    # worker name
+    worker_done = Signal(str, bool)
 
     def __init__(self, render_results, *args):
         super().__init__()
@@ -57,6 +63,7 @@ class Uploader(QObject):
 
     def upload_finished(self, file_path, success):
         self.results[file_path] = success
+        self.worker_done.emit(file_path, success)
 
     def on_done_uploading(self, file_path, success):
         if not self.cancelled:
@@ -68,8 +75,9 @@ class Uploader(QObject):
         for job in self.jobs:
             if job['file_path'] not in self.results:
                 self.results[job['file_path']] = False
-        self.cancel_sig.emit()
         self.finished.emit(self.results)
+        self.worker.uploader.browser.quit()
+            
 
     def add_upload_album_job(self, album: AlbumTreeWidgetItem):
         if album.childCount() == 0:
@@ -102,7 +110,10 @@ class Uploader(QObject):
                             'visibility': song.get('videoVisibility'),
                             'notify_subs': song.get('notifySubs') == SETTINGS_VALUES.CheckBox.CHECKED}
                 metadata['file_path'] = file
-                self.jobs.append(metadata)
+                if any(job['file_path'] == file for job in self.jobs):
+                    logger.error(f"Ignoring duplicate job {file}")
+                else:
+                    self.jobs.append(metadata)
 
     def is_uploading(self):
         return self.uploading
@@ -111,6 +122,10 @@ class Uploader(QObject):
         self.worker.deleteLater()
         self.thread.quit()
         self.finished.emit(self.results)
+        
+    def log(self, message, level):
+        if not self.cancelled:
+            logger.log(level, message)
 
     def upload(self):
         self.results = {job['file_path']: False for job in self.jobs}
@@ -122,11 +137,11 @@ class Uploader(QObject):
         if not username:
             raise ValueError("No user selected to upload to. Add a user at File > Settings > Add new user")
         self.worker = UploadWorker(username, self.jobs)
-        self.cancel_sig.connect(self.worker.cancel)
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)
         self.worker.finished.connect(lambda: self.worker_finished())
         self.thread.finished.connect(lambda: self.thread.deleteLater())
-        self.worker.log_message.connect(lambda message, level: logger.log(level, message))
+        self.worker.log_message.connect(self.log)
+        self.worker.on_progress.connect(lambda worker_name, progress: self.worker_progress.emit(worker_name, progress))
         self.worker.upload_finished.connect(self.upload_finished)
         self.thread.start()
