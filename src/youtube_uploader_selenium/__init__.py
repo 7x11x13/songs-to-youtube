@@ -150,6 +150,7 @@ class YouTubeUploader(QObject):
 
         self.__wait()
         for cookie_path in self.cookies_paths:
+            self.log_message.emit(f"Loading cookies from {cookie_path}", logging.DEBUG)
             with open(cookie_path, 'rb') as f:
                 if cookie_path.endswith('json'):
                     cookies = json.load(f)
@@ -160,7 +161,7 @@ class YouTubeUploader(QObject):
             for cookie in cookies:
                 self.browser.add_cookie(cookie)
         
-        self.browser.refresh()
+        self.browser.get(Constant.YOUTUBE_URL)
 
     def __find_playlist_checkbox_no_search(self, name):
         labels = self.browser.find_elements_by_xpath(Constant.PLAYLIST_LABEL)
