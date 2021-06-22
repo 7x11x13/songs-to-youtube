@@ -17,7 +17,7 @@ class CustomDataRole(IntEnum):
 
 ORGANIZATION = "7x11x13"
 APPLICATION = "songs-to-youtube"
-VERSION = "v0.9.1"
+VERSION = "v0.9.2"
 SETTINGS_FILENAME = "v0.8settings"
 
 SUPPORTED_IMAGE_FILTER = "Images (*.bmp *.cur *.gif *.icns *.ico *.jpeg *.jpg *.pbm *.pgm *.png *.ppm *.svg *.svgz *.tga *.tif *.tiff *.wbmp *.webp *.xbm *.xpm)"

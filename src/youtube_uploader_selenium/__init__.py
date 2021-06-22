@@ -4,12 +4,12 @@
 
 import atexit
 import traceback
+import datetime
 from PySide6.QtCore import QObject, Signal
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
-from typing import Optional
 import time
 import os
 import re
@@ -53,6 +53,7 @@ class YouTubeUploader(QObject):
 
     def __init__(self, username, jobs, headless, cookies_path="") -> None:
         super().__init__()
+        self.headless = headless
         self.cookies_paths = []
         # Optional cookies path to override username
         # for debugging purposes
@@ -117,10 +118,18 @@ class YouTubeUploader(QObject):
                 
                 success = self.upload(file, job)
                 self.upload_finished.emit(file, success)
+            self.__quit()
         except Exception:
             self.log_message.emit(traceback.format_exc(), logging.ERROR)
-        finally:
-            self.__quit()
+            if self.headless:
+                # take screenshot and quit
+                appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+                screenshot_dir = os.path.join(appdata_path, 'screenshots')
+                os.makedirs(screenshot_dir, exist_ok=True)
+                path = os.path.join(screenshot_dir, datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S.png"))
+                self.browser.save_screenshot(path)
+                self.log_message.emit(f"Screenshot saved to {path}", logging.ERROR)
+                self.__quit()
 
 
     def upload(self, video_path, metadata):
