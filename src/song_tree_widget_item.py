@@ -253,12 +253,22 @@ class AlbumTreeWidgetItem(QStandardItem):
 
     def before_upload(self):
         # generate timestamps
+        data = self.data(CustomDataRole.ITEMDATA)
         timestamp = 0
         timestamp_str = ""
         for song in self.getChildren():
-            timestamp_str += "{} {}\n".format(datetime.timedelta(seconds=int(timestamp)), song.get("videoTitle"))
+            format_string = get_setting("timestampFormat")
+            # create h/m/s keys
+            hours, minutes, seconds = int(timestamp // 3600), int((timestamp // 60) % 60), int(timestamp) % 60
+            song.set(r"%H", str(hours))
+            song.set(r"%M", str(minutes))
+            song.set(r"%S", str(seconds))
+            song.set(r"%0H", f"{hours:02}")
+            song.set(r"%0M", f"{minutes:02}")
+            song.set(r"%0S", f"{seconds:02}")
+            song.set("timestamp", format_string)
+            timestamp_str += song.get("timestamp") + '\n'
             timestamp += song.get_duration_ms() / 1000
-        data = self.data(CustomDataRole.ITEMDATA)
         data.set_value("timestamps", timestamp_str)
         data.update_fields()
 

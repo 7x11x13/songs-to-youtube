@@ -112,7 +112,7 @@ class LogWidget(QTextEdit):
 
     def exception_handler(self, type, value, trace):
         self.logger.error("".join(traceback.format_tb(trace)))
-        self.logger.error(f"Uncaught exception: {value}")
+        self.logger.error(f"{type} {value}")
         sys.__excepthook__(type, value, trace)
 
     def update_settings(self):

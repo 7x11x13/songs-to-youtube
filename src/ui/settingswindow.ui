@@ -54,9 +54,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-147</y>
         <width>433</width>
-        <height>1751</height>
+        <height>1798</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -209,6 +209,16 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Timestamp format:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="timestampFormat"/>
           </item>
          </layout>
         </widget>
