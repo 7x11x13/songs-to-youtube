@@ -11,9 +11,9 @@ def make_filename_safe(s):
     s = "".join((c if c.isalnum() or c in safe_chars else replace_char) for c in s).strip()
     
     if s[0] in '.-':
-        s[0] = replace_char
+        s = replace_char + s[1:]
     if s[-1] == ".":
-        s[-1] = replace_char
+        s = s[:-1] + replace_char
         
     device_names = {"CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", 
                     "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", 
