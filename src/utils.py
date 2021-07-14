@@ -44,6 +44,14 @@ def file_is_image(file_path: str):
     """Returns true if the given file is a readable image file"""
     return file_is_x(file_path, "image")
 
+def resource_path(relative_path):
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.dirname(__file__)
+    return os.path.join(base_path, relative_path)
+
 
 # Qt utils
 
@@ -178,7 +186,7 @@ def load_ui(name, custom_widgets=[], parent=None):
     loader = QUiLoader()
     for cw in custom_widgets:
         loader.registerCustomWidget(cw)
-    path = os.path.join(os.path.dirname(__file__), "ui", name)
+    path = resource_path(os.path.join("ui", name))
     ui_file = QFile(path)
     if not ui_file.open(QFile.ReadOnly):
         logger.error("Cannot open {}: {}".format(path, ui_file.errorString()))

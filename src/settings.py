@@ -23,7 +23,7 @@ def get_setting(setting: str, settings=get_settings()):
     """Returns the value of the given setting"""
     if not settings.contains(setting):
         # try to load from default settings
-        defaults = QSettings(os.path.join(os.path.dirname(__file__), "config", "default.ini"), QSettings.IniFormat)
+        defaults = QSettings(resource_path("config/default.ini"), QSettings.IniFormat)
         if not defaults.contains(setting):
             raise Exception(f"Setting {setting} does not exist")
         return defaults.value(setting)
@@ -37,9 +37,9 @@ class FileComboBox(QComboBox):
 
     def set_dir(self, object_name):
         if object_name == "commandName":
-            self.dir = os.path.join(os.path.dirname(__file__), "commands", "render")
+            self.dir = resource_path("commands/render")
         elif object_name == "concatCommandName":
-            self.dir = os.path.join(os.path.dirname(__file__), "commands", "concat")
+            self.dir = resource_path("commands/concat")
         else:
             raise Exception(f'ComboBox has name {self.objectName()}')
         self.reload()
@@ -170,7 +170,7 @@ class SettingsWindow(QDialog):
         msg_box.exec()
 
     def save_preset(self):
-        presets_dir = os.path.join(os.path.dirname(__file__), "config")
+        presets_dir = resource_path("config")
         if not os.path.exists(presets_dir):
             os.makedirs(presets_dir)
         file = QFileDialog.getSaveFileName(self, SettingsWindow.SAVE_PRESET_TEXT, presets_dir, "Configuration files (*.ini)")[0]
@@ -179,7 +179,7 @@ class SettingsWindow(QDialog):
             self.save_settings_from_fields(settings)
 
     def load_preset(self):
-        presets_dir = os.path.join(os.path.dirname(__file__), "config")
+        presets_dir = resource_path("config")
         if not os.path.exists(presets_dir):
             os.makedirs(presets_dir)
         file = QFileDialog.getOpenFileName(self, SettingsWindow.LOAD_PRESET_TEXT, presets_dir, "Configuration files (*.ini)")[0]

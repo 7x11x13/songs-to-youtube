@@ -1,35 +1,19 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-import PySide6
-import shiboken6
-import os
-import sys
-
-PYSIDE_PATH = PySide6.__path__[0]
-SHIBOKEN_PATH = shiboken6.__path__[0]
-
-if sys.platform == 'darwin':
-    pyside_includes = ('platforms', 'styles', 'iconengines', 'imageformats')
-    binaries = [(os.path.join(PYSIDE_PATH, 'Qt', 'plugins', name, '*'), name) for name in pyside_includes]
-elif sys.platform == 'win32' or sys.platform == 'cygwin':
-    pyside_includes = ('platforms', 'styles', 'iconengines', 'imageformats')
-    binaries = [(os.path.join(PYSIDE_PATH, 'plugins', name, '*'), name) for name in pyside_includes]
-else:
-    pyside_includes = ('platforms', 'platformthemes', 'iconengines', 'imageformats', 'platforminputcontexts')
-    binaries = [(os.path.join(PYSIDE_PATH, 'Qt', 'plugins', name, '*'), name) for name in pyside_includes]
 
 block_cipher = None
 
 
 a = Analysis(['src/main.py'],
-             pathex=[SHIBOKEN_PATH, '.'],
-             binaries=binaries,
+             pathex=['.'],
+             binaries=[],
              datas=[('src/ui/*.ui', 'ui'),
                     ('src/config/*.ini', 'config'),
                     ('src/commands/concat/*.command', 'commands/concat'),
                     ('src/commands/render/*.command', 'commands/render')],
              hiddenimports=['PySide6.QtXml'],
              hookspath=[],
+             hooksconfig={},
              runtime_hooks=[],
              excludes=[],
              win_no_prefer_redirects=False,
@@ -38,22 +22,23 @@ a = Analysis(['src/main.py'],
              noarchive=False)
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
+
 exe = EXE(pyz,
           a.scripts,
+          a.binaries,
+          a.zipfiles,
+          a.datas,  
           [],
-          exclude_binaries=True,
           name='songs-to-youtube',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
+          upx_exclude=[],
+          runtime_tmpdir=None,
           console=False,
+          disable_windowed_traceback=False,
+          target_arch=None,
+          codesign_identity=None,
+          entitlements_file=None,
           icon='src/image/icon.ico')
-coll = COLLECT(exe,
-               a.binaries,
-               a.zipfiles,
-               a.datas,
-               strip=False,
-               upx=True,
-               upx_exclude=[],
-               name='songs-to-youtube')

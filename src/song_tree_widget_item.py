@@ -162,7 +162,7 @@ class SongTreeWidgetItem(QStandardItem):
     def before_render(self):
         self.set("fileOutput", os.path.join(self.get("fileOutputDir"), self.get("fileOutputName")))
         self.set("songDuration", str(self.get_duration_ms() / 1000))
-        command_path = os.path.join(os.path.dirname(__file__), "commands", "render", self.get("commandName") + ".command")
+        command_path = resource_path(os.path.join("commands", "render", self.get("commandName") + ".command"))
         try:
             with open(command_path, 'r') as f:
                 command = f.read().strip()
@@ -243,7 +243,7 @@ class AlbumTreeWidgetItem(QStandardItem):
     def before_render(self):
         self.data(CustomDataRole.ITEMDATA).set_value("albumDuration", str(self.get_duration_ms() / 1000))
         self.data(CustomDataRole.ITEMDATA).set_value("fileOutput", os.path.join(self.get("fileOutputDirAlbum"), self.get("fileOutputNameAlbum")))
-        command_path = os.path.join(os.path.dirname(__file__), "commands", "concat", self.get("concatCommandName") + ".command")
+        command_path = resource_path(os.path.join("commands", "concat", self.get("concatCommandName") + ".command"))
         try:
             with open(command_path, 'r') as f:
                 command = f.read().strip()

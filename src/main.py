@@ -144,7 +144,7 @@ if __name__ == "__main__":
     if not os.path.exists(get_settings().fileName()):
         settings_path = get_settings().fileName()
         os.makedirs(os.path.dirname(settings_path), exist_ok=True)
-        shutil.copy(os.path.join(os.path.dirname(__file__), "config", "default.ini"), settings_path)
+        shutil.copy(resource_path("config/default.ini"), settings_path)
     app = QApplication([])
     app.setWindowIcon(QIcon(":/image/icon.ico"))
     app.setOrganizationName(ORGANIZATION)
