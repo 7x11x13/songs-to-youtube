@@ -12,7 +12,7 @@ import shutil
 
 import resource
 
-from utils import load_ui
+from utils import load_ui, resource_path
 from const import SETTINGS_VALUES, APPLICATION, ORGANIZATION, VERSION
 
 # Custom widgets

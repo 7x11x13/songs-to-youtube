@@ -10,6 +10,7 @@ from template import SettingTemplate
 from const import *
 from settings import get_setting
 from metadata import Metadata
+from utils import resource_path
 
 logger = logging.getLogger(APPLICATION)
 
