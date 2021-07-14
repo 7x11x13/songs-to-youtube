@@ -19,7 +19,10 @@ class Metadata:
         self.pictures = []
         self.path = song_path
         self.tags = {}
-        self.load_song(song_path)
+        try:
+            self.load_song(song_path)
+        except Exception as err:
+            logger.error(f"Could not load metadata for {song_path}: {err.__class__}: {err}")
 
     def load_song(self, path):
         f = mutagen.File(path, easy=True)

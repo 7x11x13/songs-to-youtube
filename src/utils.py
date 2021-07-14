@@ -27,18 +27,18 @@ def files_in_directory_and_subdirectories(dir_path: str):
     while file.hasNext():
         yield file.next()
 
-def file_is_x(file_path: str, mime_prefix: str):
+def file_is_x(file_path: str, mime_prefix: str, exclude=[]):
     info = QFileInfo(file_path)
     if not info.isReadable():
         logger.info("File {} is not readable".format(info.filePath()))
         return False
     db = QMimeDatabase()
     mime_type = db.mimeTypeForFile(info)
-    return mime_type.name().startswith(mime_prefix)
+    return mime_type.name().startswith(mime_prefix) and mime_type.name() not in exclude
 
 def file_is_audio(file_path: str):
     """Returns true if the given file is a readable audio file"""
-    return file_is_x(file_path, "audio")
+    return file_is_x(file_path, "audio", ["audio/x-mpegurl"])
 
 def file_is_image(file_path: str):
     """Returns true if the given file is a readable image file"""
@@ -56,8 +56,6 @@ def str_to_checkstate(s):
     }
     if s not in STR_TO_CHECKSTATE:
         raise Exception(f"String {s} is not a valid CheckState")
-        #logger.error("String {} is not a valid CheckState".format(s))
-        return Qt.Checked
     return STR_TO_CHECKSTATE[s]
 
 def checkstate_to_str(state):
