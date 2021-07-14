@@ -52,10 +52,10 @@ class ProcessHandler(QObject):
     def run(self, command):
 
         if os.name == "nt":
-            p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            p = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                  creationflags=subprocess.CREATE_NO_WINDOW, shell=True)
         else:
-            p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+            p = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 
         PROCESSES.append(p)
         q = Queue()
