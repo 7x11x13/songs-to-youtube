@@ -83,9 +83,12 @@ class YouTubeUploader(QObject):
             self.log_message.emit("The video title was not found in metadata", logging.WARNING)
             metadata_dict[Constant.VIDEO_TITLE] = Path(video_path).stem
             self.log_message.emit("The video title was set to {}".format(Path(video_path).stem), logging.WARNING)
-        for key in (Constant.VIDEO_DESCRIPTION, Constant.PLAYLIST, Constant.TAGS):
+        for key in (Constant.VIDEO_DESCRIPTION, Constant.TAGS):
             if key not in metadata_dict:
                 metadata_dict[key] = ""
+        
+        if Constant.PLAYLIST not in metadata_dict:
+            metadata_dict[Constant.PLAYLIST] = []
 
         title = metadata_dict[Constant.VIDEO_TITLE]
         if len(title) > Constant.MAX_TITLE_LENGTH:
@@ -106,7 +109,10 @@ class YouTubeUploader(QObject):
         # replace with fullwidth version
         metadata_dict[Constant.VIDEO_TITLE] = metadata_dict[Constant.VIDEO_TITLE].replace("<", "＜").replace(">", "＞")
         metadata_dict[Constant.VIDEO_DESCRIPTION] = metadata_dict[Constant.VIDEO_DESCRIPTION].replace("<", "＜").replace(">", "＞")
-        metadata_dict[Constant.PLAYLIST] = metadata_dict[Constant.PLAYLIST].replace("<", "＜").replace(">", "＞")
+        metadata_dict[Constant.PLAYLIST] = [name.replace("<", "＜").replace(">", "＞") for name in metadata_dict[Constant.PLAYLIST]]
+        
+        metadata_dict[Constant.PLAYLIST] = set(metadata_dict[Constant.PLAYLIST])
+        metadata_dict[Constant.PLAYLIST].discard("")
 
     def upload_all(self):
         try:
@@ -254,7 +260,7 @@ class YouTubeUploader(QObject):
 
         video_description = metadata_dict[Constant.VIDEO_DESCRIPTION]
         tags = metadata_dict[Constant.TAGS]
-        playlist = metadata_dict[Constant.PLAYLIST]
+        playlists = metadata_dict[Constant.PLAYLIST]
         notify_subs = metadata_dict[Constant.NOTIFY_SUBS]
         
         if video_description:
@@ -270,66 +276,67 @@ class YouTubeUploader(QObject):
             
         self.on_progress.emit(video_path, 25)
             
-        if playlist:
-            self.__find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
-            self.__wait()
-            checkbox = self.__find_playlist_checkbox(playlist)
-            if checkbox is None:
-                self.log_message.emit("Could not find playlist checkbox, attempting to create new playlist", logging.INFO)
-                # clear search so we can create new playlist
-                try:
-                    self.__wait()
-                    self.__find(By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON).click()
-                except:
-                    # we don't have a search bar for playlists, so just ignore
-                    pass
-                self.__wait()
-                playlist_new_button = self.__find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON)
-                self.__wait()
-                playlist_new_button.click()
-                self.__wait()
-                playlist_title = self.__find(By.XPATH, Constant.PLAYLIST_NEW_TITLE)
-                playlist_title.click()
-                self.__wait()
-                playlist_title.send_keys(playlist)
-                self.__wait()
-
-                # Set playlist visibility
-                self.__find(By.XPATH, Constant.PLAYLIST_VISIBILITY_DROPDOWN).click()
-                self.__wait()
-                playlist_visibility = self.browser.find_element_by_xpath('//*[@test-id="{}"]'.format(metadata_dict['visibility']))
-                if playlist_visibility is None:
-                    raise Exception(f"Could not find playlist visibility option {metadata_dict['visibility']}")
-                playlist_visibility.click()
-                self.__wait()
-
-                self.__find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
-                
-                self.log_message.emit(f"Created new playlist {playlist}", logging.INFO)
-                
+        if playlists:
+            for i, playlist in enumerate(playlists):
+                self.__find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
                 self.__wait()
                 checkbox = self.__find_playlist_checkbox(playlist)
+                if checkbox is None:
+                    self.log_message.emit("Could not find playlist checkbox, attempting to create new playlist", logging.INFO)
+                    # clear search so we can create new playlist
+                    try:
+                        self.__wait()
+                        self.__find(By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON).click()
+                    except:
+                        # we don't have a search bar for playlists, so just ignore
+                        pass
+                    self.__wait()
+                    playlist_new_button = self.__find(By.XPATH, Constant.PLAYLIST_NEW_BUTTON)
+                    self.__wait()
+                    playlist_new_button.click()
+                    self.__wait()
+                    playlist_title = self.__find(By.XPATH, Constant.PLAYLIST_NEW_TITLE)
+                    playlist_title.click()
+                    self.__wait()
+                    playlist_title.send_keys(playlist)
+                    self.__wait()
+
+                    # Set playlist visibility
+                    self.__find(By.XPATH, Constant.PLAYLIST_VISIBILITY_DROPDOWN).click()
+                    self.__wait()
+                    playlist_visibility = self.browser.find_element_by_xpath('//*[@test-id="{}"]'.format(metadata_dict['visibility']))
+                    if playlist_visibility is None:
+                        raise Exception(f"Could not find playlist visibility option {metadata_dict['visibility']}")
+                    playlist_visibility.click()
+                    self.__wait()
+
+                    self.__find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
+                    
+                    self.log_message.emit(f"Created new playlist {playlist}", logging.INFO)
+                    
+                    self.__wait()
+                    checkbox = self.__find_playlist_checkbox(playlist)
+                    
+                self.on_progress.emit(video_path, 25 + (35 - 25)/(2*len(playlists)) * (2*i + 1))
                 
-            self.on_progress.emit(video_path, 30)
-            
-            if checkbox is None:
-                raise Exception(f"Could not find playlist: {playlist}")
-            else:
-                checkbox.click()
-                self.__wait()
-                self.__find(By.XPATH, Constant.PLAYLIST_DONE_BUTTON).click()
-                
-                self.log_message.emit(f"Selected playlist {playlist}", logging.INFO)
-                self.on_progress.emit(video_path, 35)
-                
-                self.__wait()
+                if checkbox is None:
+                    raise Exception(f"Could not find playlist: {playlist}")
+                else:
+                    checkbox.click()
+                    self.__wait()
+                    self.__find(By.XPATH, Constant.PLAYLIST_DONE_BUTTON).click()
+                    
+                    self.log_message.emit(f"Selected playlist {playlist}", logging.INFO)
+                    self.on_progress.emit(video_path, 25 + (35 - 25)/(2*len(playlists)) * (2*i + 2))
+                    
+                    self.__wait()
 
         # hide tooltips which can obscure buttons
         tooltips = self.browser.find_elements_by_xpath(Constant.TOOLTIP)
         if tooltips is not None:
             for element in tooltips:
                 try:
-                    self.browser.execute_script_on_element("arguments[0].style.display = 'none'", element)
+                    self.browser.execute_script("arguments[0].style.display = 'none'", element)
                 except:
                     pass
 

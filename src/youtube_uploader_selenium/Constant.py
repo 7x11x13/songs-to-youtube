@@ -14,7 +14,7 @@ class Constant:
     NOTIFY_SUBS = 'notify_subs'
     DESCRIPTION_CONTAINER = '//*[@label="Description"]'
     MORE_OPTIONS_CONTAINER = '//*[text() = "Show more"]'
-    PLAYLIST_CONTAINER = '//span[@class="dropdown-trigger-text style-scope ytcp-text-dropdown-trigger"][text()[contains(.,"Select")]]'
+    PLAYLIST_CONTAINER = '/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[4]/div[3]/div[1]/ytcp-video-metadata-playlists/ytcp-text-dropdown-trigger/ytcp-dropdown-trigger/div/div[2]/span'
     PLAYLIST_SEARCH = '//*[@id="search-input"]'
     PLAYLIST_SEARCH_CLEAR_BUTTON = '//*[@class="style-scope ytcp-playlist-dialog"]/tp-yt-iron-icon[@class="remove-defaults style-scope ytcp-icon-button"]'
     PLAYLIST_NEW_BUTTON = '/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[2]/ytcp-button[1]/div'

@@ -106,7 +106,7 @@ class Uploader(QObject):
                 metadata = {'title': song.get('videoTitle'),
                             'description': song.get('videoDescription'),
                             'tags': song.get('videoTags'),
-                            'playlist': song.get('playlistName'),
+                            'playlist': song.get('playlistName').split('\n'),
                             'visibility': song.get('videoVisibility'),
                             'notify_subs': song.get('notifySubs') == SETTINGS_VALUES.CheckBox.CHECKED}
                 metadata['file_path'] = file

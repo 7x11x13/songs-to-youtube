@@ -447,12 +447,12 @@
           <item>
            <widget class="QLabel" name="label_10">
             <property name="text">
-             <string>Playlist name:</string>
+             <string>Playlist names (one per line):</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="playlistName"/>
+           <widget class="QPlainTextEdit" name="playlistName"/>
           </item>
           <item>
            <widget class="QLabel" name="label_23">
