@@ -96,19 +96,29 @@ class CoverArtDisplay(QLabel):
             path = SETTINGS_VALUES.MULTIPLE_VALUES_IMG
         if path == self.image_path:
             return
-        self.image_path = path
-        self.setPixmap(QPixmap(path))
-        self.imageChanged.emit(path)
+        if self.setPixmap(QPixmap(path)):
+            self.image_path = path
+            self.imageChanged.emit(path)
+        else:
+            # set to default image
+            path = QRC_TO_FILE_PATH[":/image/default.jpg"]
+            self.setPixmap(QPixmap(path))
+            self.image_path = path
+            self.imageChanged.emit(path)
 
     def _get_scroll_area_width(self):
         return find_ancestor(self, "SettingsScrollArea").size().width()
 
     def setPixmap(self, pixmap):
         if pixmap.isNull():
-            return
-        self.full_pixmap = pixmap
-        width = min(self._get_scroll_area_width() * 1/2, pixmap.size().width())
-        super().setPixmap(pixmap.scaledToWidth(width))
+            return False
+        try:
+            self.full_pixmap = pixmap
+            width = min(self._get_scroll_area_width() * 1/2, pixmap.size().width())
+            super().setPixmap(pixmap.scaledToWidth(width))
+            return True
+        except:
+            return False
 
     def scroll_area_width_resized(self, width):
         if self.full_pixmap and not self.full_pixmap.isNull():
