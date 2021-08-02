@@ -19,9 +19,7 @@ class SongTreeModel(QStandardItemModel):
         super().__init__(*args)
 
     def dropMimeData(self, data, action, row, column, parent):
-        # If any albums were dropped into another album,
-        # add all the songs in the dropped album
-        # but not the album item itself
+        # If album dropped onto another album, don't insert
         if parent.isValid():
             dummy_model = QStandardItemModel()
             dummy_model.dropMimeData(data, action, 0, 0, QModelIndex())
@@ -33,7 +31,7 @@ class SongTreeModel(QStandardItemModel):
                     # so we have to treat them as QStandardItems
                     item = dummy_model.item(r, c)
                     if item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.ALBUM:
-                        indexes += [child.index() for child in AlbumTreeWidgetItem.getChildrenFromStandardItem(item)]
+                        pass
                     elif item.data(CustomDataRole.ITEMTYPE) == TreeWidgetType.SONG:
                         indexes.append(index)
             data = dummy_model.mimeData(indexes)
@@ -57,7 +55,6 @@ class SongTreeSelectionModel(QItemSelectionModel):
         # deselect all song items to make sure
         # we only edit items of the same type
         # at the same time
-        indexes = []
         if isinstance(selected, QModelIndex):
             # turn single selected index into a QItemSelection
             # so we only have to deal with one type
