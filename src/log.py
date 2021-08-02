@@ -93,7 +93,7 @@ class LogWidgetLogger(logging.Handler):
         color = self.COLORS[record.levelname]
         self.widget.setTextColor(color)
         self.widget.append(self.format(record))
-        self.widget.ensureCursorVisible()
+        self.widget.verticalScrollBar().setValue(self.widget.verticalScrollBar().maximum())
 
 
 class LogWidget(QTextEdit):
