@@ -1,5 +1,5 @@
 # This Python file uses the following encoding: utf-8
-from PySide6.QtCore import Signal, QSettings, Qt
+from PySide6.QtCore import Signal, QSettings, Qt, QStandardPaths
 from PySide6.QtWidgets import *
 from PySide6.QtGui import QPixmap
 
@@ -32,27 +32,36 @@ def get_setting(setting: str, settings=get_settings()):
 class FileComboBox(QComboBox):
     def __init__(self, *args):
         super().__init__(*args)
-        self.dir = None
+        self.dirs = []
         self.objectNameChanged.connect(self.set_dir)
 
     def set_dir(self, object_name):
+        # take screenshot and quit
+        appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+        commands_dir = os.path.join(appdata_path, 'commands')
+        os.makedirs(commands_dir, exist_ok=True)
         if object_name == "commandName":
-            self.dir = resource_path("commands/render")
+            render_dir = os.path.join(commands_dir, "render")
+            os.makedirs(render_dir, exist_ok=True)
+            self.dirs = [resource_path("commands/render"), render_dir]
         elif object_name == "concatCommandName":
-            self.dir = resource_path("commands/concat")
+            concat_dir = os.path.join(commands_dir, "concat")
+            os.makedirs(concat_dir, exist_ok=True)
+            self.dirs = [resource_path("commands/concat"), concat_dir]
         else:
             raise Exception(f'ComboBox has name {self.objectName()}')
         self.reload()
 
     def reload(self):
         commands = set()
-        for file in os.listdir(self.dir):
-            file_path = os.path.join(self.dir, file)
-            if os.path.isfile(file_path) and file.endswith(".command"):
-                name = file[:-len(".command")]
-                commands.add(name)
-                if self.findText(name) == -1:
-                    self.addItem(name, name)
+        for d in self.dirs:
+            for file in os.listdir(d):
+                file_path = os.path.join(d, file)
+                if os.path.isfile(file_path) and file.endswith(".command"):
+                    name = file[:-len(".command")]
+                    commands.add(name)
+                    if self.findText(name) == -1:
+                        self.addItem(name, name)
         for i in range(self.count()):
             if self.itemText(i) not in commands:
                 self.removeItem(i)

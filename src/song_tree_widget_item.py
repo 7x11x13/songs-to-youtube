@@ -1,5 +1,5 @@
 # This Python file uses the following encoding: utf-8
-from PySide6.QtCore import QFileInfo
+from PySide6.QtCore import QFileInfo, QStandardPaths
 from PySide6.QtGui import QStandardItem
 
 import logging
@@ -164,6 +164,9 @@ class SongTreeWidgetItem(QStandardItem):
         self.set("fileOutput", os.path.join(self.get("fileOutputDir"), self.get("fileOutputName")))
         self.set("songDuration", str(self.get_duration_ms() / 1000))
         command_path = resource_path(os.path.join("commands", "render", self.get("commandName") + ".command"))
+        if not os.path.exists(command_path):
+            appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+            command_path = os.path.join(appdata_path, "commands", "render", self.get("commandName") + ".command")
         try:
             with open(command_path, 'r') as f:
                 command = f.read().strip()
@@ -245,6 +248,9 @@ class AlbumTreeWidgetItem(QStandardItem):
         self.data(CustomDataRole.ITEMDATA).set_value("albumDuration", str(self.get_duration_ms() / 1000))
         self.data(CustomDataRole.ITEMDATA).set_value("fileOutput", os.path.join(self.get("fileOutputDirAlbum"), self.get("fileOutputNameAlbum")))
         command_path = resource_path(os.path.join("commands", "concat", self.get("concatCommandName") + ".command"))
+        if not os.path.exists(command_path):
+            appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+            command_path = os.path.join(appdata_path, "commands", "concat", self.get("concatCommandName") + ".command")
         try:
             with open(command_path, 'r') as f:
                 command = f.read().strip()
