@@ -30,7 +30,7 @@ class Constant:
     TEXT_INPUT = 'text-input'
     RADIO_LABEL = 'radioLabel'
     STATUS_CONTAINER = '/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[2]/div/div[1]/ytcp-video-upload-progress/span'
-    NOT_MADE_FOR_KIDS_LABEL = 'NOT_MADE_FOR_KIDS'
+    NOT_MADE_FOR_KIDS_LABEL = 'VIDEO_MADE_FOR_KIDS_NOT_MFK'
     NEXT_BUTTON = 'next-button'
     VIDEO_URL_CONTAINER = "//span[@class='video-url-fadeable style-scope ytcp-video-info']"
     VIDEO_URL_ELEMENT = "//a[@class='style-scope ytcp-video-info']"
