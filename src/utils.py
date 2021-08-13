@@ -14,6 +14,29 @@ logger = logging.getLogger(APPLICATION)
 
 # File utils
 
+if os.name == 'nt':
+    import ctypes
+    from ctypes import wintypes
+    _GetShortPathNameW = kernel32 = ctypes.WinDLL('kernel32', use_last_error=True).GetShortPathNameW
+    _GetShortPathNameW.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD]
+    _GetShortPathNameW.restype = wintypes.DWORD
+
+    def get_short_path_name(long_name):
+        """
+        Gets the short path name of a given long path.
+        http://stackoverflow.com/a/23598461/200291
+        """
+        output_buf_size = 0
+        while True:
+            output_buf = ctypes.create_unicode_buffer(output_buf_size)
+            needed = _GetShortPathNameW(long_name, output_buf, output_buf_size)
+            if needed == 0:
+                raise ctypes.WinError(ctypes.get_last_error())
+            if output_buf_size >= needed:
+                return output_buf.value
+            else:
+                output_buf_size = needed
+
 def files_in_directory(dir_path: str):
     """Generates all the files of the given directory"""
     file = QDirIterator(dir_path, QDir.AllEntries | QDir.NoDotAndDotDot)

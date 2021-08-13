@@ -6,12 +6,14 @@ from PySide6.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea,
 import logging
 from enum import IntEnum
 
-from utils import file_is_audio, files_in_directory, files_in_directory_and_subdirectories, load_ui
+from utils import *
 from settings import SETTINGS_VALUES, get_setting
 from song_tree_widget_item import *
 from render import Renderer
 from upload import Uploader
 from metadata_table_widget import MetadataTableWidget
+
+import os
 
 
 class SongTreeModel(QStandardItemModel):
@@ -213,6 +215,8 @@ class SongTreeWidget(QTreeView):
     def addAlbum(self, dir_path: str):
         songs = []
         for file_path in files_in_directory(dir_path):
+            if os.name == 'nt' and len(file_path) > 255:
+                file_path = get_short_path_name(file_path)
             info = QFileInfo(file_path)
             if not info.isReadable():
                 logger.warning("File {} is not readable".format(file_path))
