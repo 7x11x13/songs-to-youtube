@@ -361,7 +361,18 @@ class YouTubeUploader(QObject):
             self.on_progress.emit(video_path, 45)
 
         self.__wait()
-        kids_section = self.__find(By.NAME, Constant.NOT_MADE_FOR_KIDS_LABEL)
+        
+        kids_section = None
+        for not_kids_label in Constant.NOT_MADE_FOR_KIDS_LABELS:
+            try:
+                kids_section = self.__find(By.NAME, not_kids_label)
+                break
+            except:
+                pass
+            
+        if not kids_section:
+            raise Exception("Could not find not made for kids label")
+        
         self.browser.execute_script('arguments[0].scrollIntoView({block: "center", inline: "center"});', kids_section)
         self.__wait()
         self.__find(By.ID, Constant.RADIO_LABEL, kids_section).click()
