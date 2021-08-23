@@ -144,6 +144,9 @@ class SongTreeWidgetItem(QStandardItem):
                         song_dir=info.path(),
                         song_file=info.fileName()),
                      CustomDataRole.ITEMDATA)
+        # set acodec to copy by default,
+        # overridden when concatenating
+        self.set("audioCodec", "copy")
 
     def get(self, field):
         return self.data(CustomDataRole.ITEMDATA).get_value(field)
@@ -257,6 +260,12 @@ class AlbumTreeWidgetItem(QStandardItem):
                 self.set("concatCommandString", command)
         except:
             raise Exception(f"Could not read command from {command_path}")
+        
+        if self.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.SINGLE:
+            # override song audio codec output to 24 bit FLAC
+            # so they can be concatenated
+            for song in self.getChildren():
+                song.set("audioCodec", "flac -sample_fmt s32")
 
     def before_upload(self):
         # generate timestamps
