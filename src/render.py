@@ -168,21 +168,14 @@ class AlbumRenderHelper:
             self.workers.discard(worker)
             if not success:
                 self.error = True
+                self.renderer.cancel_worker(self.combine_worker)
         if len(self.workers) == 0 and not self.error:
             # done rendering songs,
             # begin concatenation
             self.renderer.start_worker(self.combine_worker)
 
-    def worker_error(self, worker, error):
-        if worker in self.workers:
-            # one of the songs could not be rendered,
-            # cancel concatenation job
-            self.error = True
-            self.renderer.cancel_worker(self.combine_worker)
-
     def render(self, renderer):
         renderer.worker_done.connect(self.worker_done)
-        renderer.worker_error.connect(self.worker_error)
         for song in self.album.getChildren():
             song.before_render()
             worker = renderer.add_render_song_job(song, auto_delete=False)
