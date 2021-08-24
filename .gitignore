@@ -1,6 +1,7 @@
 dist
 build
 env
+venv
 *.log
 *.pkl
 __pycache__
