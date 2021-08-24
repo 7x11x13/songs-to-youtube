@@ -17,17 +17,19 @@ from settings import *
 from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
 from utils import *
+from youtube_uploader_selenium import YouTubeLogin
 
 logger = logging.getLogger(APPLICATION)
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, first_time=False):
         super().__init__()
         self.ui = load_ui(
             "mainwindow.ui",
             (SongSettingsWidget, SongTreeWidget, LogWidget, ProgressWindow),
         )
+        self.first_time = first_time
         self.ui.cancelButton.setVisible(False)
         self.connect_actions()
         self.setAcceptDrops(True)
@@ -137,6 +139,19 @@ class MainWindow(QMainWindow):
 
     def show(self):
         self.ui.show()
+        if (
+            get_setting("uploadYouTube") == SETTINGS_VALUES.CheckBox.CHECKED
+            and len(YouTubeLogin.get_all_usernames()) == 0
+        ):
+            msg_box = QMessageBox.warning(
+                self,
+                "Warning",
+                "No users detected, but upload to YouTube is the default. Add new user for uploading?",
+                QMessageBox.Ok | QMessageBox.Cancel,
+            )
+            if msg_box == QMessageBox.Ok:
+                self.msg_box = AddUserWindow()
+                self.msg_box.show()
 
     def connect_actions(self):
         self.ui.actionAbout.triggered.connect(self.about)
