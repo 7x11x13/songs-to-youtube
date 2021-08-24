@@ -7,6 +7,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import *
 
 from const import *
+from field import SETTINGS_VALUES
 from log import *
 from progress_window import ProgressWindow
 from settings import *

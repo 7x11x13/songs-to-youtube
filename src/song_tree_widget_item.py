@@ -5,6 +5,7 @@ from PySide6.QtCore import QFileInfo, QStandardPaths
 from PySide6.QtGui import QStandardItem
 
 from const import *
+from field import *
 from metadata import Metadata
 from settings import *
 from template import SettingTemplate
@@ -22,7 +23,11 @@ class TreeWidgetItemData:
         # application values
         # always strings
         self.dict = {}
-        app_fields = SONG_FIELDS if item_type == TreeWidgetType.SONG else ALBUM_FIELDS
+        app_fields = (
+            InputField.SONG_FIELDS
+            if item_type == TreeWidgetType.SONG
+            else InputField.ALBUM_FIELDS
+        )
         for field in set(kwargs.keys()) | app_fields:
             # set all mandatory settings to their defaults if not
             # specified in the parameters

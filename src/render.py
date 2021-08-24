@@ -11,6 +11,7 @@ import psutil
 from PySide6.QtCore import *
 
 from const import *
+from field import SETTINGS_VALUES
 from song_tree_widget_item import *
 
 logger = logging.getLogger(APPLICATION)

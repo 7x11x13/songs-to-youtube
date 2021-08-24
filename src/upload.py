@@ -4,6 +4,7 @@ import traceback
 from PySide6.QtCore import *
 
 from const import *
+from field import SETTINGS_VALUES
 from settings import get_setting
 from song_tree_widget_item import *
 from youtube_uploader_selenium import YouTubeUploader

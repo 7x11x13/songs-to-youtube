@@ -5,6 +5,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import *
 
 from const import *
+from field import *
 from utils import *
 from youtube_uploader_selenium import YouTubeLogin
 

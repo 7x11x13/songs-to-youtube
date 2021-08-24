@@ -4,6 +4,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
+from field import SETTINGS_VALUES
 from metadata_table_widget import MetadataTableWidget
 from render import Renderer
 from settings import *
