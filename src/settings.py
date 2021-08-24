@@ -1,4 +1,5 @@
 import os
+import posixpath
 
 from PySide6.QtCore import *
 from PySide6.QtGui import QPixmap
@@ -39,14 +40,14 @@ class FileComboBox(QComboBox):
     def set_dir(self, object_name):
         # take screenshot and quit
         appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-        commands_dir = os.path.join(appdata_path, "commands")
+        commands_dir = posixpath.join(appdata_path, "commands")
         os.makedirs(commands_dir, exist_ok=True)
         if object_name == "commandName":
-            render_dir = os.path.join(commands_dir, "render")
+            render_dir = posixpath.join(commands_dir, "render")
             os.makedirs(render_dir, exist_ok=True)
             self.dirs = [resource_path("commands/render"), render_dir]
         elif object_name == "concatCommandName":
-            concat_dir = os.path.join(commands_dir, "concat")
+            concat_dir = posixpath.join(commands_dir, "concat")
             os.makedirs(concat_dir, exist_ok=True)
             self.dirs = [resource_path("commands/concat"), concat_dir]
         else:
@@ -57,7 +58,7 @@ class FileComboBox(QComboBox):
         commands = set()
         for d in self.dirs:
             for file in os.listdir(d):
-                file_path = os.path.join(d, file)
+                file_path = posixpath.join(d, file)
                 if os.path.isfile(file_path) and file.endswith(".command"):
                     name = file[: -len(".command")]
                     commands.add(name)
@@ -112,7 +113,7 @@ class CoverArtDisplay(QLabel):
             self.imageChanged.emit(path)
         else:
             # set to default image
-            path = QRC_TO_FILE_PATH[":/image/default.jpg"]
+            path = APPLICATION_IMAGES[":/image/default.jpg"]
             self.setPixmap(QPixmap(path))
             self.image_path = path
             self.imageChanged.emit(path)
@@ -193,11 +194,12 @@ class SettingsWindow(QDialog):
         msg_box.setWindowTitle("Add new user")
         msg_box.setText(
             "To add a new user, you must first log in to youtube, then save your browser cookies for youtube to<br><br>"
-            f"{os.path.join(YouTubeLogin.get_cookie_path_from_username('(username)'), 'youtube.com.json')}<br><br>"
+            f"{posixpath.join(YouTubeLogin.get_cookie_path_from_username('(username)'), 'youtube.com.json')}<br><br>"
             "To save the cookies after logging in, you can use a"
             " <a href='https://github.com/ktty1220/export-cookie-for-puppeteer'>browser extension.</a> Make sure you "
             "name the file youtube.com.json"
         )
+        msg_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
         msg_box.exec()
 
     def save_preset(self):

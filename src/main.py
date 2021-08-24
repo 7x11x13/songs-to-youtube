@@ -1,4 +1,7 @@
+import atexit
+import glob
 import logging
+import posixpath
 import os
 import shutil
 import sys
@@ -7,7 +10,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import *
 
 from const import *
-from field import SETTINGS_VALUES
+from field import *
 from log import *
 from progress_window import ProgressWindow
 from settings import *
@@ -93,7 +96,7 @@ class MainWindow(QMainWindow):
             self.ui.treeWidget.remove_by_file_paths(
                 {path for path in results if results[path]}, False
             )
-            # upload to youtube
+            # upload to youtube;
             self.uploader = self.ui.treeWidget.get_uploader(results)
             self.uploader.finished.connect(self.on_upload_finished)
             self.ui.progressWindow.on_upload_start(self.uploader)
@@ -150,12 +153,21 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     addLoggingLevel("SUCCESS", 60, "success")
     # initialize default settings
-    if not os.path.exists(get_settings().fileName()):
-        settings_path = get_settings().fileName()
+    settings_path = get_settings().fileName()
+    if not os.path.exists(settings_path):
         os.makedirs(os.path.dirname(settings_path), exist_ok=True)
         shutil.copy(resource_path("config/default.ini"), settings_path)
+
+    os.makedirs(posixpath.join(QDir().tempPath(), APPLICATION), exist_ok=True)
+
+    def clean_up():
+        for file in glob.glob(posixpath.join(QDir().tempPath(), APPLICATION, "*")):
+            os.remove(file)
+
+    atexit.register(clean_up)
+
     app = QApplication([])
-    app.setWindowIcon(QIcon(":/image/icon.ico"))
+    app.setWindowIcon(QIcon(APPLICATION_IMAGES[":/image/icon.ico"]))
     app.setOrganizationName(ORGANIZATION)
     app.setApplicationName(APPLICATION)
     widget = MainWindow()

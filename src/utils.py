@@ -1,5 +1,6 @@
 import logging
 import os
+import posixpath
 import sys
 
 from PySide6.QtCore import *
@@ -82,7 +83,7 @@ def resource_path(relative_path):
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.dirname(__file__)
-    return os.path.join(base_path, relative_path)
+    return posixpath.join(base_path, relative_path)
 
 
 # Qt utils
@@ -123,7 +124,7 @@ def load_ui(name, custom_widgets=[], parent=None):
     loader = QUiLoader()
     for cw in custom_widgets:
         loader.registerCustomWidget(cw)
-    path = resource_path(os.path.join("ui", name))
+    path = resource_path(posixpath.join("ui", name))
     ui_file = QFile(path)
     if not ui_file.open(QFile.ReadOnly):
         logger.error("Cannot open {}: {}".format(path, ui_file.errorString()))

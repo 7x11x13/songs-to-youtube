@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import pickle
+import posixpath
 import re
 import shutil
 import sys
@@ -29,14 +30,14 @@ class YouTubeLogin:
     @staticmethod
     def get_cookie_path_from_username(username):
         appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-        general_cookies_folder_path = os.path.join(appdata_path, "cookies")
+        general_cookies_folder_path = posixpath.join(appdata_path, "cookies")
         os.makedirs(general_cookies_folder_path, exist_ok=True)
-        return os.path.join(general_cookies_folder_path, username)
+        return posixpath.join(general_cookies_folder_path, username)
 
     @staticmethod
     def get_all_usernames():
         appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-        general_cookies_folder_path = os.path.join(appdata_path, "cookies")
+        general_cookies_folder_path = posixpath.join(appdata_path, "cookies")
         os.makedirs(general_cookies_folder_path, exist_ok=True)
         return next(os.walk(general_cookies_folder_path))[1]
 
@@ -61,9 +62,9 @@ class YouTubeUploader(QObject):
         if cookies_path == "":
             # find cookie files
             dir = YouTubeLogin.get_cookie_path_from_username(username)
-            self.cookies_paths += glob.glob(os.path.join(dir, "*youtube*.pkl"))
+            self.cookies_paths += glob.glob(posixpath.join(dir, "*youtube*.pkl"))
             if len(self.cookies_paths) == 0:
-                self.cookies_paths += glob.glob(os.path.join(dir, "*youtube*.json"))
+                self.cookies_paths += glob.glob(posixpath.join(dir, "*youtube*.json"))
             if len(self.cookies_paths) == 0:
                 raise FileNotFoundError(
                     f"No cookie files matching *youtube*.pkl or *youtube*.json found in {dir}"
@@ -164,9 +165,9 @@ class YouTubeUploader(QObject):
                 appdata_path = QStandardPaths.writableLocation(
                     QStandardPaths.AppDataLocation
                 )
-                screenshot_dir = os.path.join(appdata_path, "screenshots")
+                screenshot_dir = posixpath.join(appdata_path, "screenshots")
                 os.makedirs(screenshot_dir, exist_ok=True)
-                path = os.path.join(
+                path = posixpath.join(
                     screenshot_dir,
                     datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S.png"),
                 )

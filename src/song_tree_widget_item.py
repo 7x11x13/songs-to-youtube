@@ -1,5 +1,6 @@
 import logging
 import os
+import posixpath
 
 from PySide6.QtCore import QFileInfo, QStandardPaths
 from PySide6.QtGui import QStandardItem
@@ -38,9 +39,9 @@ class TreeWidgetItemData:
                 # set to default setting
                 self.dict[field] = get_setting(field)
 
-            if field == "coverArt" and self.dict[field] in QRC_TO_FILE_PATH:
+            if field == "coverArt" and self.dict[field] in APPLICATION_IMAGES:
                 # convert resource path to real file path for ffmpeg
-                self.dict[field] = QRC_TO_FILE_PATH[get_setting(field)]
+                self.dict[field] = APPLICATION_IMAGES[get_setting(field)]
 
         # add song metadata
         if item_type == TreeWidgetType.SONG:
@@ -56,7 +57,7 @@ class TreeWidgetItemData:
                 }
                 cover_file = None
                 for file in os.listdir(self.dict["song_dir"]):
-                    path = os.path.join(self.dict["song_dir"], file)
+                    path = posixpath.join(self.dict["song_dir"], file)
                     name, ext = os.path.splitext(file)
                     if (
                         os.path.isfile(path)
@@ -192,17 +193,17 @@ class SongTreeWidgetItem(QStandardItem):
     def before_render(self):
         self.set(
             "fileOutput",
-            os.path.join(self.get("fileOutputDir"), self.get("fileOutputName")),
+            posixpath.join(self.get("fileOutputDir"), self.get("fileOutputName")),
         )
         self.set("songDuration", str(self.get_duration_ms() / 1000))
         command_path = resource_path(
-            os.path.join("commands", "render", self.get("commandName") + ".command")
+            posixpath.join("commands", "render", self.get("commandName") + ".command")
         )
         if not os.path.exists(command_path):
             appdata_path = QStandardPaths.writableLocation(
                 QStandardPaths.AppDataLocation
             )
-            command_path = os.path.join(
+            command_path = posixpath.join(
                 appdata_path, "commands", "render", self.get("commandName") + ".command"
             )
         try:
@@ -290,12 +291,12 @@ class AlbumTreeWidgetItem(QStandardItem):
         )
         self.data(CustomDataRole.ITEMDATA).set_value(
             "fileOutput",
-            os.path.join(
+            posixpath.join(
                 self.get("fileOutputDirAlbum"), self.get("fileOutputNameAlbum")
             ),
         )
         command_path = resource_path(
-            os.path.join(
+            posixpath.join(
                 "commands", "concat", self.get("concatCommandName") + ".command"
             )
         )
@@ -303,7 +304,7 @@ class AlbumTreeWidgetItem(QStandardItem):
             appdata_path = QStandardPaths.writableLocation(
                 QStandardPaths.AppDataLocation
             )
-            command_path = os.path.join(
+            command_path = posixpath.join(
                 appdata_path,
                 "commands",
                 "concat",

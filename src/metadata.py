@@ -1,5 +1,5 @@
 import logging
-import os
+import posixpath
 
 import mutagen
 from mutagen.easyid3 import EasyID3
@@ -71,7 +71,7 @@ class Metadata:
         if len(self.pictures) > 0:
             bytes = QByteArray(self.pictures[0])
             cover = QTemporaryFile(
-                os.path.join(QDir().tempPath(), APPLICATION, "XXXXXX.cover")
+                posixpath.join(QDir().tempPath(), APPLICATION, "XXXXXX.cover")
             )
             cover.setAutoRemove(False)
             cover.open(QIODevice.WriteOnly)

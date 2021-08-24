@@ -79,6 +79,8 @@ class SettingTemplate(Template):
                         arg = arg[1:-1]
                         if arg in mapping:
                             return make_filename_safe(str(mapping[arg]))
+                        else:
+                            return "INVALID"
                 return mo.group()
             if mo.group("escaped") is not None:
                 return self.delimiter

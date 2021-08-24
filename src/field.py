@@ -9,6 +9,12 @@ from utils import *
 
 logger = logging.getLogger(APPLICATION)
 
+APPLICATION_IMAGES = {
+    ":/image/default.jpg": resource_path("image/default.jpg"),
+    ":/image/multiple_values.png": resource_path("image/multiple_values.png"),
+    ":/image/icon.ico": resource_path("image/icon.ico"),
+}
+
 
 class SETTINGS_VALUES:
 
