@@ -54,9 +54,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-147</y>
+        <y>0</y>
         <width>433</width>
-        <height>1798</height>
+        <height>1873</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -188,6 +188,13 @@
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="removeUserButton">
+              <property name="text">
+               <string>Remove user</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="addNewUserButton">

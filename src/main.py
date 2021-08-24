@@ -172,4 +172,4 @@ if __name__ == "__main__":
     app.setApplicationName(APPLICATION)
     widget = MainWindow()
     widget.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

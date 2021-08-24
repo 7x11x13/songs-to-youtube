@@ -1,5 +1,6 @@
 import os
 import posixpath
+import shutil
 
 from PySide6.QtCore import *
 from PySide6.QtGui import QPixmap
@@ -164,6 +165,36 @@ class SettingsScrollArea(QScrollArea):
         self.findChild(CoverArtDisplay).scroll_area_width_resized(event.size().width())
 
 
+class AddUserWindow(QDialog):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.ui = load_ui("adduser.ui")
+        self.connect_actions()
+
+    def connect_actions(self):
+        self.ui.buttonBox.accepted.connect(self.save_user)
+        self.ui.buttonBox.rejected.connect(self.reject)
+        self.ui.cookiesButton.clicked.connect(self.open_cookies)
+
+    def open_cookies(self):
+        cookie_file = QFileDialog.getOpenFileName(
+            self, "Select cookies.json file", filter="Cookies (*.json)"
+        )[0]
+        if cookie_file:
+            self.ui.cookiesFile.setText(cookie_file)
+
+    def save_user(self):
+        cookie_folder = YouTubeLogin.get_cookie_path_from_username(
+            self.ui.username.text()
+        )
+        os.makedirs(cookie_folder, exist_ok=True)
+        cookie_file = posixpath.join(cookie_folder, "youtube.com.json")
+        shutil.copyfile(self.ui.cookiesFile.text(), cookie_file)
+
+    def show(self):
+        self.ui.show()
+
+
 class SettingsWindow(QDialog):
 
     settings_changed = Signal()
@@ -189,18 +220,17 @@ class SettingsWindow(QDialog):
         self.load_settings()
 
     def add_new_user(self):
-        msg_box = QMessageBox()
-        msg_box.setTextFormat(Qt.RichText)
-        msg_box.setWindowTitle("Add new user")
-        msg_box.setText(
-            "To add a new user, you must first log in to youtube, then save your browser cookies for youtube to<br><br>"
-            f"{posixpath.join(YouTubeLogin.get_cookie_path_from_username('(username)'), 'youtube.com.json')}<br><br>"
-            "To save the cookies after logging in, you can use a"
-            " <a href='https://github.com/ktty1220/export-cookie-for-puppeteer'>browser extension.</a> Make sure you "
-            "name the file youtube.com.json"
-        )
-        msg_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        msg_box.exec()
+        self.msg_box = AddUserWindow()
+        self.msg_box.ui.buttonBox.accepted.connect(self.reload_users)
+        self.msg_box.show()
+
+    def remove_user(self):
+        if self.ui.username.currentText():
+            cookie_folder = YouTubeLogin.get_cookie_path_from_username(
+                self.ui.username.currentText()
+            )
+            shutil.rmtree(cookie_folder)
+            self.ui.username.removeItem(self.ui.username.currentIndex())
 
     def save_preset(self):
         presets_dir = resource_path("config")
@@ -230,14 +260,19 @@ class SettingsWindow(QDialog):
             settings = QSettings(file, QSettings.IniFormat)
             self.set_fields_from_settings(settings)
 
+    def reload_users(self):
+        self.ui.username.clear()
+        for username in YouTubeLogin.get_all_usernames():
+            self.ui.username.addItem(username, username)
+            self.ui.username.setCurrentText(username)
+
     def save_settings(self):
         settings = get_settings()
         self.save_settings_from_fields(settings)
         self.settings_changed.emit()
 
     def load_settings(self):
-        for username in YouTubeLogin.get_all_usernames():
-            self.ui.username.addItem(username, username)
+        self.reload_users()
         settings = get_settings()
         self.set_fields_from_settings(settings)
 
@@ -278,3 +313,4 @@ class SettingsWindow(QDialog):
         ).clicked.connect(self.load_preset)
         self.ui.coverArtButton.clicked.connect(self.change_cover_art)
         self.ui.addNewUserButton.clicked.connect(self.add_new_user)
+        self.ui.removeUserButton.clicked.connect(self.remove_user)
