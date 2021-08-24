@@ -1,14 +1,13 @@
-# This Python file uses the following encoding: utf-8
-from PySide6 import QtCore
-from PySide6.QtWidgets import QTextEdit
-from PySide6.QtGui import QColor
-
 import logging
 import sys
 import traceback
-from const import APPLICATION
 
-from settings import get_setting
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QTextEdit
+
+from const import *
+from settings import *
+
 
 def addLoggingLevel(levelName, levelNum, methodName=None):
     """
@@ -41,11 +40,11 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
         methodName = levelName.lower()
 
     if hasattr(logging, levelName):
-       raise AttributeError('{} already defined in logging module'.format(levelName))
+        raise AttributeError("{} already defined in logging module".format(levelName))
     if hasattr(logging, methodName):
-       raise AttributeError('{} already defined in logging module'.format(methodName))
+        raise AttributeError("{} already defined in logging module".format(methodName))
     if hasattr(logging.getLoggerClass(), methodName):
-       raise AttributeError('{} already defined in logger class'.format(methodName))
+        raise AttributeError("{} already defined in logger class".format(methodName))
 
     # This method was inspired by the answers to Stack Overflow post
     # http://stackoverflow.com/q/2183233/2988730, especially
@@ -53,6 +52,7 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
     def logForLevel(self, message, *args, **kwargs):
         if self.isEnabledFor(levelNum):
             self._log(levelNum, message, args, **kwargs)
+
     def logToRoot(message, *args, **kwargs):
         logging.log(levelNum, message, *args, **kwargs)
 
@@ -61,9 +61,11 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
     setattr(logging.getLoggerClass(), methodName, logForLevel)
     setattr(logging, methodName, logToRoot)
 
+
 def convert_log_level(level: str):
     """Converts from LogLevel combobox text to Python log level value"""
     return getattr(logging, level)
+
 
 class LogWidgetFormatter(logging.Formatter):
     def __init__(self, *args):
@@ -81,7 +83,7 @@ class LogWidgetLogger(logging.Handler):
         "DEBUG": QColor("blue"),
         "CRITICAL": QColor("red"),
         "ERROR": QColor("red"),
-        "SUCCESS": QColor("green")
+        "SUCCESS": QColor("green"),
     }
 
     def __init__(self, parent: QTextEdit):
@@ -93,18 +95,21 @@ class LogWidgetLogger(logging.Handler):
         color = self.COLORS[record.levelname]
         self.widget.setTextColor(color)
         self.widget.append(self.format(record))
-        self.widget.verticalScrollBar().setValue(self.widget.verticalScrollBar().maximum())
+        self.widget.verticalScrollBar().setValue(
+            self.widget.verticalScrollBar().maximum()
+        )
 
 
 class LogWidget(QTextEdit):
-
     def __init__(self, *args):
         super().__init__(*args)
 
         self.logger = logging.getLogger(APPLICATION)
 
         log_handler = LogWidgetLogger(self)
-        log_handler.setFormatter(LogWidgetFormatter("[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S"))
+        log_handler.setFormatter(
+            LogWidgetFormatter("[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
+        )
         self.logger.addHandler(log_handler)
         self.logger.setLevel(logging.INFO)
         sys.excepthook = self.exception_handler

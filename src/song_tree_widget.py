@@ -1,19 +1,15 @@
-# This Python file uses the following encoding: utf-8
-from PySide6.QtCore import Qt, QFileInfo, QModelIndex, QItemSelection, QItemSelectionModel, QDir, QFile, QByteArray, QPoint
-from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent, QStandardItemModel, QStandardItem, QImage, QAction, QKeySequence, QShortcut
-from PySide6.QtWidgets import QTreeView, QAbstractItemView, QAbstractScrollArea, QMenu
-
-import logging
-from enum import IntEnum
-
-from utils import *
-from settings import SETTINGS_VALUES, get_setting
-from song_tree_widget_item import *
-from render import Renderer
-from upload import Uploader
-from metadata_table_widget import MetadataTableWidget
-
 import os
+
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+
+from metadata_table_widget import MetadataTableWidget
+from render import Renderer
+from settings import *
+from song_tree_widget_item import *
+from upload import Uploader
+from utils import *
 
 
 class SongTreeModel(QStandardItemModel):
@@ -87,7 +83,6 @@ class SongTreeSelectionModel(QItemSelectionModel):
 
 
 class SongTreeWidget(QTreeView):
-
     def __init__(self, *args):
         super().__init__(*args)
         self.setAcceptDrops(True)
@@ -130,14 +125,16 @@ class SongTreeWidget(QTreeView):
             if item.item_type() == TreeWidgetType.ALBUM:
                 yield from item.getChildren()
 
-
     def remove_by_file_paths(self, paths, uploaded=True):
         """Remove items from widget with output paths given by paths;
-           if uploaded is False, only remove items which are not going
-           to be uploaded (render-only)"""
+        if uploaded is False, only remove items which are not going
+        to be uploaded (render-only)"""
         for item in list(self._get_all_items_flat())[::-1]:
             if item.get("fileOutput") in paths:
-                if uploaded or item.get("uploadYouTube") == SETTINGS_VALUES.CheckBox.UNCHECKED:
+                if (
+                    uploaded
+                    or item.get("uploadYouTube") == SETTINGS_VALUES.CheckBox.UNCHECKED
+                ):
                     self.model().removeRow(item.row(), item.index().parent())
 
         # if all children of an album are removed,
@@ -169,7 +166,9 @@ class SongTreeWidget(QTreeView):
         menu = QMenu(self)
 
         meta_action = menu.addAction("View metadata")
-        meta_action.triggered.connect(lambda chk=False, index=index: self.show_metadata_menu(index))
+        meta_action.triggered.connect(
+            lambda chk=False, index=index: self.show_metadata_menu(index)
+        )
 
         remove_action = menu.addAction("Remove")
         remove_action.setShortcut(QKeySequence(QKeySequence.Delete))
@@ -204,10 +203,15 @@ class SongTreeWidget(QTreeView):
                     logger.warning("File {} is not readable".format(info.filePath()))
                     continue
                 if info.isDir():
-                    if get_setting("dragAndDropBehavior") == SETTINGS_VALUES.DragAndDrop.ALBUM_MODE:
+                    if (
+                        get_setting("dragAndDropBehavior")
+                        == SETTINGS_VALUES.DragAndDrop.ALBUM_MODE
+                    ):
                         self.addAlbum(url.toLocalFile())
                     else:
-                        for file_path in files_in_directory_and_subdirectories(info.filePath()):
+                        for file_path in files_in_directory_and_subdirectories(
+                            info.filePath()
+                        ):
                             self.addSong(file_path)
                 else:
                     self.addSong(info.filePath())
@@ -215,7 +219,7 @@ class SongTreeWidget(QTreeView):
     def addAlbum(self, dir_path: str):
         songs = []
         for file_path in files_in_directory(dir_path):
-            if os.name == 'nt' and len(file_path) > 255:
+            if os.name == "nt" and len(file_path) > 255:
                 file_path = get_short_path_name(file_path)
             info = QFileInfo(file_path)
             if not info.isReadable():

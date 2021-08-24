@@ -1,13 +1,13 @@
-# This Python file uses the following encoding: utf-8
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QProgressBar, QLabel, QVBoxLayout, QSizePolicy
-
 import logging
-from const import APPLICATION
 
-from utils import find_ancestor
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import *
+
+from const import *
+from utils import *
 
 logger = logging.getLogger(APPLICATION)
+
 
 class WorkerProgress(QWidget):
     def __init__(self, worker_name, *args):
@@ -64,11 +64,17 @@ class ProgressWindow(QWidget):
     def connect_workers(self, obj, obj_type):
         obj.worker_progress.connect(self.worker_progress)
         obj.worker_error.connect(self.worker_error)
-        obj.worker_done.connect(lambda worker_name, success, obj_type=obj_type: self.worker_done(worker_name, success, obj_type))
-        obj.finished.connect(lambda success: find_ancestor(self, "QScrollArea").setVisible(False))
+        obj.worker_done.connect(
+            lambda worker_name, success, obj_type=obj_type: self.worker_done(
+                worker_name, success, obj_type
+            )
+        )
+        obj.finished.connect(
+            lambda success: find_ancestor(self, "QScrollArea").setVisible(False)
+        )
 
     def on_render_start(self, renderer):
-        self.connect_workers(renderer, 'rendering')
-        
+        self.connect_workers(renderer, "rendering")
+
     def on_upload_start(self, uploader):
-        self.connect_workers(uploader, 'uploading')
+        self.connect_workers(uploader, "uploading")

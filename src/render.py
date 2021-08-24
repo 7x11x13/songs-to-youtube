@@ -1,19 +1,17 @@
-# This Python file uses the following encoding: utf-8
-
-from PySide6.QtCore import QThread, Signal, QObject, QTemporaryFile, QIODevice, QByteArray, QRunnable, QThreadPool
-
-import subprocess
+import atexit
 import logging
+import os
+import subprocess
 import time
 import traceback
-import atexit
-import os
-import psutil
-from threading import Thread
 from queue import Queue
+from threading import Thread
 
+import psutil
+from PySide6.QtCore import *
+
+from const import *
 from song_tree_widget_item import *
-from const import APPLICATION
 
 logger = logging.getLogger(APPLICATION)
 
@@ -31,7 +29,9 @@ def clean_up():
         except:
             pass
 
+
 atexit.register(clean_up)
+
 
 class ProcessHandler(QObject):
 
@@ -44,18 +44,30 @@ class ProcessHandler(QObject):
     def read_pipe(self, pipe, queue):
         try:
             with pipe:
-                for line in iter(pipe.readline, b''):
-                    queue.put((pipe, line.decode('utf-8')))
+                for line in iter(pipe.readline, b""):
+                    queue.put((pipe, line.decode("utf-8")))
         finally:
             queue.put((None, None))
 
     def run(self, command):
 
         if os.name == "nt":
-            p = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                 creationflags=subprocess.CREATE_NO_WINDOW, shell=True)
+            p = subprocess.Popen(
+                command,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+                shell=True,
+            )
         else:
-            p = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+            p = subprocess.Popen(
+                command,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=False,
+            )
 
         PROCESSES.append(p)
         q = Queue()
@@ -80,13 +92,12 @@ class WorkerSignals(QObject):
     finished = Signal(bool)
     error = Signal(str)
     progress = Signal(str)
-    
+
     def __init__(self):
         super().__init__()
 
 
 class RenderSongWorker(QRunnable):
-
     def __init__(self, song: SongTreeWidgetItem, auto_delete):
         super().__init__()
         self.auto_delete = auto_delete
@@ -113,8 +124,8 @@ class RenderSongWorker(QRunnable):
     def __str__(self):
         return self.name
 
-class CombineSongWorker(QRunnable):
 
+class CombineSongWorker(QRunnable):
     def __init__(self, album: AlbumTreeWidgetItem):
         super().__init__()
         self.auto_delete = True
@@ -128,11 +139,18 @@ class CombineSongWorker(QRunnable):
             song_list = QTemporaryFile()
             song_list.open(QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text)
             for song in self.album.getChildren():
-                song_list.write(QByteArray("file 'file:{}'\n".format(song.get("fileOutput").replace("'", "'\\''"))))
+                song_list.write(
+                    QByteArray(
+                        "file 'file:{}'\n".format(
+                            song.get("fileOutput").replace("'", "'\\''")
+                        )
+                    )
+                )
             song_list.close()
             command_str = self.album.get("concatCommandString").format(
-                                input_file_list=song_list.fileName(),
-                                fileOutputPath=self.album.get("fileOutput"))
+                input_file_list=song_list.fileName(),
+                fileOutputPath=self.album.get("fileOutput"),
+            )
             handler = ProcessHandler()
             handler.stderr.connect(self.signals.error.emit)
             handler.stdout.connect(self.signals.progress.emit)
@@ -155,7 +173,6 @@ class CombineSongWorker(QRunnable):
 
 
 class AlbumRenderHelper:
-
     def __init__(self, album: AlbumTreeWidgetItem, *args):
         self.album = album
         self.workers = set()
@@ -185,8 +202,6 @@ class AlbumRenderHelper:
         return self
 
 
-
-
 class Renderer(QObject):
 
     # emit true on success, false on failure
@@ -203,20 +218,20 @@ class Renderer(QObject):
 
     def __init__(self):
         super().__init__()
-        
+
         QThreadPool.globalInstance().setMaxThreadCount(int(get_setting("maxProcesses")))
 
         # array of album helpers so they
         # don't get garbage collected
         self.helpers = []
-        
+
         # worker name -> QRunnable
         self.workers = {}
-        
+
         # worker name -> QRunnable
         # workers which are not in the thread pool yet
         self.queued_workers = {}
-        
+
         # finished workers that still need to be held onto
         # so that resources don't go out of scope
         self.finished_workers = []
@@ -232,11 +247,12 @@ class Renderer(QObject):
             if key == "out_time_us":
                 current_time_ms = int(value) // 1000
                 total_time_ms = worker.get_duration_ms()
-                progress = max(0, min(int((current_time_ms / total_time_ms) * 100), 100))
+                progress = max(
+                    0, min(int((current_time_ms / total_time_ms) * 100), 100)
+                )
                 self.worker_progress.emit(str(worker), progress)
         except:
             logger.warning("Could not parse worker_progress line: {}".format(progress))
-
 
     def worker_finished(self, worker, success):
         self.results[str(worker)] = success
@@ -269,24 +285,30 @@ class Renderer(QObject):
         self.queued_workers.pop(worker_name, None)
 
     def add_worker(self, worker, auto_start=True):
-        worker.signals.finished.connect(lambda success, worker=worker: self.worker_finished(worker, success))
-        worker.signals.error.connect(lambda error, worker=worker: self.worker_error.emit(str(worker), error))
-        worker.signals.progress.connect(lambda progress, worker=worker: self._worker_progress(worker, progress))
+        worker.signals.finished.connect(
+            lambda success, worker=worker: self.worker_finished(worker, success)
+        )
+        worker.signals.error.connect(
+            lambda error, worker=worker: self.worker_error.emit(str(worker), error)
+        )
+        worker.signals.progress.connect(
+            lambda progress, worker=worker: self._worker_progress(worker, progress)
+        )
         if auto_start:
             self.workers[str(worker)] = worker
             QThreadPool.globalInstance().start(worker)
         else:
             self.queued_workers[str(worker)] = worker
-            
+
         return worker
 
     def add_render_album_job(self, album: AlbumTreeWidgetItem):
         album.before_render()
         if album.childCount() == 0:
             return
-        if album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.SINGLE:
+        if album.get("albumPlaylist") == SETTINGS_VALUES.AlbumPlaylist.SINGLE:
             self.helpers.append(AlbumRenderHelper(album).render(self))
-        elif album.get('albumPlaylist') == SETTINGS_VALUES.AlbumPlaylist.MULTIPLE:
+        elif album.get("albumPlaylist") == SETTINGS_VALUES.AlbumPlaylist.MULTIPLE:
             for song in album.getChildren():
                 self.add_render_song_job(song)
 

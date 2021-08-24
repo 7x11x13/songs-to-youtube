@@ -1,18 +1,19 @@
-from PySide6.QtCore import *
-
-import os
-import mutagen
 import logging
+import os
+
+import mutagen
 from mutagen.easyid3 import EasyID3
 from mutagen.easymp4 import EasyMP4
+from PySide6.QtCore import *
 
-from utils import make_value_qt_safe
 from const import *
+from utils import *
 
 # can expand these if wanted
 EasyMP4.RegisterTextKey("url", "purl")
 
 logger = logging.getLogger(APPLICATION)
+
 
 class Metadata:
     def __init__(self, song_path):
@@ -22,7 +23,9 @@ class Metadata:
         try:
             self.load_song(song_path)
         except Exception as err:
-            logger.error(f"Could not load metadata for {song_path}: {err.__class__}: {err}")
+            logger.error(
+                f"Could not load metadata for {song_path}: {err.__class__}: {err}"
+            )
 
     def load_song(self, path):
         f = mutagen.File(path, easy=True)
@@ -34,7 +37,9 @@ class Metadata:
             for key, value in f.tags.items():
                 self.tags[key] = make_value_qt_safe(value)
 
-            if isinstance(f.tags, mutagen.easyid3.EasyID3) or isinstance(f.tags, mutagen.id3.ID3):
+            if isinstance(f.tags, mutagen.easyid3.EasyID3) or isinstance(
+                f.tags, mutagen.id3.ID3
+            ):
                 if isinstance(f.tags, mutagen.easyid3.EasyID3):
                     f = mutagen.File(path)
                 for key in f:
@@ -61,14 +66,13 @@ class Metadata:
                 for picture in f.pictures:
                     self.pictures.append(picture.data)
 
-
-
-
     def get_cover_art(self):
         # extract cover art if it exists
         if len(self.pictures) > 0:
             bytes = QByteArray(self.pictures[0])
-            cover = QTemporaryFile(os.path.join(QDir().tempPath(), APPLICATION, "XXXXXX.cover"))
+            cover = QTemporaryFile(
+                os.path.join(QDir().tempPath(), APPLICATION, "XXXXXX.cover")
+            )
             cover.setAutoRemove(False)
             cover.open(QIODevice.WriteOnly)
             cover.write(bytes)

@@ -1,26 +1,18 @@
-# This Python file uses the following encoding: utf-8
-from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog, QListView, QTreeView, QAbstractItemView, QMessageBox
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import QSettings
-
-
-import sys
-import os
 import logging
-import pathlib
+import os
 import shutil
+import sys
 
-import resource
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import *
 
-from utils import load_ui, resource_path
-from const import SETTINGS_VALUES, APPLICATION, ORGANIZATION, VERSION
-
-# Custom widgets
+from const import *
+from log import *
+from progress_window import ProgressWindow
+from settings import *
 from song_settings_widget import SongSettingsWidget
 from song_tree_widget import SongTreeWidget
-from log import LogWidget, addLoggingLevel
-from settings import SettingsWindow, get_setting, get_settings
-from progress_window import ProgressWindow
+from utils import *
 
 logger = logging.getLogger(APPLICATION)
 
@@ -28,7 +20,10 @@ logger = logging.getLogger(APPLICATION)
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.ui = load_ui("mainwindow.ui", (SongSettingsWidget, SongTreeWidget, LogWidget, ProgressWindow))
+        self.ui = load_ui(
+            "mainwindow.ui",
+            (SongSettingsWidget, SongTreeWidget, LogWidget, ProgressWindow),
+        )
         self.ui.cancelButton.setVisible(False)
         self.connect_actions()
         self.setAcceptDrops(True)
@@ -41,7 +36,7 @@ class MainWindow(QMainWindow):
         file_dialog.setFileMode(QFileDialog.Directory)
         file_dialog.setOption(QFileDialog.ShowDirsOnly, True)
         file_dialog.setOption(QFileDialog.DontUseNativeDialog, True)
-        file_view = file_dialog.findChild(QListView, 'listView')
+        file_view = file_dialog.findChild(QListView, "listView")
 
         if file_view:
             file_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -68,24 +63,35 @@ class MainWindow(QMainWindow):
                     pass
             self.cancelled = False
         else:
-            logger.success("{}/{} uploads successful".format(sum(int(s) for s in results.values()),len(results)))
+            logger.success(
+                "{}/{} uploads successful".format(
+                    sum(int(s) for s in results.values()), len(results)
+                )
+            )
             self.uploader = None
             if get_setting("deleteAfterUploading") == SETTINGS_VALUES.CheckBox.CHECKED:
                 for path, success in results.items():
                     if success:
                         os.remove(path)
             # remove successful uploads
-            self.ui.treeWidget.remove_by_file_paths({path for path in results if results[path]})
-
+            self.ui.treeWidget.remove_by_file_paths(
+                {path for path in results if results[path]}
+            )
 
     def on_render_finished(self, results):
         if self.cancelled:
             logger.error("Render cancelled")
             self.on_upload_finished(results)
         else:
-            logger.success("{}/{} renders successful".format(sum(int(s) for s in results.values()),len(results)))
+            logger.success(
+                "{}/{} renders successful".format(
+                    sum(int(s) for s in results.values()), len(results)
+                )
+            )
             # remove successful renders that will not be uploaded
-            self.ui.treeWidget.remove_by_file_paths({path for path in results if results[path]}, False)
+            self.ui.treeWidget.remove_by_file_paths(
+                {path for path in results if results[path]}, False
+            )
             # upload to youtube
             self.uploader = self.ui.treeWidget.get_uploader(results)
             self.uploader.finished.connect(self.on_upload_finished)
@@ -133,7 +139,9 @@ class MainWindow(QMainWindow):
         self.ui.actionAlbums.triggered.connect(self.load_albums)
         self.ui.actionSongs.triggered.connect(self.load_songs)
         self.ui.actionSettings.triggered.connect(self.open_settings)
-        self.ui.treeWidget.selectionModel().selectionChanged.connect(self.ui.songSettingsWindow.song_tree_selection_changed)
+        self.ui.treeWidget.selectionModel().selectionChanged.connect(
+            self.ui.songSettingsWindow.song_tree_selection_changed
+        )
         self.ui.renderButton.clicked.connect(self.render)
         self.ui.cancelButton.clicked.connect(self.cancel)
 

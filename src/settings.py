@@ -1,23 +1,22 @@
-# This Python file uses the following encoding: utf-8
-from PySide6.QtCore import Signal, QSettings, Qt, QStandardPaths
-from PySide6.QtWidgets import *
-from PySide6.QtGui import QPixmap
-
-import logging
-import traceback
-import time
 import os
-from threading import Thread
 
+from PySide6.QtCore import *
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import *
+
+from const import *
 from utils import *
 from youtube_uploader_selenium import YouTubeLogin
-from const import *
+
 
 def get_settings():
     """Returns the QSettings for this application"""
-    settings = QSettings(QSettings.IniFormat, QSettings.UserScope, ORGANIZATION, SETTINGS_FILENAME)
+    settings = QSettings(
+        QSettings.IniFormat, QSettings.UserScope, ORGANIZATION, SETTINGS_FILENAME
+    )
     # for some reason this doesn't work when the settings are first initialized so we do this
     return QSettings(settings.fileName(), QSettings.IniFormat)
+
 
 def get_setting(setting: str, settings=get_settings()):
     """Returns the value of the given setting"""
@@ -29,6 +28,7 @@ def get_setting(setting: str, settings=get_settings()):
         return defaults.value(setting)
     return settings.value(setting)
 
+
 class FileComboBox(QComboBox):
     def __init__(self, *args):
         super().__init__(*args)
@@ -38,7 +38,7 @@ class FileComboBox(QComboBox):
     def set_dir(self, object_name):
         # take screenshot and quit
         appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-        commands_dir = os.path.join(appdata_path, 'commands')
+        commands_dir = os.path.join(appdata_path, "commands")
         os.makedirs(commands_dir, exist_ok=True)
         if object_name == "commandName":
             render_dir = os.path.join(commands_dir, "render")
@@ -49,7 +49,7 @@ class FileComboBox(QComboBox):
             os.makedirs(concat_dir, exist_ok=True)
             self.dirs = [resource_path("commands/concat"), concat_dir]
         else:
-            raise Exception(f'ComboBox has name {self.objectName()}')
+            raise Exception(f"ComboBox has name {self.objectName()}")
         self.reload()
 
     def reload(self):
@@ -58,13 +58,14 @@ class FileComboBox(QComboBox):
             for file in os.listdir(d):
                 file_path = os.path.join(d, file)
                 if os.path.isfile(file_path) and file.endswith(".command"):
-                    name = file[:-len(".command")]
+                    name = file[: -len(".command")]
                     commands.add(name)
                     if self.findText(name) == -1:
                         self.addItem(name, name)
         for i in range(self.count()):
             if self.itemText(i) not in commands:
                 self.removeItem(i)
+
 
 class SettingCheckBox(QCheckBox):
     def __init__(self, *args):
@@ -123,7 +124,7 @@ class CoverArtDisplay(QLabel):
             return False
         try:
             self.full_pixmap = pixmap
-            width = min(self._get_scroll_area_width() * 1/2, pixmap.size().width())
+            width = min(self._get_scroll_area_width() * 1 / 2, pixmap.size().width())
             super().setPixmap(pixmap.scaledToWidth(width))
             return True
         except:
@@ -131,9 +132,9 @@ class CoverArtDisplay(QLabel):
 
     def scroll_area_width_resized(self, width):
         if self.full_pixmap and not self.full_pixmap.isNull():
-            width = min(width * 1/2, self.full_pixmap.size().width())
+            width = min(width * 1 / 2, self.full_pixmap.size().width())
             scaled = self.full_pixmap.scaledToWidth(width)
-            super().setPixmap(scaled)         
+            super().setPixmap(scaled)
 
     def dragEnterEvent(self, event):
         if event.source() is None and mimedata_has_image(event.mimeData()):
@@ -160,6 +161,7 @@ class SettingsScrollArea(QScrollArea):
         super().resizeEvent(event)
         self.findChild(CoverArtDisplay).scroll_area_width_resized(event.size().width())
 
+
 class SettingsWindow(QDialog):
 
     settings_changed = Signal()
@@ -169,10 +171,17 @@ class SettingsWindow(QDialog):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.ui = load_ui("settingswindow.ui", (CoverArtDisplay, SettingCheckBox, SettingsScrollArea, FileComboBox))
+        self.ui = load_ui(
+            "settingswindow.ui",
+            (CoverArtDisplay, SettingCheckBox, SettingsScrollArea, FileComboBox),
+        )
         # rename default buttons
-        self.ui.buttonBox.addButton(SettingsWindow.SAVE_PRESET_TEXT, QDialogButtonBox.ApplyRole)
-        self.ui.buttonBox.addButton(SettingsWindow.LOAD_PRESET_TEXT, QDialogButtonBox.ApplyRole)
+        self.ui.buttonBox.addButton(
+            SettingsWindow.SAVE_PRESET_TEXT, QDialogButtonBox.ApplyRole
+        )
+        self.ui.buttonBox.addButton(
+            SettingsWindow.LOAD_PRESET_TEXT, QDialogButtonBox.ApplyRole
+        )
         SettingsWindow.init_combo_boxes(self.ui)
         self.connect_actions()
         self.load_settings()
@@ -181,18 +190,25 @@ class SettingsWindow(QDialog):
         msg_box = QMessageBox()
         msg_box.setTextFormat(Qt.RichText)
         msg_box.setWindowTitle("Add new user")
-        msg_box.setText("To add a new user, you must first log in to youtube, then save your browser cookies for youtube to<br><br>"
-                        f"{os.path.join(YouTubeLogin.get_cookie_path_from_username('(username)'), 'youtube.com.json')}<br><br>"
-                        "To save the cookies after logging in, you can use a"
-                        " <a href='https://github.com/ktty1220/export-cookie-for-puppeteer'>browser extension.</a> Make sure you "
-                        "name the file youtube.com.json")
+        msg_box.setText(
+            "To add a new user, you must first log in to youtube, then save your browser cookies for youtube to<br><br>"
+            f"{os.path.join(YouTubeLogin.get_cookie_path_from_username('(username)'), 'youtube.com.json')}<br><br>"
+            "To save the cookies after logging in, you can use a"
+            " <a href='https://github.com/ktty1220/export-cookie-for-puppeteer'>browser extension.</a> Make sure you "
+            "name the file youtube.com.json"
+        )
         msg_box.exec()
 
     def save_preset(self):
         presets_dir = resource_path("config")
         if not os.path.exists(presets_dir):
             os.makedirs(presets_dir)
-        file = QFileDialog.getSaveFileName(self, SettingsWindow.SAVE_PRESET_TEXT, presets_dir, "Configuration files (*.ini)")[0]
+        file = QFileDialog.getSaveFileName(
+            self,
+            SettingsWindow.SAVE_PRESET_TEXT,
+            presets_dir,
+            "Configuration files (*.ini)",
+        )[0]
         if file:
             settings = QSettings(file, QSettings.IniFormat)
             self.save_settings_from_fields(settings)
@@ -201,7 +217,12 @@ class SettingsWindow(QDialog):
         presets_dir = resource_path("config")
         if not os.path.exists(presets_dir):
             os.makedirs(presets_dir)
-        file = QFileDialog.getOpenFileName(self, SettingsWindow.LOAD_PRESET_TEXT, presets_dir, "Configuration files (*.ini)")[0]
+        file = QFileDialog.getOpenFileName(
+            self,
+            SettingsWindow.LOAD_PRESET_TEXT,
+            presets_dir,
+            "Configuration files (*.ini)",
+        )[0]
         if file:
             settings = QSettings(file, QSettings.IniFormat)
             self.set_fields_from_settings(settings)
@@ -226,7 +247,9 @@ class SettingsWindow(QDialog):
             settings.setValue(field.name, field.get())
 
     def change_cover_art(self):
-        file = QFileDialog.getOpenFileName(self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER)[0]
+        file = QFileDialog.getOpenFileName(
+            self, "Import album artwork", "", SUPPORTED_IMAGE_FILTER
+        )[0]
         self.ui.coverArt.set(file)
 
     def show(self):
@@ -244,7 +267,11 @@ class SettingsWindow(QDialog):
     def connect_actions(self):
         self.ui.buttonBox.accepted.connect(self.save_settings)
         self.ui.buttonBox.rejected.connect(self.reject)
-        find_child_text(self.ui.buttonBox, SettingsWindow.SAVE_PRESET_TEXT).clicked.connect(self.save_preset)
-        find_child_text(self.ui.buttonBox, SettingsWindow.LOAD_PRESET_TEXT).clicked.connect(self.load_preset)
+        find_child_text(
+            self.ui.buttonBox, SettingsWindow.SAVE_PRESET_TEXT
+        ).clicked.connect(self.save_preset)
+        find_child_text(
+            self.ui.buttonBox, SettingsWindow.LOAD_PRESET_TEXT
+        ).clicked.connect(self.load_preset)
         self.ui.coverArtButton.clicked.connect(self.change_cover_art)
         self.ui.addNewUserButton.clicked.connect(self.add_new_user)
