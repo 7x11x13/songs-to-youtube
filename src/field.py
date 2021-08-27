@@ -11,7 +11,7 @@ logger = logging.getLogger(APPLICATION)
 
 APPLICATION_IMAGES = {
     ":/image/default.jpg": resource_path("image/default.jpg"),
-    ":/image/multiple_values.png": resource_path("image/multiple_values.png"),
+    ":/image/multiple-values.png": resource_path("image/multiple-values.png"),
     ":/image/icon.ico": resource_path("image/icon.ico"),
 }
 
@@ -19,7 +19,7 @@ APPLICATION_IMAGES = {
 class SETTINGS_VALUES:
 
     MULTIPLE_VALUES = "<<Multiple values>>"
-    MULTIPLE_VALUES_IMG = ":/image/multiple-values.png"
+    MULTIPLE_VALUES_IMG = APPLICATION_IMAGES[":/image/multiple-values.png"]
 
     # combo box values
 
