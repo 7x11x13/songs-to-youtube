@@ -8,44 +8,42 @@ class Constant:
     YOUTUBE_STUDIO_URL = "https://studio.youtube.com"
     YOUTUBE_UPLOAD_URL = "https://www.youtube.com/upload"
     USER_WAITING_TIME = 1
-    USER_AVATAR_XPATH = (
-        '//button[@id="avatar-btn"]/yt-img-shadow/img[@id="img"][@alt="Avatar image"]'
-    )
+    USER_AVATAR_XPATH = "/html/body/ytd-app/div/div/ytd-masthead/div[3]/div[3]/div[2]/ytd-topbar-menu-button-renderer[3]/button/yt-img-shadow/img"
     VIDEO_TITLE = "title"
     VIDEO_DESCRIPTION = "description"
     PLAYLIST = "playlist"
     TAGS = "tags"
     NOTIFY_SUBS = "notify_subs"
-    DESCRIPTION_CONTAINER = '//*[@label="Description"]'
-    MORE_OPTIONS_CONTAINER = '//*[text() = "Show more"]'
+    DESCRIPTION_CONTAINER = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[2]/ytcp-mention-textbox"
+    MORE_OPTIONS_CONTAINER = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-video-metadata-editor/div/div/ytcp-button/div"
     PLAYLIST_CONTAINER = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[4]/div[3]/div[1]/ytcp-video-metadata-playlists/ytcp-text-dropdown-trigger/ytcp-dropdown-trigger/div/div[2]/span"
-    PLAYLIST_SEARCH = '//*[@id="search-input"]'
-    PLAYLIST_SEARCH_CLEAR_BUTTON = '//*[@class="style-scope ytcp-playlist-dialog"]/tp-yt-iron-icon[@class="remove-defaults style-scope ytcp-icon-button"]'
+    PLAYLIST_SEARCH = "/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[1]/input"
+    PLAYLIST_SEARCH_CLEAR_BUTTON = "/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[1]/ytcp-icon-button/tp-yt-iron-icon"
     PLAYLIST_NEW_BUTTON = (
         "/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[2]/ytcp-button[1]/div"
     )
-    PLAYLIST_NEW_TITLE = (
-        '//div[@id="create-playlist-form"]/div/ytcp-form-textarea/div/textarea'
-    )
+    PLAYLIST_NEW_TITLE = "/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[2]/div[1]/ytcp-form-textarea/div/textarea"
     PLAYLIST_DONE_BUTTON = '//*[@class="done-button action-button style-scope ytcp-playlist-dialog"]/*[text() = "Done"]'
-    PLAYLIST_CREATE_BUTTON = '//*[@class="create-playlist-button action-button style-scope ytcp-playlist-dialog"][@label="Create"]'
+    PLAYLIST_CREATE_BUTTON = (
+        "/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[3]/ytcp-button[2]"
+    )
     PLAYLIST_VISIBILITY_DROPDOWN = (
-        '//*[@class="input-container visibility style-scope ytcp-playlist-dialog"]'
+        "/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[2]/div[2]"
     )
     PLAYLIST_LABEL = "//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group']]"
     TOOLTIP = "//ytcp-paper-tooltip"
-    TAGS_TEXT_INPUT = '//input[@aria-label="Tags"]'
-    NOTIFY_SUBSCRIBERS_CHECKBOX = '//ytcp-checkbox-lit[@id="notify-subscribers"]/div'
+    TAGS_TEXT_INPUT = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-advanced/div[3]/ytcp-form-input-container/div[1]/div[2]/ytcp-free-text-chip-bar/ytcp-chip-bar/div/input"
+    NOTIFY_SUBSCRIBERS_CHECKBOX = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-advanced/div[6]/div[4]/ytcp-checkbox-lit/div[1]"
     TEXTBOX = "textbox"
     TEXT_INPUT = "text-input"
     RADIO_LABEL = "radioLabel"
     STATUS_CONTAINER = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[2]/div/div[1]/ytcp-video-upload-progress/span"
-    NOT_MADE_FOR_KIDS_LABELS = ["VIDEO_MADE_FOR_KIDS_NOT_MFK", "NOT_MADE_FOR_KIDS"]
+    NOT_MADE_FOR_KIDS = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[5]/ytkc-made-for-kids-select/div[4]/tp-yt-paper-radio-group/tp-yt-paper-radio-button[2]"
     NEXT_BUTTON = "next-button"
     VIDEO_URL_CONTAINER = (
         "//span[@class='video-url-fadeable style-scope ytcp-video-info']"
     )
-    VIDEO_URL_ELEMENT = "//a[@class='style-scope ytcp-video-info']"
+    VIDEO_URL_ELEMENT = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-uploads-review/div[3]/ytcp-video-info/div/div[2]/div[1]/div[2]/span/a"
     HREF = "href"
     UPLOADED = "Uploading"
     ERROR_CONTAINER = '//*[@id="error-message"]'

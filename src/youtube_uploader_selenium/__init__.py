@@ -429,16 +429,7 @@ class YouTubeUploader(QObject):
 
         self.__wait()
 
-        kids_section = None
-        for not_kids_label in Constant.NOT_MADE_FOR_KIDS_LABELS:
-            try:
-                kids_section = self.__find(By.NAME, not_kids_label)
-                break
-            except:
-                pass
-
-        if not kids_section:
-            raise Exception("Could not find not made for kids label")
+        kids_section = self.__find(By.XPATH, Constant.NOT_MADE_FOR_KIDS)
 
         self.browser.execute_script(
             'arguments[0].scrollIntoView({block: "center", inline: "center"});',
