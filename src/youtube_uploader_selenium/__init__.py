@@ -19,6 +19,7 @@ from pathlib import Path
 
 from PySide6.QtCore import *
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
@@ -261,9 +262,15 @@ class YouTubeUploader(QObject):
 
     def __find(self, by, constant, parent=None):
         if parent is None:
-            element = self.browser.find_element(by, constant)
+            try:
+                element = self.browser.find_element(by, constant)
+            except NoSuchElementException:
+                element = None
         else:
-            element = parent.find_element(by, constant)
+            try:
+                element = parent.find_element(by, constant)
+            except NoSuchElementException:
+                element = None
         if not element:
             raise Exception(f"Could not find {Constant.lookup(constant)}")
         return element
