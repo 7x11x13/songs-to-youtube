@@ -67,7 +67,7 @@ class ProcessHandler(QObject):
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                shell=False,
+                shell=True,
             )
 
         PROCESSES.append(p)
