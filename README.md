@@ -11,26 +11,24 @@ Convert audio files to videos and upload them to YouTube automatically.
 - Extracts other metadata which can be used in template strings for the video title/description etc.
 - Can concatenate songs to upload an album as a single video
 - Can upload an album as a playlist of multiple videos
-- Encodes multiple videos in parallel
-- Supports multiple users, multiple presets
-- Does not use YouTube API; upload up to 50-100 videos per day
+- Does not use YouTube API; can upload up to 50-100 videos per day
 - Does not re-encode audio before uploading
 
 ## Pre-installation
-- [FFmpeg](https://ffmpeg.org/download.html) binary is required to convert songs into videos
-- [Firefox](https://www.mozilla.org/firefox/new/) and [geckodriver](https://github.com/mozilla/geckodriver/releases) binaries are required to upload to YouTube
+- [FFmpeg](https://ffmpeg.org/download.html) is required to convert songs into videos
+- [Firefox](https://www.mozilla.org/firefox/new/) and [geckodriver](https://github.com/mozilla/geckodriver/releases) are required to upload to YouTube
 - Make sure FFmpeg and geckodriver are both in your PATH environment variable
-- If you have a package manager you can install through that instead. e.g. with [Chocolatey](https://chocolatey.org/):
+- If you have a package manager you can install through that instead. e.g. with [Scoop](https://scoop.sh/):
 ```
-choco install ffmpeg
-choco install selenium-gecko-driver
+scoop install ffmpeg
+scoop install geckodriver
 ```
 
 ## Installation
 
 There are two ways to install this program:
 
-### PyInstaller
+### PyInstaller binary
 
 Download the latest release for your platform [here](https://github.com/7x11x13/songs-to-youtube/releases), unzip the archive, and run the songs-to-youtube executable.
 
@@ -40,15 +38,16 @@ If you have issues running the exectuable, you can try running the program from 
 1. Make sure you have Python version 3.8+ installed
 2. Download the source code
 3. Install required Python modules with `python3 -m pip install -r requirements.txt`
-4. Run the program with `python3 main.py`
+4. Run the program with `python3 src/main.py`
 
 ## Notes
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
-- The language of your YouTube must be English
+- The language of your YouTube might need to be English
 - You can drag and drop songs on the main window to add them to the queue. The order in which they are uploaded goes from top to bottom
 - You can also drag and drop images onto a song's current album art to change it
-- You probably shouldn't change the output file extension from .mkv
+- Make sure the output file extension stays  as .mkv
 - The characters < and > will be replaced with fullwidth versions in titles and descriptions, as YouTube does not allow these symbols
+- Video titles and descriptions longer than YouTube allows will be truncated
 
 ### Template strings
 Write `~{key}` in any text field and it will be replaced with an appropriate value. If no value exists for that key, it will not be replaced. To see the available keys, right click on an album or song and select "View metadata."
