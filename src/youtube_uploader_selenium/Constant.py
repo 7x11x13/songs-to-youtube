@@ -23,7 +23,7 @@ class Constant:
         "/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[2]/ytcp-button[1]/div"
     )
     PLAYLIST_NEW_TITLE = "/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[2]/div[1]/ytcp-form-textarea/div/textarea"
-    PLAYLIST_DONE_BUTTON = '//*[@class="done-button action-button style-scope ytcp-playlist-dialog"]/*[text() = "Done"]'
+    PLAYLIST_DONE_BUTTON = '/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[2]/ytcp-button[3]/div'
     PLAYLIST_CREATE_BUTTON = (
         "/html/body/ytcp-playlist-dialog/tp-yt-paper-dialog/div[3]/ytcp-button[2]"
     )
@@ -44,10 +44,8 @@ class Constant:
         "//span[@class='video-url-fadeable style-scope ytcp-video-info']"
     )
     VIDEO_URL_ELEMENT = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-uploads-review/div[3]/ytcp-video-info/div/div[2]/div[1]/div[2]/span/a"
-    HREF = "href"
     UPLOADED = "Uploading"
     ERROR_CONTAINER = '//*[@id="error-message"]'
-    VIDEO_NOT_FOUND_ERROR = "Could not find video_id"
     DONE_BUTTON = "done-button"
     INPUT_FILE_VIDEO = "//input[@type='file']"
     USERNAME_ID = "account-name"
