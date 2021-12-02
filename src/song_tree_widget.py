@@ -194,11 +194,12 @@ class SongTreeWidget(QTreeView):
             event.ignore()
 
     def dropEvent(self, event: QDropEvent):
+        for format in event.mimeData().formats():
+            print(format, event.mimeData().data(format))
         if event.source():
             super().dropEvent(event)
         else:
             for url in event.mimeData().urls():
-
                 info = QFileInfo(url.toLocalFile())
                 if not info.isReadable():
                     logger.warning("File {} is not readable".format(info.filePath()))
@@ -220,7 +221,7 @@ class SongTreeWidget(QTreeView):
     def addAlbum(self, dir_path: str):
         songs = []
         for file_path in files_in_directory(dir_path):
-            if os.name == "nt" and len(file_path) > 255:
+            if os.name == "nt":
                 file_path = get_short_path_name(file_path)
             info = QFileInfo(file_path)
             if not info.isReadable():
@@ -238,6 +239,8 @@ class SongTreeWidget(QTreeView):
             self.addTopLevelItem(album_item)
 
     def addSong(self, path: str):
+        if os.name == "nt":
+            path = get_short_path_name(path)
         if not file_is_audio(path):
             logger.info("File {} is not audio".format(path))
             return

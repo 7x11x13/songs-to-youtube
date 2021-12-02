@@ -16,7 +16,8 @@ if os.name == "nt":
     import ctypes
     from ctypes import wintypes
 
-    _GetShortPathNameW = kernel32 = ctypes.WinDLL(
+
+    _GetShortPathNameW = ctypes.WinDLL(
         "kernel32", use_last_error=True
     ).GetShortPathNameW
     _GetShortPathNameW.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD]
