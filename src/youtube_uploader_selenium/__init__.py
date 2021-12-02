@@ -153,13 +153,23 @@ class YouTubeUploader(QObject):
             for job in self.jobs:
                 file = job["file_path"]
 
-                self.log_message.emit(f"Starting upload of {file}", logging.INFO)
+                try:
+                    self.log_message.emit(f"Starting upload of {file}", logging.INFO)
+                    self.on_progress.emit(file, 0)
+                    success = self.upload(file, job)
+                    self.upload_finished.emit(file, success)
+                    continue
+                except Exception:
+                    self.log_message.emit(traceback.format_exc(), logging.ERROR)
+                
+                # retry
+                self.log_message.emit(f"Retrying upload of {file}", logging.INFO)
                 self.on_progress.emit(file, 0)
-
                 success = self.upload(file, job)
                 self.upload_finished.emit(file, success)
+                
             self.__quit()
-        except Exception:
+        except:
             self.log_message.emit(traceback.format_exc(), logging.ERROR)
             if self.headless:
                 # take screenshot and quit
