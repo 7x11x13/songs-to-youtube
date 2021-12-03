@@ -194,8 +194,6 @@ class SongTreeWidget(QTreeView):
             event.ignore()
 
     def dropEvent(self, event: QDropEvent):
-        for format in event.mimeData().formats():
-            print(format, event.mimeData().data(format))
         if event.source():
             super().dropEvent(event)
         else:
@@ -239,7 +237,7 @@ class SongTreeWidget(QTreeView):
             self.addTopLevelItem(album_item)
 
     def addSong(self, path: str):
-        if os.name == "nt" and len(file_path) > 255:
+        if os.name == "nt" and len(path) > 255:
             path = get_short_path_name(path)
         if not file_is_audio(path):
             logger.info("File {} is not audio".format(path))
