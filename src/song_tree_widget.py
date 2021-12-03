@@ -221,7 +221,7 @@ class SongTreeWidget(QTreeView):
     def addAlbum(self, dir_path: str):
         songs = []
         for file_path in files_in_directory(dir_path):
-            if os.name == "nt":
+            if os.name == "nt" and len(file_path) > 255:
                 file_path = get_short_path_name(file_path)
             info = QFileInfo(file_path)
             if not info.isReadable():
@@ -239,7 +239,7 @@ class SongTreeWidget(QTreeView):
             self.addTopLevelItem(album_item)
 
     def addSong(self, path: str):
-        if os.name == "nt":
+        if os.name == "nt" and len(file_path) > 255:
             path = get_short_path_name(path)
         if not file_is_audio(path):
             logger.info("File {} is not audio".format(path))
