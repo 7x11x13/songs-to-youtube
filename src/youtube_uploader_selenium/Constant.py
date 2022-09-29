@@ -33,7 +33,7 @@ class Constant:
     PLAYLIST_LABEL = "//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group']]"
     TOOLTIP = "//ytcp-paper-tooltip"
     TAGS_TEXT_INPUT = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-advanced/div[3]/ytcp-form-input-container/div[1]/div[2]/ytcp-free-text-chip-bar/ytcp-chip-bar/div/input"
-    NOTIFY_SUBSCRIBERS_CHECKBOX = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-advanced/div[7]/div[4]/ytcp-checkbox-lit/div[1]"
+    NOTIFY_SUBSCRIBERS_CHECKBOX = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-advanced/div[8]/div[4]/ytcp-checkbox-lit"
     TEXTBOX = "textbox"
     TEXT_INPUT = "text-input"
     RADIO_LABEL = "radioLabel"
