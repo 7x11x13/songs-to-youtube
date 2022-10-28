@@ -44,12 +44,15 @@ class Constant:
         "//span[@class='video-url-fadeable style-scope ytcp-video-info']"
     )
     VIDEO_URL_ELEMENT = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-uploads-review/div[3]/ytcp-video-info/div/div[2]/div[1]/div[2]/span/a"
-    UPLOADED = "Uploading"
+    UPLOADED = "Checks complete"
     ERROR_CONTAINER = '//*[@id="error-message"]'
     DONE_BUTTON = "done-button"
     INPUT_FILE_VIDEO = "//input[@type='file']"
     USERNAME_ID = "account-name"
     VIDEO_PUBLISHED_DIALOG = '//*[@id="dialog-title"]'
+    AVATAR_CHANNEL_BUTTON = '//*[@id="avatar-btn"]'
+    LANGUAGE_SETTINGS_ITEM = '/html/body/ytd-app/ytd-popup-container/tp-yt-iron-dropdown/div/ytd-multi-page-menu-renderer/div[3]/div[1]/yt-multi-page-menu-section-renderer[3]/div[2]/ytd-compact-link-renderer[1]/a/tp-yt-paper-item'
+    ENGLISH_LANGUAGE_SELECTION_ITEM = '/html/body/ytd-app/ytd-popup-container/tp-yt-iron-dropdown/div/ytd-multi-page-menu-renderer/div[4]/ytd-multi-page-menu-renderer/div[3]/div[1]/yt-multi-page-menu-section-renderer/div[2]/ytd-compact-link-renderer[13]/a/tp-yt-paper-item'
 
     PROGRESS_REGEX = re.compile(r"Uploading (?P<progress>\d+)%.*")
 

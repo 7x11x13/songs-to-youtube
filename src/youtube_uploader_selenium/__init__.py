@@ -83,6 +83,18 @@ class YouTubeUploader(QObject):
         self.browser.implicitly_wait(30)
         self.cancelled = False
 
+    def __change_inferface_language(self):
+        self.log_message.emit(
+            "Attempting to change YouTube's language to English (US)",
+            logging.INFO,
+        )
+        self.browser.implicitly_wait(30)
+        self.browser.find_element_by_xpath(Constant.AVATAR_CHANNEL_BUTTON).click()
+        self.browser.implicitly_wait(10)
+        self.browser.find_element_by_xpath(Constant.LANGUAGE_SETTINGS_ITEM).click()
+        self.browser.implicitly_wait(10)
+        self.browser.find_element_by_xpath(Constant.ENGLISH_LANGUAGE_SELECTION_ITEM).click()
+
     def __validate_inputs(self, video_path, metadata_dict):
         if Constant.NOTIFY_SUBS not in metadata_dict:
             metadata_dict[Constant.NOTIFY_SUBS] = True
@@ -224,6 +236,11 @@ class YouTubeUploader(QObject):
                 self.browser.add_cookie(cookie)
 
         self.browser.get(Constant.YOUTUBE_URL)
+        try:
+            self.__change_inferface_language()
+        except Exception:
+            self.log_message.emit(traceback.format_exc(), logging.ERROR)
+
 
     def __find_playlist_checkbox_no_search(self, name):
         labels = self.browser.find_elements_by_xpath(Constant.PLAYLIST_LABEL)
@@ -498,7 +515,7 @@ class YouTubeUploader(QObject):
                 f"Upload status: {status_container.text}", logging.INFO
             )
             progress = status_container.text
-            in_process = progress.find(Constant.UPLOADED) != -1
+            in_process = progress.find(Constant.UPLOADED) == -1
             if in_process:
                 match = Constant.PROGRESS_REGEX.match(progress)
                 if match:
