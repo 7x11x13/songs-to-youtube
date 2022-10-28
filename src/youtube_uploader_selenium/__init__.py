@@ -83,7 +83,7 @@ class YouTubeUploader(QObject):
         self.browser.implicitly_wait(30)
         self.cancelled = False
 
-    def __change_inferface_language(self):
+    def __change_interface_language(self):
         self.log_message.emit(
             "Attempting to change YouTube's language to English (US)",
             logging.INFO,
@@ -237,7 +237,7 @@ class YouTubeUploader(QObject):
 
         self.browser.get(Constant.YOUTUBE_URL)
         try:
-            self.__change_inferface_language()
+            self.__change_interface_language()
         except Exception:
             self.log_message.emit(traceback.format_exc(), logging.ERROR)
 
