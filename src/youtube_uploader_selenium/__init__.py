@@ -8,15 +8,12 @@ import glob
 import json
 import logging
 import os
-# import pickle
 import posixpath
-# import re
 import shutil
 import sys
 import time
 import traceback
 import math
-# from pathlib import Path
 
 from PySide6.QtCore import *
 from selenium import webdriver
@@ -27,7 +24,6 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.action_chains import ActionChains
-
 
 from .Constant import Constant
 
@@ -104,7 +100,6 @@ class YouTubeUploader(QObject):
                     self.log_message.emit(f'Starting upload of {job["file_path"]}', logging.INFO)
                     self.on_progress.emit(job['file_path'], 0)
                     success = self.upload(job)
-
                     self.upload_finished.emit(job['file_path'], success)
                 except Exception:
                     self.log_message.emit(traceback.format_exc(), logging.ERROR)
