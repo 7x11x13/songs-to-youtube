@@ -1,11 +1,11 @@
-from enum import IntEnum
+from enum import IntEnum, auto
 
 from PySide6.QtCore import *
 
 
 class TreeWidgetType(IntEnum):
-    SONG = 0
-    ALBUM = 1
+    SONG = auto()
+    ALBUM = auto()
 
 
 class CustomDataRole(IntEnum):

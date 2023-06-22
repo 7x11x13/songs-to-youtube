@@ -8,23 +8,28 @@ import glob
 import json
 import logging
 import os
-import pickle
+# import pickle
 import posixpath
-import re
+# import re
 import shutil
 import sys
 import time
 import traceback
-from pathlib import Path
+import math
+# from pathlib import Path
 
 from PySide6.QtCore import *
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.action_chains import ActionChains
 
-from .Constant import *
+
+from .Constant import Constant
 
 
 class YouTubeLogin:
@@ -54,122 +59,60 @@ class YouTubeUploader(QObject):
     log_message = Signal(str, int)  # message, loglevel
     on_progress = Signal(str, int)  # job filename, percent done
 
-    def __init__(self, username, jobs, headless, cookies_path="") -> None:
+    def __init__(self, username, jobs, headless) -> None:
         super().__init__()
-        self.headless = headless
-        self.cookies_paths = []
-        # Optional cookies path to override username
-        # for debugging purposes
-        if cookies_path == "":
-            # find cookie files
-            dir = YouTubeLogin.get_cookie_path_from_username(username)
-            self.cookies_paths += glob.glob(posixpath.join(dir, "*youtube*.pkl"))
-            if len(self.cookies_paths) == 0:
-                self.cookies_paths += glob.glob(posixpath.join(dir, "*youtube*.json"))
-            if len(self.cookies_paths) == 0:
-                raise FileNotFoundError(
-                    f"No cookie files matching *youtube*.pkl or *youtube*.json found in {dir}"
-                )
-        else:
-            self.cookies_paths.append(cookies_path)
         self.username = username
         self.jobs = jobs
+        self.headless = headless
+        self.cancelled = False
+
         options = Options()
         options.headless = headless
         self.browser = webdriver.Firefox(
-            firefox_options=options, service_log_path=os.devnull
+            firefox_options = options,
+            service_log_path = os.path.devnull
         )
-        atexit.register(self.quit)
-        self.browser.implicitly_wait(30)
-        self.cancelled = False
+        atexit.register(self.browser.quit)
 
-    def __validate_inputs(self, video_path, metadata_dict):
-        if Constant.NOTIFY_SUBS not in metadata_dict:
-            metadata_dict[Constant.NOTIFY_SUBS] = True
-        if Constant.VIDEO_TITLE not in metadata_dict:
-            self.log_message.emit(
-                "The video title was not found in metadata", logging.WARNING
+        self.browser.get(Constant.YOUTUBE_URL)
+
+        try:
+            cookies_path = next(iter(glob.glob(posixpath.join(YouTubeLogin.get_cookie_path_from_username(username), "*youtube*.json"))))
+        except StopIteration:
+            raise FileNotFoundError(
+                f'No cookie files matching *youtube*.json found in {YouTubeLogin.get_cookie_path_from_username(username)}'
             )
-            metadata_dict[Constant.VIDEO_TITLE] = Path(video_path).stem
-            self.log_message.emit(
-                "The video title was set to {}".format(Path(video_path).stem),
-                logging.WARNING,
+
+        self.log_message.emit(f'Loading cookies from {cookies_path}', logging.DEBUG)
+        list(map(self.browser.add_cookie, json.load(open(cookies_path, 'rb'))))
+
+        self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
+
+        try:
+            WebDriverWait(self.browser, 30.0).until(
+                expected_conditions.presence_of_element_located(Constant.INPUT_FILE_VIDEO)
             )
-        for key in (Constant.VIDEO_DESCRIPTION, Constant.TAGS):
-            if key not in metadata_dict:
-                metadata_dict[key] = ""
-
-        if Constant.PLAYLIST not in metadata_dict:
-            metadata_dict[Constant.PLAYLIST] = []
-
-        title = metadata_dict[Constant.VIDEO_TITLE]
-        if len(title) > Constant.MAX_TITLE_LENGTH:
-            self.log_message.emit(
-                "Truncating title to {} characters".format(Constant.MAX_TITLE_LENGTH),
-                logging.WARNING,
-            )
-            metadata_dict[Constant.VIDEO_TITLE] = title[: Constant.MAX_TITLE_LENGTH]
-
-        description = metadata_dict[Constant.VIDEO_DESCRIPTION]
-        if len(description) > Constant.MAX_DESCRIPTION_LENGTH:
-            self.log_message.emit(
-                "Truncating description to {} characters".format(
-                    Constant.MAX_DESCRIPTION_LENGTH
-                ),
-                logging.WARNING,
-            )
-            metadata_dict[Constant.VIDEO_DESCRIPTION] = description[
-                : Constant.MAX_DESCRIPTION_LENGTH
-            ]
-
-        tags = metadata_dict[Constant.TAGS]
-        if len(tags) > Constant.MAX_TAGS_LENGTH:
-            self.log_message.emit(
-                "Truncating tags to {} characters".format(Constant.MAX_TAGS_LENGTH),
-                logging.WARNING,
-            )
-            metadata_dict[Constant.TAGS] = tags[: Constant.MAX_TAGS_LENGTH]
-
-        # youtube does not allow < and > symbols in title/description/playlists
-        # replace with fullwidth version
-        metadata_dict[Constant.VIDEO_TITLE] = (
-            metadata_dict[Constant.VIDEO_TITLE].replace("<", "＜").replace(">", "＞")
-        )
-        metadata_dict[Constant.VIDEO_DESCRIPTION] = (
-            metadata_dict[Constant.VIDEO_DESCRIPTION]
-            .replace("<", "＜")
-            .replace(">", "＞")
-        )
-        metadata_dict[Constant.PLAYLIST] = [
-            name.replace("<", "＜").replace(">", "＞")
-            for name in metadata_dict[Constant.PLAYLIST]
-        ]
-
-        metadata_dict[Constant.PLAYLIST] = set(metadata_dict[Constant.PLAYLIST])
-        metadata_dict[Constant.PLAYLIST].discard("")
+        except TimeoutException:
+            raise ValueError(f'The given cookies were either expired or invalid: {cookies_path}') from None
+        
+        self.log_message.emit(f"Logged in as {self.username}", logging.INFO)
 
     def upload_all(self):
         try:
             for job in self.jobs:
-                file = job["file_path"]
-
                 try:
-                    self.log_message.emit(f"Starting upload of {file}", logging.INFO)
-                    self.on_progress.emit(file, 0)
-                    success = self.upload(file, job)
-                    self.upload_finished.emit(file, success)
-                    continue
+                    self.log_message.emit(f'Starting upload of {job["file_path"]}', logging.INFO)
+                    self.on_progress.emit(job['file_path'], 0)
+                    success = self.upload(job)
+
+                    self.upload_finished.emit(job['file_path'], success)
                 except Exception:
                     self.log_message.emit(traceback.format_exc(), logging.ERROR)
-                
-                # retry
-                self.log_message.emit(f"Retrying upload of {file}", logging.INFO)
-                self.on_progress.emit(file, 0)
-                success = self.upload(file, job)
-                self.upload_finished.emit(file, success)
-                
-            self.__quit()
-        except:
+                    self.log_message.emit(f'Retrying upload of {job["file_path"]}', logging.INFO)
+                    self.on_progress.emit(job['file_path'], 0)
+                    success = self.upload(job)
+                    self.upload_finished.emit(job['file_path'], success)
+        except Exception:
             self.log_message.emit(traceback.format_exc(), logging.ERROR)
             if self.headless:
                 # take screenshot and quit
@@ -184,240 +127,75 @@ class YouTubeUploader(QObject):
                 )
                 self.browser.save_screenshot(path)
                 self.log_message.emit(f"Screenshot saved to {path}", logging.ERROR)
-                self.__quit()
-
-    def upload(self, video_path, metadata):
-        self.__validate_inputs(video_path, metadata)
-
-        self.log_message.emit(f"Validated inputs successfully", logging.INFO)
-        self.on_progress.emit(video_path, 5)
-
-        self.__login()
-
-        self.log_message.emit(f"Logged in as {self.username}", logging.INFO)
-        self.on_progress.emit(video_path, 10)
-
-        return self.__upload(video_path, metadata)
-
-    def __login(self):
-        self.browser.get(Constant.YOUTUBE_URL)
-
+        self.browser.quit()
+    
+    def await_element(self, locator, condition='present', ret=True, timeout=30.0, s=0, parent=None):
         try:
-            self.browser.implicitly_wait(5)
-            self.browser.find_element_by_xpath(Constant.USER_AVATAR_XPATH)
-            self.browser.implicitly_wait(30)
-            return  # already logged in
-        except:
-            pass
-
-        self.__wait()
-        for cookie_path in self.cookies_paths:
-            self.log_message.emit(f"Loading cookies from {cookie_path}", logging.DEBUG)
-            with open(cookie_path, "rb") as f:
-                if cookie_path.endswith("json"):
-                    cookies = json.load(f)
-                elif cookie_path.endswith("pkl"):
-                    cookies = pickle.load(f)
-                else:
-                    raise TypeError(f"File {cookie_path} is not a json or pkl file")
-            for cookie in cookies:
-                self.browser.add_cookie(cookie)
-
-        self.browser.get(Constant.YOUTUBE_URL)
-
-    def __find_playlist_checkbox_no_search(self, name):
-        labels = self.browser.find_elements_by_xpath(Constant.PLAYLIST_LABEL)
-        if not labels:
-            return None
-        for element in labels:
-            name_element = element.find_element_by_xpath(
-                ".//span/span[@class='label label-text style-scope ytcp-checkbox-group']"
+            WebDriverWait([self.browser, parent][bool(parent)], timeout).until(
+                {
+                    'present': expected_conditions.presence_of_element_located,
+                    'clickable': expected_conditions.element_to_be_clickable,
+                    'stale': expected_conditions.staleness_of,
+                    'visible': expected_conditions.visibility_of_element_located,
+                }[condition](locator)
             )
-            # if playlist has zero width space, this will not find the checkbox
-            # might also need to replace u200c
-            if name_element.text == name.replace("\u200b", ""):
-                return element.find_element_by_xpath(".//ytcp-checkbox-lit")
-        return None
+        except TimeoutException:
+            NoSuchElementException(f'Could not find {next(k for k,v in Constant.__dict__.items() if v == locator)}')
+        if ret:
+            return [self.browser, parent][bool(parent)].__getattribute__('find_element' + ['', 's'][s])(*locator)
 
-    def __find_playlist_checkbox(self, name):
-        try:
-            checkbox = self.__find_playlist_checkbox_no_search(name)
 
-            if not checkbox:
-                # sometimes a newly created playlist will not show up in the list of playlists
-                # we can search for it to update the list
-                search = self.__find(By.XPATH, Constant.PLAYLIST_SEARCH)
+    def upload(self, metadata):
+        ltgt = lambda x: x.replace("<", "＜").replace(">", "＞")
+        metadata['title'] = ltgt(metadata['title'][:Constant.MAX_TITLE_LENGTH])
+        metadata['description'] = ltgt(metadata['description'][:Constant.MAX_DESCRIPTION_LENGTH])
+        metadata['tags'] = metadata['tags'][:Constant.MAX_TAGS_LENGTH]
+        metadata['playlist'] = list(map(ltgt, metadata['playlist']))
+        self.log_message.emit(f"Validated inputs successfully", logging.INFO)
+        self.on_progress.emit(metadata['file_path'], 10)
 
-                if not search:
-                    # we do not have a search bar, meaning all the playlists are loaded
-                    return None
+        if not self.browser.current_url == Constant.YOUTUBE_UPLOAD_URL:
+            self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
 
-                # search behaves weird with opening brackets / parentheses,
-                # possibly other characters as well
-                # need to investigate this further:
-                # Uncaught SyntaxError: unterminated character class
-                # Uncaught SyntaxError: unterminated parenthetical
-                phrases = re.split(r"[\[(]", name)
-                phrases.sort(key=lambda p: len(p))
-                search.click()
-                self.__wait()
-                search.clear()
-                self.__wait()
-                search.send_keys(phrases[-1])
-                checkbox = self.__find_playlist_checkbox_no_search(name)
-            return checkbox
-
-        except Exception as e:
-            return None
-
-    def __find(self, by, constant, parent=None):
-        if parent is None:
-            try:
-                element = self.browser.find_element(by, constant)
-            except NoSuchElementException:
-                element = None
-        else:
-            try:
-                element = parent.find_element(by, constant)
-            except NoSuchElementException:
-                element = None
-        if not element:
-            raise Exception(f"Could not find {Constant.lookup(constant)}")
-        return element
-
-    def __wait(self):
-        time.sleep(Constant.USER_WAITING_TIME)
-
-    def __upload(self, video_path, metadata_dict):
-        self.browser.get(Constant.YOUTUBE_URL)
-        self.__wait()
-        self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
-        self.__wait()
-        absolute_video_path = str(Path.cwd() / video_path)
-        self.__find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(absolute_video_path)
+        # upload the video
+        input = self.await_element(Constant.INPUT_FILE_VIDEO)
+        input.send_keys(os.path.abspath(metadata['file_path']))
 
         self.log_message.emit(f"Uploaded video file", logging.INFO)
-        self.on_progress.emit(video_path, 15)
+        self.on_progress.emit(metadata['file_path'], 15)
 
-        self.__wait()
-        title_field = self.__find(By.ID, Constant.TEXTBOX)
-        title_field.click()
-        self.__wait()
-        if sys.platform == "darwin":
-            title_field.send_keys(Keys.COMMAND + "a")
-        else:
-            title_field.send_keys(Keys.CONTROL + "a")
-        self.__wait()
-        title_field.send_keys(metadata_dict[Constant.VIDEO_TITLE])
+        self.await_element(input, 'stale', ret=False)
+
+        # clear and fill the title field
+        title = self.await_element(Constant.TEXTBOX, 'visible')
+        time.sleep(0.1)
+        title.click()
+        title.send_keys([Keys.CONTROL, Keys.COMMAND][sys.platform == 'darwin'] + 'a')
+        title.send_keys(metadata['title'])
 
         self.log_message.emit(
-            f"Set video title to {metadata_dict[Constant.VIDEO_TITLE]}", logging.INFO
+            f"Set video title to {metadata['title']}", logging.INFO
         )
-        self.on_progress.emit(video_path, 20)
+        self.on_progress.emit(metadata['file_path'], 20)
 
-        video_description = metadata_dict[Constant.VIDEO_DESCRIPTION]
-        tags = metadata_dict[Constant.TAGS]
-        playlists = metadata_dict[Constant.PLAYLIST]
-        notify_subs = metadata_dict[Constant.NOTIFY_SUBS]
-
-        if video_description:
-            description_container = self.__find(
-                By.XPATH, Constant.DESCRIPTION_CONTAINER
-            )
-            description_field = self.__find(
-                By.ID, Constant.TEXTBOX, parent=description_container
-            )
-            description_field.click()
-            self.__wait()
-            description_field.clear()
-            self.__wait()
-            description_field.send_keys(video_description)
+        # if there is a description fill the field
+        if metadata['description']:
+            self.browser.switch_to.active_element.send_keys(Keys.TAB)  # focus on ? in desc
+            self.browser.switch_to.active_element.send_keys(Keys.TAB)  # focus on desc
+            self.browser.switch_to.active_element.send_keys(metadata['description'])
 
             self.log_message.emit(
-                f"Set video description to {video_description}", logging.INFO
+                f"Set video description to {metadata['description']}", logging.INFO
             )
 
-        self.on_progress.emit(video_path, 25)
+        self.on_progress.emit(metadata['file_path'], 25)
 
-        if playlists:
-            for i, playlist in enumerate(playlists):
-                self.__find(By.XPATH, Constant.PLAYLIST_CONTAINER).click()
-                self.__wait()
-                checkbox = self.__find_playlist_checkbox(playlist)
-                if checkbox is None:
-                    self.log_message.emit(
-                        "Could not find playlist checkbox, attempting to create new playlist",
-                        logging.INFO,
-                    )
-                    # clear search so we can create new playlist
-                    try:
-                        self.__wait()
-                        self.__find(
-                            By.XPATH, Constant.PLAYLIST_SEARCH_CLEAR_BUTTON
-                        ).click()
-                    except:
-                        # we don't have a search bar for playlists, so just ignore
-                        pass
-                    self.__wait()
-                    playlist_new_button = self.__find(
-                        By.XPATH, Constant.PLAYLIST_NEW_BUTTON
-                    )
-                    self.__wait()
-                    playlist_new_button.click()
-                    self.__wait()
-                    playlist_new_button_create = self.__find(
-                        By.XPATH, Constant.PLAYLIST_NEW_BUTTON_CREATE
-                    )
-                    playlist_new_button_create.click()
-                    self.__wait()
-                    playlist_title = self.__find(By.XPATH, Constant.PLAYLIST_NEW_TITLE)
-                    playlist_title.click()
-                    self.__wait()
-                    playlist_title.send_keys(playlist)
-                    self.__wait()
-
-                    # Set playlist visibility
-                    self.__find(By.XPATH, Constant.PLAYLIST_VISIBILITY_DROPDOWN).click()
-                    self.__wait()
-                    playlist_visibility = self.browser.find_element_by_xpath(
-                        '//*[@test-id="{}"]'.format(metadata_dict["visibility"])
-                    )
-                    if playlist_visibility is None:
-                        raise Exception(
-                            f"Could not find playlist visibility option {metadata_dict['visibility']}"
-                        )
-                    playlist_visibility.click()
-                    self.__wait()
-
-                    self.__find(By.XPATH, Constant.PLAYLIST_CREATE_BUTTON).click()
-
-                    self.log_message.emit(
-                        f"Created new playlist {playlist}", logging.INFO
-                    )
-
-                    self.__wait()
-                    checkbox = self.__find_playlist_checkbox(playlist)
-
-                self.on_progress.emit(
-                    video_path, 25 + (35 - 25) / (2 * len(playlists)) * (2 * i + 1)
-                )
-
-                if checkbox is None:
-                    raise Exception(f"Could not find playlist: {playlist}")
-                else:
-                    checkbox.click()
-                    self.__wait()
-                    self.__find(By.XPATH, Constant.PLAYLIST_DONE_BUTTON).click()
-
-                    self.log_message.emit(f"Selected playlist {playlist}", logging.INFO)
-                    self.on_progress.emit(
-                        video_path, 25 + (35 - 25) / (2 * len(playlists)) * (2 * i + 2)
-                    )
-
-                    self.__wait()
-
+        # if metadata['playlist']:
+        #     raise NotImplementedError()
+            # for i, playlist in enumerate(metadata['playlist']):
+        
         # hide tooltips which can obscure buttons
-        tooltips = self.browser.find_elements_by_xpath(Constant.TOOLTIP)
+        tooltips = self.await_element(Constant.TOOLTIP, s=1)
         if tooltips is not None:
             for element in tooltips:
                 try:
@@ -426,125 +204,64 @@ class YouTubeUploader(QObject):
                     )
                 except:
                     pass
-
-        if tags or not notify_subs:
-            self.log_message.emit(f"Setting extra options", logging.INFO)
-            self.__find(By.XPATH, Constant.MORE_OPTIONS_CONTAINER).click()
-            self.__wait()
-            if tags:
-                self.__find(By.XPATH, Constant.TAGS_TEXT_INPUT).send_keys(tags)
-                self.__wait()
-
-                self.log_message.emit(f"Set tags playlist {tags}", logging.INFO)
-
-            self.on_progress.emit(video_path, 40)
-
-            if not notify_subs:
-                self.__find(By.XPATH, Constant.NOTIFY_SUBSCRIBERS_CHECKBOX).click()
-                self.__wait()
-
-                self.log_message.emit(
-                    f"Disabled subscriber notifications", logging.INFO
-                )
-
-            self.on_progress.emit(video_path, 45)
-
-        self.__wait()
-
-        kids_section = self.__find(By.XPATH, Constant.NOT_MADE_FOR_KIDS)
-
-        self.browser.execute_script(
-            'arguments[0].scrollIntoView({block: "center", inline: "center"});',
-            kids_section,
-        )
-        self.__wait()
-        self.__find(By.ID, Constant.RADIO_LABEL, kids_section).click()
-
+        
+        # "scroll" down
+        for _ in range(15):
+            ActionChains(self.browser).send_keys(Keys.TAB).perform()
+        self.await_element(Constant.RADIO_LABEL, parent=self.await_element(Constant.NOT_MADE_FOR_KIDS)).click()
         self.log_message.emit(f"Selected not made for kids label", logging.INFO)
-        self.on_progress.emit(video_path, 50)
-        self.__wait()
-
-        self.__find(By.ID, Constant.NEXT_BUTTON).click()
-
-        self.log_message.emit(f"Clicked next", logging.INFO)
-        self.on_progress.emit(video_path, 55)
-        self.__wait()
+        self.on_progress.emit(metadata['file_path'], 50)
 
         # Video elements
-        self.__find(By.ID, Constant.NEXT_BUTTON).click()
-
+        self.await_element(Constant.NEXT_BUTTON).click()
         self.log_message.emit(f"Clicked next", logging.INFO)
-        self.on_progress.emit(video_path, 60)
-        self.__wait()
+        self.on_progress.emit(metadata['file_path'], 55)
+
+        self.await_element(Constant.NEXT_BUTTON).click()
+        self.log_message.emit(f"Clicked next", logging.INFO)
+        self.on_progress.emit(metadata['file_path'], 60)
 
         # Checks
-        self.__find(By.ID, Constant.NEXT_BUTTON).click()
-
+        self.await_element(Constant.NEXT_BUTTON).click()
         self.log_message.emit(f"Clicked next", logging.INFO)
-        self.on_progress.emit(video_path, 65)
-        self.__wait()
+        self.on_progress.emit(metadata['file_path'], 65)
 
-        visibility_button = self.browser.find_element(
-            By.NAME, metadata_dict["visibility"]
-        )
-        visibility_button.find_element(By.ID, Constant.RADIO_LABEL).click()
-
+        self.await_element(Constant.RADIO_LABEL, parent=self.await_element((By.NAME, metadata['visibility']))).click()
         self.log_message.emit(
-            f"Made the video {metadata_dict['visibility']}", logging.INFO
+            f"Made the video {metadata['visibility']}", logging.INFO
         )
-        self.on_progress.emit(video_path, 70)
-        self.__wait()
+        self.on_progress.emit(metadata['file_path'], 70)
 
-        while True:
-            status_container = self.browser.find_element_by_xpath(
-                Constant.STATUS_CONTAINER
-            )
-            self.log_message.emit(
-                f"Upload status: {status_container.text}", logging.INFO
-            )
-            progress = status_container.text
-            in_process = progress.find(Constant.UPLOADED) != -1
-            if in_process:
-                match = Constant.PROGRESS_REGEX.match(progress)
-                if match:
-                    percent = match.group("progress")
-                    if not percent:
-                        self.log_message.emit(
-                            f"Could not find progress in string {progress}",
-                            logging.WARNING,
-                        )
-                    else:
-                        self.on_progress.emit(
-                            video_path, 70 + int((95 - 70) * int(percent) / 100)
-                        )
-                self.__wait()
-            else:
-                break
+        # poll the upload % until not uploading
+        while (progress := self.await_element(Constant.STATUS_CONTAINER).text).find('Uploading') != -1:
+            match = Constant.PROGRESS_REGEX.match(progress)
+            if match:
+                percent = match.group("progress")
+                if not percent:
+                    self.log_message.emit(
+                        f"Could not find progress in string {progress}",
+                        logging.WARNING,
+                    )
+                else:
+                    self.on_progress.emit(
+                        metadata['file_path'], 70 + int((95 - 70) * int(percent) / 100)
+                    )
+            time.sleep(0.5)
 
         self.log_message.emit(f"Video fully uploaded", logging.INFO)
-        self.on_progress.emit(video_path, 95)
+        self.on_progress.emit(metadata['file_path'], 95)
 
-        done_button = self.__find(By.ID, Constant.DONE_BUTTON)
+        done_button = self.await_element(Constant.DONE_BUTTON)
 
-        # Catch such error as
-        # "File is a duplicate of a video you have already uploaded"
-        if done_button.get_attribute("aria-disabled") == "true":
-            error_message = self.__find(By.XPATH, Constant.ERROR_CONTAINER).text
-            self.log_message(error_message, logging.ERROR)
+        if done_button.get_attribute('aria-disabled') == 'true': # o.0
+            self.log_message.emit(self.await_element(Constant.ERROR_CONTAINER).text, logging.ERROR)
             return False
-
+        
         done_button.click()
-        self.log_message.emit(f"Uploaded video {video_path}", logging.SUCCESS)
+        self.log_message.emit(f"Uploaded video {metadata['file_path']}", logging.SUCCESS)
+
         # wait for youtube to save the video info
-        while self.__find(By.XPATH, Constant.VIDEO_PUBLISHED_DIALOG) is None:
-            self.__wait()
+        self.await_element(Constant.VIDEO_PUBLISHED_DIALOG, timeout=math.inf, ret=False)
 
-        self.on_progress.emit(video_path, 100)
-
+        self.on_progress.emit(metadata['file_path'], 100)
         return True
-
-    def __quit(self):
-        self.browser.quit()
-
-    def quit(self):
-        self.__quit()
