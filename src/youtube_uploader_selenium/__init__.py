@@ -24,6 +24,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.firefox.service import Service
 
 from .Constant import Constant
 
@@ -64,9 +65,11 @@ class YouTubeUploader(QObject):
 
         options = Options()
         options.headless = headless
+
+        service = Service()
+        service.log_path = os.devnull
         self.browser = webdriver.Firefox(
-            firefox_options = options,
-            service_log_path = os.path.devnull
+            options, service
         )
         atexit.register(self.browser.quit)
 
@@ -185,8 +188,8 @@ class YouTubeUploader(QObject):
 
         self.on_progress.emit(metadata['file_path'], 25)
 
-        if metadata['playlist'] in ([], ['']):
-            raise NotImplementedError('playlists')
+        # if metadata['playlist'] in ([], ['']):
+            # raise NotImplementedError('playlists')
 
         # hide tooltips which can obscure buttons
         tooltips = self.await_element(Constant.TOOLTIP, s=1)
@@ -227,35 +230,22 @@ class YouTubeUploader(QObject):
         self.on_progress.emit(metadata['file_path'], 70)
 
         # poll the upload % until not uploading
-        while (progress := self.await_element(Constant.STATUS_CONTAINER).text).find('Uploading') != -1:
-            match = Constant.PROGRESS_REGEX.match(progress)
-            if match:
-                percent = match.group("progress")
-                if not percent:
-                    self.log_message.emit(
-                        f"Could not find progress in string {progress}",
-                        logging.WARNING,
-                    )
-                else:
-                    self.on_progress.emit(
-                        metadata['file_path'], 70 + int((95 - 70) * int(percent) / 100)
-                    )
-            time.sleep(0.5)
+        while 'Uploading' in self.await_element(Constant.STATUS_CONTAINER).text:
+            time.sleep(1)
 
         self.log_message.emit(f"Video fully uploaded", logging.INFO)
         self.on_progress.emit(metadata['file_path'], 95)
 
-        done_button = self.await_element(Constant.DONE_BUTTON)
+        done = self.await_element(Constant.DONE_BUTTON, 'clickable')
+        #poll until done button is clickable (is blue)
+        while done.value_of_css_property('background-color') != 'rgb(62, 166, 255)':
+            time.sleep(1)
+        done.click()
 
-        if done_button.get_attribute('aria-disabled') == 'true': # o.0
-            self.log_message.emit(self.await_element(Constant.ERROR_CONTAINER).text, logging.ERROR)
-            return False
-        
-        done_button.click()
         self.log_message.emit(f"Uploaded video {metadata['file_path']}", logging.SUCCESS)
 
         # wait for youtube to save the video info
-        self.await_element(Constant.VIDEO_PUBLISHED_DIALOG, timeout=math.inf, ret=False)
+        self.await_element(Constant.VIDEO_PUBLISHED_DIALOG, timeout=180, ret=False)
 
         self.on_progress.emit(metadata['file_path'], 100)
         return True
