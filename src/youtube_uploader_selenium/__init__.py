@@ -59,7 +59,7 @@ class YouTubeUploader(QObject):
     log_message = Signal(str, int)  # message, loglevel
     on_progress = Signal(str, int)  # job filename, percent done
 
-    def __init__(self, username, jobs, headless) -> None:
+    def __init__(self, username, jobs, headless):
         super().__init__()
         self.username = username
         self.jobs = jobs
@@ -190,10 +190,9 @@ class YouTubeUploader(QObject):
 
         self.on_progress.emit(metadata['file_path'], 25)
 
-        # if metadata['playlist']:
-        #     raise NotImplementedError()
-            # for i, playlist in enumerate(metadata['playlist']):
-        
+        if metadata['playlist'] in ([], ['']):
+            raise NotImplementedError('playlists')
+
         # hide tooltips which can obscure buttons
         tooltips = self.await_element(Constant.TOOLTIP, s=1)
         if tooltips is not None:

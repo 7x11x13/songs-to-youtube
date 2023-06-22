@@ -10,26 +10,27 @@ class Constant:
     MAX_DESCRIPTION_LENGTH = 5000
     MAX_TAGS_LENGTH = 500
 
-    INPUT_FILE_VIDEO = (By.XPATH, '//input[@type="file"]')
+    INPUT_FILE_VIDEO = By.XPATH, '//input[@type="file"]'
 
-    DESCRIPTION_CONTAINER = (By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[2]/ytcp-video-description/div/ytcp-social-suggestions-textbox")
-    TEXTBOX = (By.ID, "textbox")
-    UPLOAD_URL = (By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/ytcp-video-metadata-editor-sidepanel/ytcp-video-info/div/div[2]/div[1]/div[2]/span/a")
-    TOOLTIP = (By.XPATH, "//ytcp-paper-tooltip")
+    DESCRIPTION_CONTAINER = By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[2]/ytcp-video-description/div/ytcp-social-suggestions-textbox"
+    TEXTBOX = By.ID, "textbox"
+    UPLOAD_URL = By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/ytcp-video-metadata-editor-sidepanel/ytcp-video-info/div/div[2]/div[1]/div[2]/span/a"
+    TOOLTIP = By.XPATH, "//ytcp-paper-tooltip"
 
-    MORE_OPTIONS_CONTAINER = (By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/div/ytcp-button/div")
-    NOTIFY_SUBSCRIBERS_CHECKBOX = (By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-advanced/div[7]/div[4]/ytcp-checkbox-lit")
-    NOT_MADE_FOR_KIDS = By.NAME, 'VIDEO_MADE_FOR_KIDS_NOT_MFK'
+    MORE_OPTIONS_CONTAINER = By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/div/ytcp-button/div"
+    NOTIFY_SUBSCRIBERS_CHECKBOX = By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-advanced/div[7]/div[4]/ytcp-checkbox-lit"
+    NOT_MADE_FOR_KIDS = By.NAME, "VIDEO_MADE_FOR_KIDS_NOT_MFK"
 
     NEXT_BUTTON = By.ID, "next-button"
     TAGS_TEXT_INPUT = By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-advanced/div[3]/ytcp-form-input-container/div[1]/div[2]/ytcp-free-text-chip-bar/ytcp-chip-bar/div/input"
     RADIO_LABEL = By.ID, "radioLabel"
 
     STATUS_CONTAINER = By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[2]/div/div[1]/ytcp-video-upload-progress/span"
-    PROGRESS_REGEX = re.compile(r"Uploading (?P<progress>\d+)%.*")
     DONE_BUTTON = By.ID, "done-button"
     ERROR_CONTAINER = By.XPATH, '//*[@id="error-message"]'
     VIDEO_PUBLISHED_DIALOG = By.XPATH, '//*[@id="dialog-title"]'
+    
+    PROGRESS_REGEX = re.compile(r"Uploading (?P<progress>\d+)%.*")
 
 # DESCRIPTION_CONTAINER = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[2]/ytcp-video-description/div/ytcp-social-suggestions-textbox"
 # PLAYLIST_CONTAINER = "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[4]/div[3]/div[1]/ytcp-video-metadata-playlists/ytcp-text-dropdown-trigger/ytcp-dropdown-trigger/div/div[2]/span"
