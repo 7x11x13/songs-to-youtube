@@ -64,6 +64,17 @@ class YouTubeUploader(QObject):
         self.jobs = jobs
         self.headless = headless
 
+        
+        self.upload_finished.connect(
+            lambda file_path, success: self.upload_finished.emit(file_path, success)
+        )
+        self.log_message.connect(
+            lambda message, level: self.log_message.emit(message, level)
+        )
+        self.on_progress.connect(
+            lambda job_name, progress: self.on_progress.emit(job_name, progress)
+        )
+
         options = Options()
         options.headless = headless
 
@@ -304,15 +315,14 @@ class YouTubeUploader(QObject):
             # "scroll" down
             for _ in range(5):
                 ActionChains(self.browser).send_keys(Keys.TAB).perform()
-            self.await_element(self.await_element(self.browser, Constant.NOT_MADE_FOR_KIDS), Constant.RADIO_LABEL).click()
 
+            self.await_element(self.await_element(self.browser, Constant.NOT_MADE_FOR_KIDS), Constant.RADIO_LABEL).click()
             self.log_message.emit('Selected not made for kids label', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 50)
 
             if any((not metadata['notify_subs'], metadata['tags'])):
 
                 self.log_message.emit('Setting extra options', logging.INFO)
-                # self.on_progress.emit(metadata['file_path'], 60)
 
                 self.await_element(self.browser, Constant.SHOW_MORE).click()
 
@@ -361,7 +371,7 @@ class YouTubeUploader(QObject):
             self.log_message.emit('Video fully uploaded', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 95)
 
-            done = self.await_element(self.browser, Constant.DONE_BUTTON, 'clickable', timeout=5.0)
+            done = self.await_element(self.browser, Constant.DONE_BUTTON, 'clickable', timeout=10.0)
             
             #poll until done button is clickable (is blue)
             while done.value_of_css_property('background-color') != 'rgb(62, 166, 255)':
