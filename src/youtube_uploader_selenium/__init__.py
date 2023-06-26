@@ -106,13 +106,6 @@ class YouTubeUploader(QObject):
                     success = self.upload(job)
                     self.upload_finished.emit(job['file_path'], success)
                 except Exception:
-                    # try:
-                    #     e = self.browser.find_element(*Constant.ERR)
-                    #     if e.is_displayed():
-                    #         raise YouTubeException(e.text)
-                    #     else:
-                    #         raise NoSuchElementException()
-                    # except NoSuchElementException:
                     self.log_message.emit(traceback.format_exc(), logging.ERROR)
                     self.log_message.emit(f'Retrying upload of {job["file_path"]}', logging.INFO)
                     self.on_progress.emit(job['file_path'], 0)
@@ -153,6 +146,22 @@ class YouTubeUploader(QObject):
             return parent.__getattribute__('find_element' + ('', 's')[s])(*locator)
 
     def upload(self, metadata):
+        if len(metadata['title']) > Constant.MAX_TITLE_LENGTH:
+            self.log_message.emit(
+                f'Truncating title to {Constant.MAX_TITLE_LENGTH} characters',
+                logging.WARNING
+            )
+        if len(metadata['description']) > Constant.MAX_DESCRIPTION_LENGTH:
+            self.log_message.emit(
+                f'Truncating description to {Constant.MAX_DESCRIPTION_LENGTH} characters',
+                logging.WARNING
+            )
+        if len(metadata['tags']) > Constant.MAX_TAGS_LENGTH:
+            self.log_message.emit(
+                f'Truncating tags to {Constant.MAX_TAGS_LENGTH} characters',
+                logging.WARNING
+            )
+
         ltgt = lambda x: x.replace("<", "＜").replace(">", "＞")
         metadata['title'] = ltgt(metadata['title'][:Constant.MAX_TITLE_LENGTH])
         metadata['description'] = ltgt(metadata['description'][:Constant.MAX_DESCRIPTION_LENGTH])
