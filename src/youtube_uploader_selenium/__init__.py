@@ -63,18 +63,7 @@ class YouTubeUploader(QObject):
         self.username = username
         self.jobs = jobs
         self.headless = headless
-
         
-        self.upload_finished.connect(
-            lambda file_path, success: self.upload_finished.emit(file_path, success)
-        )
-        self.log_message.connect(
-            lambda message, level: self.log_message.emit(message, level)
-        )
-        self.on_progress.connect(
-            lambda job_name, progress: self.on_progress.emit(job_name, progress)
-        )
-
         options = Options()
         options.headless = headless
 
