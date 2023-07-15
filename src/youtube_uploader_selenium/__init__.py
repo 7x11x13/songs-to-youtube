@@ -337,17 +337,17 @@ class YouTubeUploader(QObject):
             self.on_progress.emit(metadata['file_path'], 55)
 
             # Video elements (2/4)
-            self.await_element(self.browser, Constant.NEXT_BUTTON).click()
+            self.click_next()
             self.log_message.emit('Clicked next', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 57)
 
             # (3/4)
-            self.await_element(self.browser, Constant.NEXT_BUTTON).click()
+            self.click_next()
             self.log_message.emit('Clicked next', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 59)
 
             # Checks (4/4)
-            self.await_element(self.browser, Constant.NEXT_BUTTON).click()
+            self.click_next()
             self.log_message.emit('Clicked next', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 61)
 
