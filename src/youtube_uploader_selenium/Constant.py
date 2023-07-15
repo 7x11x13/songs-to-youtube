@@ -30,6 +30,7 @@ class Constant:
     TAGS_CONTAINER = By.ID, 'tags-container'
     NOTIFY_SUBS = By.ID, 'notify-subscribers'
     NEXT_BUTTON = By.ID, "next-button"
+    NEXT_BUTTON_2 = By.XPATH, '/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[2]/div/div[2]'
     PRIVACY_RADIOS = By.ID, 'privacy-radios'
     STATUS_CONTAINER = By.XPATH, "/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[2]/div/div[1]/ytcp-video-upload-progress/span"
     DONE_BUTTON = By.ID, "done-button"

@@ -128,6 +128,12 @@ class YouTubeUploader(QObject):
                 self.browser.save_screenshot(path)
                 self.log_message.emit(f"Screenshot saved to {path}", logging.ERROR)
         self.browser.quit()
+
+    def click_next(self):
+        try:
+            self.await_element(self.browser, Constant.NEXT_BUTTON, 'clickable').click()
+        except ElementClickInterceptedException:
+            self.await_element(self.browser, Constant.NEXT_BUTTON_2, 'clickable').click()
     
     def await_element(self, parent, locator, condition='present', ret=True, timeout=30.0, s=0):
         try:
