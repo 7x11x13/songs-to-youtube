@@ -110,7 +110,7 @@ class YouTubeUploader(QObject):
 
         try:
             WebDriverWait(self.browser, 30.0).until(
-                lambda b: b.current_url.startswith(Constant.YOUTUBE_UPLOAD_LOADED)
+                lambda browser: browser.current_url.startswith(Constant.YOUTUBE_UPLOAD_LOADED)
             )
         except TimeoutException:
             raise ValueError(f'The given cookies were either expired or invalid: {cookies_path}') from None
@@ -148,28 +148,6 @@ class YouTubeUploader(QObject):
                 self.browser.save_screenshot(path)
                 self.log_message.emit(f"Screenshot saved to {path}", logging.ERROR)
         self.browser.quit()
-
-    def click_next(self):
-        try:
-            await_element(self.browser, Constant.NEXT_BUTTON, 'clickable').click()
-        except ElementClickInterceptedException:
-            await_element(self.browser, Constant.NEXT_BUTTON_2, 'clickable').click()
-    
-    def await_element(self, parent, locator, condition='present', ret=True, timeout=30.0, s=0):
-        try:
-            WebDriverWait(parent, timeout).until(
-                {
-                    'present': expected_conditions.presence_of_element_located,
-                    'clickable': expected_conditions.element_to_be_clickable,
-                    'stale': expected_conditions.staleness_of,
-                    'visible': expected_conditions.visibility_of_element_located,
-                    'invisible': expected_conditions.invisibility_of_element_located
-                }[condition](locator)
-            )
-        except TimeoutException:
-            raise NoSuchElementException(locator)
-        if ret:
-            return parent.__getattribute__('find_element' + ('', 's')[s])(*locator)
 
     def upload(self, metadata):
         if len(metadata['title']) > Constant.MAX_TITLE_LENGTH:
@@ -357,17 +335,17 @@ class YouTubeUploader(QObject):
             self.on_progress.emit(metadata['file_path'], 55)
 
             # Video elements (2/4)
-            self.click_next()
+            await_element(self.browser, Constant.NEXT_BUTTON, 'clickable').click()
             self.log_message.emit('Clicked next', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 57)
 
             # (3/4)
-            self.click_next()
+            await_element(self.browser, Constant.NEXT_BUTTON, 'clickable').click()
             self.log_message.emit('Clicked next', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 59)
 
             # Checks (4/4)
-            self.click_next()
+            await_element(self.browser, Constant.NEXT_BUTTON, 'clickable').click()
             self.log_message.emit('Clicked next', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 61)
 
