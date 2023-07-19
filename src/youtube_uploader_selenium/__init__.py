@@ -357,9 +357,9 @@ class YouTubeUploader(QObject):
 
             # poll the upload % until not uploading
             status = await_element(self.browser, Constant.STATUS_CONTAINER)
-            # the first digit in the string 3 or 2 or 1 chars long
-            get_digit = re.compile('^\d{3}|^\d{2}|^\d{1}')
-            for _ in range(300):
+            # the first digit in the string 1 to 3 chars long
+            get_digit = re.compile('^\d{1,3}')
+            for _ in range(1000): # 0.3 * 1000 = 300 seconds until timeout
                 time.sleep(0.3)
                 if 'Uploading' in status.text:
                     break
@@ -371,6 +371,8 @@ class YouTubeUploader(QObject):
                     )
                 except TypeError: # float(None)
                     pass
+            else:
+                raise TimeoutError(repr(status))
             
             self.log_message.emit('Video fully uploaded', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 95)
