@@ -94,14 +94,12 @@ class YouTubeUploader(QObject):
 
         self.browser.get(Constant.YOUTUBE_URL)
 
-        cookies_path = "C:\\Users\\Administrator\\AppData\\Roaming\\7x11x13\\songs-to-youtube\\cookies\\nwya\\youtube.com.json"
-        assert os.path.isfile(cookies_path)
-        # try:
-        #     cookies_path = next(iter(glob.glob(posixpath.join(YouTubeLogin.get_cookie_path_from_username(username), "*youtube*.json"))))
-        # except StopIteration:
-        #     raise FileNotFoundError(
-        #         f'No cookie files matching *youtube*.json found in {YouTubeLogin.get_cookie_path_from_username(username)}'
-        #     ) from None
+        try:
+            cookies_path = next(iter(glob.glob(posixpath.join(YouTubeLogin.get_cookie_path_from_username(username), "*youtube*.json"))))
+        except StopIteration:
+            raise FileNotFoundError(
+                f'No cookie files matching *youtube*.json found in {YouTubeLogin.get_cookie_path_from_username(username)}'
+            ) from None
 
         self.log_message.emit(f'Loading cookies from {cookies_path}', logging.DEBUG)
 
