@@ -3,7 +3,7 @@
     Based on https://github.com/linouk23/youtube_uploader_selenium"""
 
 import atexit
-import string
+import re
 import datetime
 import glob
 import json
@@ -29,6 +29,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from .Constant import Constant
 
 lerp = lambda p0, p1, t: p0 + ((p1 - p0) * t)
+const_fstr = lambda byval, *strargs: (byval[0], byval[1].format(*strargs))
 
 
 class YouTubeLogin:
@@ -50,6 +51,23 @@ class YouTubeLogin:
     def remove_user_cookies(username):
         cookie_folder = YouTubeLogin.get_cookie_path_from_username(username)
         shutil.rmtree(cookie_folder)
+
+
+def await_element(parent, locator, condition='present', ret=True, timeout=30.0, s=0):
+    try:
+        WebDriverWait(parent, timeout).until(
+            {
+                'present': expected_conditions.presence_of_element_located,
+                'clickable': expected_conditions.element_to_be_clickable,
+                'stale': expected_conditions.staleness_of,
+                'visible': expected_conditions.visibility_of_element_located,
+                'invisible': expected_conditions.invisibility_of_element_located
+            }[condition](locator)
+        )
+    except TimeoutException:
+        raise NoSuchElementException(locator) from None
+    if ret:
+        return parent.__getattribute__('find_element' + ('', 's')[s])(*locator)
 
 
 class YouTubeUploader(QObject):
@@ -76,15 +94,19 @@ class YouTubeUploader(QObject):
 
         self.browser.get(Constant.YOUTUBE_URL)
 
-        try:
-            cookies_path = next(iter(glob.glob(posixpath.join(YouTubeLogin.get_cookie_path_from_username(username), "*youtube*.json"))))
-        except StopIteration:
-            raise FileNotFoundError(
-                f'No cookie files matching *youtube*.json found in {YouTubeLogin.get_cookie_path_from_username(username)}'
-            )
+        cookies_path = "C:\\Users\\Administrator\\AppData\\Roaming\\7x11x13\\songs-to-youtube\\cookies\\nwya\\youtube.com.json"
+        assert os.path.isfile(cookies_path)
+        # try:
+        #     cookies_path = next(iter(glob.glob(posixpath.join(YouTubeLogin.get_cookie_path_from_username(username), "*youtube*.json"))))
+        # except StopIteration:
+        #     raise FileNotFoundError(
+        #         f'No cookie files matching *youtube*.json found in {YouTubeLogin.get_cookie_path_from_username(username)}'
+        #     ) from None
 
         self.log_message.emit(f'Loading cookies from {cookies_path}', logging.DEBUG)
-        list(map(self.browser.add_cookie, json.load(open(cookies_path, 'rb'))))
+
+        for cookie in json.load(open(cookies_path, 'rb')):
+            self.browser.add_cookie(cookie)
 
         self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
 
@@ -131,9 +153,9 @@ class YouTubeUploader(QObject):
 
     def click_next(self):
         try:
-            self.await_element(self.browser, Constant.NEXT_BUTTON, 'clickable').click()
+            await_element(self.browser, Constant.NEXT_BUTTON, 'clickable').click()
         except ElementClickInterceptedException:
-            self.await_element(self.browser, Constant.NEXT_BUTTON_2, 'clickable').click()
+            await_element(self.browser, Constant.NEXT_BUTTON_2, 'clickable').click()
     
     def await_element(self, parent, locator, condition='present', ret=True, timeout=30.0, s=0):
         try:
@@ -181,15 +203,15 @@ class YouTubeUploader(QObject):
             self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
 
             # upload the video
-            input = self.await_element(self.browser, Constant.INPUT_FILE_VIDEO)
+            input = await_element(self.browser, Constant.INPUT_FILE_VIDEO)
             input.send_keys(os.path.abspath(metadata['file_path']))
 
             self.log_message.emit('Uploaded video file', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 10)
 
             # wait until upload button is stale and title field is visible
-            self.await_element(self.browser, input, 'stale', ret=False)
-            title = self.await_element(self.browser, Constant.TEXTBOX, 'visible')
+            await_element(self.browser, input, 'stale', ret=False)
+            title = await_element(self.browser, Constant.TEXTBOX, 'visible')
             time.sleep(0.1)
 
             try:
@@ -220,20 +242,18 @@ class YouTubeUploader(QObject):
             self.on_progress.emit(metadata['file_path'], 30)
             
             if metadata['playlist']:
-                self.await_element(self.browser, Constant.PLAYLIST_DROPDOWN_TRIGGER).click()
-                playlist_ele = self.await_element(self.browser, Constant.PLAYLIST_POPUP)
+                await_element(self.browser, Constant.PLAYLIST_DROPDOWN_TRIGGER).click()
+                playlist_ele = await_element(self.browser, Constant.PLAYLIST_POPUP)
 
                 cur_playlists = []
                 c = 0
                 while 1:
                     try:
                         pp = self.browser.find_element(
-                            Constant.PLAYLIST_ITEM_TEXT[0],
-                            Constant.PLAYLIST_ITEM_TEXT[1].format(c)
+                            *const_fstr(Constant.PLAYLIST_ITEM_TEXT, c)
                         )
                         pp_checkbox = pp.parent.find_element(
-                            Constant.PLAYLIST_ITEM_CHECKBOX[0],
-                            Constant.PLAYLIST_ITEM_CHECKBOX[1].format(c)
+                            *const_fstr(Constant.PLAYLIST_ITEM_CHECKBOX, c)
                         )
                         cur_playlists.append({
                             'name': pp.text,
@@ -245,13 +265,17 @@ class YouTubeUploader(QObject):
 
                 for i, playlist in enumerate(metadata['playlist']):
                     try:
-                        index = [p['name'] for p in cur_playlists].index(playlist)  # raise valueerror
+                        index = [p['name'] for p in cur_playlists].index(playlist) # raise valueerror
+
                         assert cur_playlists[index]['checked'] == False, cur_playlists[index]['name']  # tmp
 
-                        self.await_element(
-                            self.await_element(self.browser, Constant.PLAYLIST_ITEM_TEXT(index)).parent,
-                            Constant.PLAYLIST_ITEM_CHECKBOX(index)
-                        ).click()
+                        pclick = await_element(
+                            await_element(self.browser, const_fstr(Constant.PLAYLIST_ITEM_TEXT, index)).parent,
+                            const_fstr(Constant.PLAYLIST_ITEM_CHECKBOX, index)
+                        )
+                        assert pclick.get_attribute('checked') is None
+                        pclick.click()
+
                         cur_playlists[index]['checked'] = True
                         self.log_message.emit(f'Selected playlist {playlist}', logging.INFO)
 
@@ -261,43 +285,41 @@ class YouTubeUploader(QObject):
                             logging.INFO
                         )
 
-                        self.await_element(playlist_ele, Constant.CREATE_PLAYLIST_BUTTON).click()  # new playlist
+                        await_element(playlist_ele, Constant.CREATE_PLAYLIST_BUTTON).click()  # new playlist
                         ActionChains(self.browser).send_keys(Keys.TAB).perform()
                         ActionChains(self.browser).send_keys(Keys.ENTER).perform()  # playlist
 
                         #popup 2
-                        p_name = self.await_element(self.browser, Constant.PLAYLIST_NAME, 'clickable')
+                        p_name = await_element(self.browser, Constant.PLAYLIST_NAME, 'clickable')
                         p_name.click()
                         time.sleep(0.1)
                         ActionChains(self.browser).send_keys(playlist).perform()
 
                         if metadata['visibility'] != 'PUBLIC':
                             # open visibility dropdown
-                            self.await_element(self.browser, Constant.PLAYLIST_VISIBILITY_BUTTON).click()
-                            self.await_element(
-                                self.await_element(self.browser, Constant.PLAYLIST_VISIBILITY_MENU),
-                                (
-                                    Constant.PLAYLIST_VISIBILITY_TYPE[0],
-                                    Constant.PLAYLIST_VISIBILITY_TYPE[1].format(
-                                        ['PUBLIC', 'PRIVATE', 'UNLISTED'].index(metadata['visibility'])
-                                    )
-                                )                        
+                            await_element(self.browser, Constant.PLAYLIST_VISIBILITY_BUTTON).click()
+                            await_element(
+                                await_element(self.browser, Constant.PLAYLIST_VISIBILITY_MENU),
+                                const_fstr(
+                                    Constant.PLAYLIST_VISIBILITY_TYPE,
+                                    ['PUBLIC', 'PRIVATE', 'UNLISTED'].index(metadata['visibility'])
+                                )
                             ).click()
 
-                        self.await_element(self.browser, Constant.PLAYLIST_CREATE_BUTTON).click()
-                        self.await_element(self.browser, Constant.PLAYLIST_NAME, 'invisible', ret=False)
+                        await_element(self.browser, Constant.PLAYLIST_CREATE_BUTTON).click()
+                        await_element(self.browser, Constant.PLAYLIST_NAME, 'invisible', ret=False)
                         cur_playlists.insert(0, {'name': playlist, 'checked': True})
 
                         self.log_message.emit(f'Created new playlist {playlist}', logging.INFO)
 
                     self.on_progress.emit(metadata['file_path'], round(lerp(31, 39, i / len(metadata['playlist']))))
 
-                self.await_element(self.browser, Constant.PLAYLIST_DONE).click()
+                await_element(self.browser, Constant.PLAYLIST_DONE).click()
             self.on_progress.emit(metadata['file_path'], 40)
 
 
             # hide tooltips which can obscure buttons
-            tooltips = self.await_element(self.browser, Constant.TOOLTIP, s=1)
+            tooltips = await_element(self.browser, Constant.TOOLTIP, s=1)
             if tooltips is not None:
                 for element in tooltips:
                     try:
@@ -311,7 +333,7 @@ class YouTubeUploader(QObject):
             for _ in range(5):
                 ActionChains(self.browser).send_keys(Keys.TAB).perform()
 
-            self.await_element(self.await_element(self.browser, Constant.NOT_MADE_FOR_KIDS), Constant.RADIO_LABEL).click()
+            await_element(await_element(self.browser, Constant.NOT_MADE_FOR_KIDS), Constant.RADIO_LABEL).click()
             self.log_message.emit('Selected not made for kids label', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 50)
 
@@ -319,15 +341,15 @@ class YouTubeUploader(QObject):
 
                 self.log_message.emit('Setting extra options', logging.INFO)
 
-                self.await_element(self.browser, Constant.SHOW_MORE).click()
+                await_element(self.browser, Constant.SHOW_MORE).click()
 
                 if metadata['tags']:
-                    self.await_element(self.browser, Constant.TAGS_CONTAINER).click()
+                    await_element(self.browser, Constant.TAGS_CONTAINER).click()
                     ActionChains(self.browser).send_keys(metadata['tags']).perform()
                     self.log_message.emit(f"Set tags to {metadata['tags']}", logging.INFO)
 
                 if not metadata['notify_subs']:
-                    notify = self.await_element(self.browser, Constant.NOTIFY_SUBS)
+                    notify = await_element(self.browser, Constant.NOTIFY_SUBS)
                     assert notify.get_attribute('checked') is not None  # tmp
                     notify.click()
                     self.log_message.emit(
@@ -351,33 +373,47 @@ class YouTubeUploader(QObject):
             self.log_message.emit('Clicked next', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 61)
 
-            self.await_element(self.await_element(self.browser, Constant.PRIVACY_RADIOS), (By.NAME, metadata['visibility'])).click()
+            # set video's visibility
+            await_element(await_element(self.browser, Constant.PRIVACY_RADIOS), (By.NAME, metadata['visibility'])).click()
 
             self.log_message.emit(f'Made the video {metadata["visibility"]}', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 62)
 
             # poll the upload % until not uploading
-            status = self.await_element(self.browser, Constant.STATUS_CONTAINER)
-            while 'Uploading' in status.text:
+            status = await_element(self.browser, Constant.STATUS_CONTAINER)
+            # the first digit in the string 3 or 2 or 1 chars long
+            get_digit = re.compile('^\d{3}|^\d{2}|^\d{1}')
+            for _ in range(300):
+                time.sleep(0.3)
+                if 'Uploading' in status.text:
+                    break
                 self.log_message.emit(status.text, logging.INFO)
-                self.on_progress.emit(metadata['file_path'], lerp(63, 94, int(''.join(filter(lambda x: x in string.digits, status.text))) / 100))
-                time.sleep(0.4)
-
+                try:
+                    self.on_progress.emit(
+                        metadata['file_path'],
+                        lerp(63, 94, float(get_digit.match(status.text)) / 100)
+                    )
+                except TypeError: # float(None)
+                    pass
+            
             self.log_message.emit('Video fully uploaded', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 95)
 
-            done = self.await_element(self.browser, Constant.DONE_BUTTON, 'clickable', timeout=10.0)
-            
-            #poll until done button is clickable (is blue)
-            while done.value_of_css_property('background-color') != 'rgb(62, 166, 255)':
-                time.sleep(1)
-            done.click()
 
+            done = await_element(self.browser, Constant.DONE_BUTTON, 'clickable', timeout=10.0)
+            # poll until done button is clickable (is blue)
+            for _ in range(300):
+                time.sleep(1)
+                if done.value_of_css_property('background-color') == 'rgb(62, 166, 255)':
+                    break
+            else: # never went blue
+                raise TimeoutException(repr(done))
+
+            done.click()
             self.log_message.emit(f'Uploaded video {metadata["file_path"]}', logging.INFO)
 
-            # wait for youtube to save the video info
-            self.await_element(self.browser, Constant.VIDEO_PUBLISHED_DIALOG, timeout=180, ret=False)
-
+            #wait for youtube to save the video info
+            await_element(self.browser, Constant.VIDEO_PUBLISHED_DIALOG, timeout=60, ret=False)
             self.on_progress.emit(metadata['file_path'], 100)
             return True
         except Exception:

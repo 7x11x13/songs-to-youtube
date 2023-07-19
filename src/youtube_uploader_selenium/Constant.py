@@ -1,6 +1,4 @@
-import re
 from selenium.webdriver.common.by import By
-
 class Constant:
     YOUTUBE_URL = "https://www.youtube.com"
     YOUTUBE_UPLOAD_URL = "https://www.youtube.com/upload"
@@ -12,7 +10,7 @@ class Constant:
     TEXTBOX = By.ID, "textbox"
     CALLOUT = By.XPATH, '//*[@id="callout"]'
     CALLOUT_CLOSE = By.ID, 'close-button'
-    PLAYLIST_DROPDOWN_TRIGGER = By.XPATH, '/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[6]/div[3]/div[1]/ytcp-video-metadata-playlists/ytcp-text-dropdown-trigger/ytcp-dropdown-trigger/div'
+    PLAYLIST_DROPDOWN_TRIGGER = By.XPATH, '/html/body/ytcp-uploads-dialog/tp-yt-paper-dialog/div/ytcp-animatable[1]/ytcp-ve/ytcp-video-metadata-editor/div/ytcp-video-metadata-editor-basics/div[4]/div[3]/div[1]/ytcp-video-metadata-playlists/ytcp-text-dropdown-trigger/ytcp-dropdown-trigger/div' 
     PLAYLIST_POPUP = By.CSS_SELECTOR, 'tp-yt-paper-dialog.ytcp-playlist-dialog'
     PLAYLIST_ITEM_TEXT = By.ID, 'checkbox-label-{0}'
     PLAYLIST_ITEM_CHECKBOX = By.ID, 'checkbox-{0}'
