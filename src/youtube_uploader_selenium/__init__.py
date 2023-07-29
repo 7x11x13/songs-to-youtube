@@ -368,7 +368,7 @@ class YouTubeUploader(QObject):
             # poll the upload % until not uploading
             status = await_element(self.browser, Constant.STATUS_CONTAINER)
             # the first digit in the string 1 to 3 chars long
-            get_digit = re.compile('^\d{1,3}')
+            get_digit = re.compile('\d{1,3}')
             for _ in poll(Constant.UPLOAD_TIMEOUT_SECONDS):
                 if 'Uploading' not in status.text:
                     break
@@ -377,9 +377,9 @@ class YouTubeUploader(QObject):
                 try:
                     self.on_progress.emit(
                         metadata['file_path'],
-                        round(lerp(63, 94, float(get_digit.match(status.text)) / 100))
+                        round(lerp(63, 94, float(get_digit.findall(status.text)[0]) / 100))
                     )
-                except TypeError: # float(None)
+                except IndexError:
                     pass
             else:
                 raise TimeoutException(repr(status))
