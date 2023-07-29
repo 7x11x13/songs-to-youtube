@@ -69,6 +69,16 @@ def await_element(parent, locator, condition='present', ret=True, timeout=30.0, 
     if ret:
         return parent.__getattribute__('find_element' + ('', 's')[s])(*locator)
 
+def poll(n_polls):
+    if n_polls == -1:
+        while 1:
+            time.sleep(1)
+            yield
+    else:
+        for _ in range(n_polls):
+            time.sleep(1)
+            yield
+
 
 class YouTubeUploader(QObject):
 
@@ -359,34 +369,26 @@ class YouTubeUploader(QObject):
             status = await_element(self.browser, Constant.STATUS_CONTAINER)
             # the first digit in the string 1 to 3 chars long
             get_digit = re.compile('^\d{1,3}')
-            for _ in range(1000): # 0.3 * 1000 = 300 seconds until timeout
-                time.sleep(0.3)
-                if 'Uploading' in status.text:
+            for _ in poll(Constant.UPLOAD_TIMEOUT_SECONDS):
+                if 'Uploading' not in status.text:
                     break
+
                 self.log_message.emit(status.text, logging.INFO)
                 try:
                     self.on_progress.emit(
                         metadata['file_path'],
-                        lerp(63, 94, float(get_digit.match(status.text)) / 100)
+                        round(lerp(63, 94, float(get_digit.match(status.text)) / 100))
                     )
                 except TypeError: # float(None)
                     pass
             else:
-                raise TimeoutError(repr(status))
+                raise TimeoutException(repr(status))
             
             self.log_message.emit('Video fully uploaded', logging.INFO)
             self.on_progress.emit(metadata['file_path'], 95)
 
-
             done = await_element(self.browser, Constant.DONE_BUTTON, 'clickable', timeout=10.0)
-            # poll until done button is clickable (is blue)
-            for _ in range(300):
-                time.sleep(1)
-                if done.value_of_css_property('background-color') == 'rgb(62, 166, 255)':
-                    break
-            else: # never went blue
-                raise TimeoutException(repr(done))
-
+            assert not self.browser.execute_script('return arguments[0].__data.disabled', done)
             done.click()
             self.log_message.emit(f'Uploaded video {metadata["file_path"]}', logging.INFO)
 
