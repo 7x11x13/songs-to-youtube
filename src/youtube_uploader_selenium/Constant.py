@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 class Constant:
     UPLOAD_TIMEOUT_SECONDS = 600
+    UPLOAD_BUTTON_TIMEOUT_SECONDS = 600
     YOUTUBE_URL = "https://www.youtube.com"
     YOUTUBE_UPLOAD_URL = "https://www.youtube.com/upload"
     YOUTUBE_UPLOAD_LOADED = 'https://studio.youtube.com/channel'

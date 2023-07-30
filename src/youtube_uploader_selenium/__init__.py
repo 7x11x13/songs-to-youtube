@@ -72,12 +72,12 @@ def await_element(parent, locator, condition='present', ret=True, timeout=30.0, 
 def poll(n_polls):
     if n_polls == -1:
         while 1:
-            time.sleep(1)
             yield
+            time.sleep(1)
     else:
         for _ in range(n_polls):
-            time.sleep(1)
             yield
+            time.sleep(1)
 
 
 class YouTubeUploader(QObject):
@@ -388,7 +388,11 @@ class YouTubeUploader(QObject):
             self.on_progress.emit(metadata['file_path'], 95)
 
             done = await_element(self.browser, Constant.DONE_BUTTON, 'clickable', timeout=10.0)
-            assert not self.browser.execute_script('return arguments[0].__data.disabled', done)
+            for _ in poll(Constant.UPLOAD_BUTTON_TIMEOUT_SECONDS):
+                if not self.browser.execute_script('return arguments[0].__data.disabled', done):
+                    break
+            else:
+                raise TimeoutException(repr(done))
             done.click()
             self.log_message.emit(f'Uploaded video {metadata["file_path"]}', logging.INFO)
 
