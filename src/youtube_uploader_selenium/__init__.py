@@ -389,7 +389,7 @@ class YouTubeUploader(QObject):
 
             done = await_element(self.browser, Constant.DONE_BUTTON, 'clickable', timeout=10.0)
             for _ in poll(Constant.UPLOAD_BUTTON_TIMEOUT_SECONDS):
-                if not self.browser.execute_script('return arguments[0].__data.disabled', done):
+                if self.browser.execute_script('return arguments[0].inst.__dataEnabled', done):
                     break
             else:
                 raise TimeoutException(repr(done))
