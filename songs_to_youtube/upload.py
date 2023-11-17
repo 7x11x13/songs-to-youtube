@@ -8,6 +8,7 @@ from typing import List, Tuple
 
 from PySide6.QtCore import *
 from youtube_up import Metadata as YTMetadata
+from youtube_up import Playlist as YTPlaylist
 from youtube_up import YTUploaderSession
 
 from songs_to_youtube.const import *
@@ -195,16 +196,21 @@ class Uploader(QObject):
                 file = album.get("fileOutput")
                 if file in self.render_results and self.render_results[file]:
                     album.before_upload()
-                    privacy = album.get("videoDescriptionAlbum")
+                    privacy = album.get("videoVisibilityAlbum")
                     notify_subs = (
                         album.get("notifySubsAlbum") == SETTINGS_VALUES.CheckBox.CHECKED
+                    )
+                    tags = (
+                        album.get("videoTagsAlbum").split(",")
+                        if album.get("videoTagsAlbum")
+                        else []
                     )
                     metadata = YTMetadata(
                         album.get("videoTitleAlbum"),
                         album.get("videoDescriptionAlbum"),
                         privacy,
                         False,
-                        album.get("videoTagsAlbum"),
+                        tags,
                         publish_to_feed=notify_subs,
                     )
                     self.jobs.append((file, metadata))
@@ -217,14 +223,26 @@ class Uploader(QObject):
             file = song.get("fileOutput")
             if file in self.render_results and self.render_results[file]:
                 song.before_upload()
-                privacy = song.get("videoDescription")
+                privacy = song.get("videoVisibility")
                 notify_subs = song.get("notifySubs") == SETTINGS_VALUES.CheckBox.CHECKED
+                tags = song.get("videoTags").split(",") if song.get("videoTags") else []
+                playlist_names = song.get("playlistName").split("\n")
+                playlists = [
+                    YTPlaylist(
+                        name,
+                        privacy=privacy,
+                        create_if_title_exists=False,
+                        create_if_title_doesnt_exist=True,
+                    )
+                    for name in playlist_names
+                ]
                 metadata = YTMetadata(
                     song.get("videoTitle"),
                     song.get("videoDescription"),
                     privacy,
                     False,
-                    song.get("videoTags"),
+                    tags,
+                    playlists=playlists,
                     publish_to_feed=notify_subs,
                 )
                 if any(job_file == file for job_file, _ in self.jobs):
