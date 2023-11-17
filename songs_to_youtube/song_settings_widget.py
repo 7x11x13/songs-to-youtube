@@ -1,17 +1,16 @@
 from PySide6.QtCore import QPersistentModelIndex
 from PySide6.QtWidgets import *
 
-from const import *
-from field import *
-from settings import *
-from song_tree_widget_item import *
-from utils import *
+from songs_to_youtube.const import *
+from songs_to_youtube.field import *
+from songs_to_youtube.settings import *
+from songs_to_youtube.song_tree_widget_item import *
+from songs_to_youtube.utils import *
 
 logger = logging.getLogger(APPLICATION)
 
 
 class SongSettingsWidget(QWidget):
-
     SONG_ONLY_WIDGETS = ((QGroupBox, "ffmpegSettings"), (QGroupBox, "youtubeSettings"))
     ALBUM_ONLY_WIDGETS = (
         (QComboBox, "albumPlaylist"),

@@ -6,8 +6,8 @@ from mutagen.easyid3 import EasyID3
 from mutagen.easymp4 import EasyMP4
 from PySide6.QtCore import *
 
-from const import *
-from utils import *
+from songs_to_youtube.const import *
+from songs_to_youtube.utils import *
 
 # can expand these if wanted
 EasyMP4.RegisterTextKey("url", "purl")

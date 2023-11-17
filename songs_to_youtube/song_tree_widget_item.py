@@ -5,19 +5,18 @@ import posixpath
 from PySide6.QtCore import QFileInfo, QStandardPaths
 from PySide6.QtGui import QStandardItem
 
-from const import *
-from field import *
-from metadata import Metadata
-from settings import *
-from template import SettingTemplate
-from utils import *
+from songs_to_youtube.const import *
+from songs_to_youtube.field import *
+from songs_to_youtube.metadata import Metadata
+from songs_to_youtube.settings import *
+from songs_to_youtube.template import SettingTemplate
+from songs_to_youtube.utils import *
 
 logger = logging.getLogger(APPLICATION)
 
 
 class TreeWidgetItemData:
     def __init__(self, item_type, songs=None, **kwargs):
-
         # metadata values
         self.metadata = None
 

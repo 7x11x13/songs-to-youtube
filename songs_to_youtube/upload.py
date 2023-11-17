@@ -3,17 +3,15 @@ import traceback
 
 from PySide6.QtCore import *
 
-from const import *
-from field import SETTINGS_VALUES
-from settings import get_setting
-from song_tree_widget_item import *
-from youtube_uploader_selenium import YouTubeUploader
+from songs_to_youtube.const import *
+from songs_to_youtube.field import SETTINGS_VALUES
+from songs_to_youtube.settings import get_setting
+from songs_to_youtube.song_tree_widget_item import *
 
 logger = logging.getLogger(APPLICATION)
 
 
 class UploadWorker(QObject):
-
     upload_finished = Signal(str, bool)  # file_path, success
     log_message = Signal(str, int)  # message, loglevel
     on_progress = Signal(str, int)  # job name, percent done
@@ -26,11 +24,11 @@ class UploadWorker(QObject):
 
     def run(self):
         try:
-            self.uploader = YouTubeUploader(
+            """self.uploader = YouTubeUploader(
                 self.username,
                 self.jobs,
                 get_setting("headlessBrowser") == SETTINGS_VALUES.CheckBox.CHECKED,
-            )
+            )"""
             self.uploader.upload_finished.connect(
                 lambda file_path, success: self.upload_finished.emit(file_path, success)
             )
@@ -48,7 +46,6 @@ class UploadWorker(QObject):
 
 
 class Uploader(QObject):
-
     # dict of worker name and worker success
     finished = Signal(dict)
 

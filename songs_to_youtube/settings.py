@@ -6,10 +6,9 @@ from PySide6.QtCore import *
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import *
 
-from const import *
-from field import *
-from utils import *
-from youtube_uploader_selenium import YouTubeLogin
+from songs_to_youtube.const import *
+from songs_to_youtube.field import *
+from songs_to_youtube.utils import *
 
 
 def get_settings():
@@ -85,7 +84,6 @@ class SettingCheckBox(QCheckBox):
 
 
 class CoverArtDisplay(QLabel):
-
     imageChanged = Signal(str)
 
     def __init__(self, *args):
@@ -196,7 +194,6 @@ class AddUserWindow(QDialog):
 
 
 class SettingsWindow(QDialog):
-
     settings_changed = Signal()
 
     SAVE_PRESET_TEXT = "Save preset"

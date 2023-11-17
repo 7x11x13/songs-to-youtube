@@ -1,11 +1,11 @@
-from enum import Enum
 import logging
+from enum import Enum
 
 from PySide6.QtCore import *
 from PySide6.QtWidgets import QWidget
 
-from const import *
-from utils import *
+from songs_to_youtube.const import *
+from songs_to_youtube.utils import *
 
 logger = logging.getLogger(APPLICATION)
 
@@ -17,7 +17,6 @@ APPLICATION_IMAGES = {
 
 
 class SETTINGS_VALUES:
-
     MULTIPLE_VALUES = "<<Multiple values>>"
     MULTIPLE_VALUES_IMG = APPLICATION_IMAGES[":/image/multiple-values.png"]
 
@@ -78,7 +77,6 @@ def checkstate_to_str(state):
 
 
 class InputField:
-
     SONG_FIELDS = {
         "backgroundColor",
         "videoHeight",
