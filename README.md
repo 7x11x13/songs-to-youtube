@@ -35,14 +35,14 @@ Download the latest release for your platform [here](https://github.com/7x11x13/
 ### Run from source
 If you have issues running the exectuable, you can try running the program from the source code:
 
-1. Make sure you have Python version 3.8+ installed
+1. Make sure you have Python version 3.8-3.12 installed, and [poetry](https://python-poetry.org/)
 2. Download the source code
-3. Install required Python modules with `python3 -m pip install -r requirements.txt`
-4. Run the program with `python3 src/main.py`
+3. Install required Python modules with `poetry install`
+4. Run the program with `poetry run songs-to-youtube`
 
 ## Notes
+- New versions of FFmpeg might cause problems, version 4.4 is confirmed to work
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
-- The language of your YouTube might need to be English
 - You can drag and drop songs on the main window to add them to the queue. The order in which they are uploaded goes from top to bottom
 - You can also drag and drop images onto a song's current album art to change it
 - Make sure the output file extension stays  as .mkv
