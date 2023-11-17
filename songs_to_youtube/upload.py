@@ -1,7 +1,12 @@
+import glob
+import json
 import logging
+import time
 import traceback
+from http.cookiejar import Cookie, FileCookieJar, MozillaCookieJar
 
 from PySide6.QtCore import *
+from youtube_up import Metadata, YTUploaderSession
 
 from songs_to_youtube.const import *
 from songs_to_youtube.field import SETTINGS_VALUES
@@ -9,6 +14,102 @@ from songs_to_youtube.settings import get_setting
 from songs_to_youtube.song_tree_widget_item import *
 
 logger = logging.getLogger(APPLICATION)
+
+
+class JSONFileCookieJar(FileCookieJar):
+    def _really_load(self, f, filename, ignore_discard, ignore_expires):
+        now = time.time()
+        cookies = json.load(f)
+        for cookie in cookies:
+            rest = {}
+            if cookie.get("httpOnly"):
+                rest["HTTPOnly"] = ""
+            c = Cookie(
+                0,
+                cookie["name"],
+                cookie["value"],
+                None,
+                False,
+                cookie["domain"],
+                True,
+                cookie["domain"].startswith("."),
+                cookie["path"],
+                True,
+                cookie["secure"],
+                cookie["expires"],
+                False,
+                None,
+                None,
+                rest,
+            )
+            if not ignore_discard and c.discard:
+                continue
+            if not ignore_expires and c.is_expired(now):
+                continue
+            self.set_cookie(c)
+
+    def save(self, filename=None, ignore_discard=False, ignore_expires=False):
+        now = time.time()
+        cookies = []
+        for cookie in self:
+            domain = cookie.domain
+            if not ignore_discard and cookie.discard:
+                continue
+            if not ignore_expires and cookie.is_expired(now):
+                continue
+            if cookie.secure:
+                secure = "TRUE"
+            else:
+                secure = "FALSE"
+            if domain.startswith("."):
+                initial_dot = "TRUE"
+            else:
+                initial_dot = "FALSE"
+            if cookie.expires is not None:
+                expires = str(cookie.expires)
+            else:
+                expires = ""
+            if cookie.value is None:
+                name = ""
+                value = cookie.name
+            else:
+                name = cookie.name
+                value = cookie.value
+            httpOnly = False
+            if cookie.has_nonstandard_attr("HTTPOnly"):
+                httpOnly = True
+            cookies.append(
+                {
+                    "name": name,
+                    "value": value,
+                    "domain": domain,
+                    "path": cookie.path,
+                    "expires": expires,
+                    "httpOnly": httpOnly,
+                    "secure": secure,
+                }
+            )
+
+        if filename is None:
+            if self.filename is not None:
+                filename = self.filename
+
+        with open(filename, "w") as f:
+            json.dump(cookies, f)
+
+
+def get_cookie_jar_for_username(username: str) -> FileCookieJar:
+    cookie_dir = YouTubeLogin.get_cookie_path_from_username(username)
+    txt_cookie_paths = glob.glob(posixpath.join(cookie_dir, "*.txt"))
+    json_cookie_paths = glob.glob(posixpath.join(cookie_dir, "*.json"))
+    if txt_cookie_paths:
+        return MozillaCookieJar(txt_cookie_paths[0])
+    elif json_cookie_paths:
+        return JSONFileCookieJar(json_cookie_paths[0])
+    else:
+        raise FileNotFoundError(
+            f"No cookie files matching *.txt or *.json found in {cookie_dir}"
+        )
 
 
 class UploadWorker(QObject):
@@ -24,11 +125,8 @@ class UploadWorker(QObject):
 
     def run(self):
         try:
-            """self.uploader = YouTubeUploader(
-                self.username,
-                self.jobs,
-                get_setting("headlessBrowser") == SETTINGS_VALUES.CheckBox.CHECKED,
-            )"""
+            cj = get_cookie_jar_for_username(self.username)
+            self.uploader = YTUploaderSession(cj)
             self.uploader.upload_finished.connect(
                 lambda file_path, success: self.upload_finished.emit(file_path, success)
             )
