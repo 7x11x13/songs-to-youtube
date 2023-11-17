@@ -176,7 +176,7 @@ class AddUserWindow(QDialog):
 
     def open_cookies(self):
         cookie_file = QFileDialog.getOpenFileName(
-            self, "Select cookies.json file", filter="Cookies (*.json)"
+            self, "Select cookies.txt or json file", filter="Cookies (*.txt *.json)"
         )[0]
         if cookie_file:
             self.ui.cookiesFile.setText(cookie_file)
@@ -186,7 +186,11 @@ class AddUserWindow(QDialog):
             self.ui.username.text()
         )
         os.makedirs(cookie_folder, exist_ok=True)
-        cookie_file = posixpath.join(cookie_folder, "youtube.com.json")
+        cookie_file = self.ui.cookiesFile.text()
+        if cookie_file.endswith("json"):
+            cookie_file = posixpath.join(cookie_folder, "youtube.com.json")
+        else:
+            cookie_file = posixpath.join(cookie_folder, "cookies.txt")
         shutil.copyfile(self.ui.cookiesFile.text(), cookie_file)
 
     def show(self):

@@ -4,9 +4,11 @@ import logging
 import time
 import traceback
 from http.cookiejar import Cookie, FileCookieJar, MozillaCookieJar
+from typing import List, Tuple
 
 from PySide6.QtCore import *
-from youtube_up import Metadata, YTUploaderSession
+from youtube_up import Metadata as YTMetadata
+from youtube_up import YTUploaderSession
 
 from songs_to_youtube.const import *
 from songs_to_youtube.field import SETTINGS_VALUES
@@ -127,16 +129,19 @@ class UploadWorker(QObject):
         try:
             cj = get_cookie_jar_for_username(self.username)
             self.uploader = YTUploaderSession(cj)
-            self.uploader.upload_finished.connect(
-                lambda file_path, success: self.upload_finished.emit(file_path, success)
-            )
-            self.uploader.log_message.connect(
-                lambda message, level: self.log_message.emit(message, level)
-            )
-            self.uploader.on_progress.connect(
-                lambda job_name, progress: self.on_progress.emit(job_name, progress)
-            )
-            self.uploader.upload_all()
+            for file, metadata in self.jobs:
+
+                def callback(step, progress):
+                    self.on_progress.emit(file, progress)
+                    # self.log_message.emit(step, logging.DEBUG)
+
+                try:
+                    self.uploader.upload(file, metadata, callback)
+                    self.upload_finished.emit(file, True)
+                except Exception:
+                    self.log_message.emit(traceback.format_exc(), logging.ERROR)
+                    self.upload_finished.emit(file, False)
+
         except Exception:
             self.log_message.emit(traceback.format_exc(), logging.ERROR)
         finally:
@@ -159,7 +164,7 @@ class Uploader(QObject):
     def __init__(self, render_results, *args):
         super().__init__()
         self.uploading = False
-        self.jobs = []
+        self.jobs: List[Tuple[str, YTMetadata]] = []  # file path and metadata
         self.results = {}
         self.render_results = render_results
         self.cancelled = False
@@ -177,11 +182,10 @@ class Uploader(QObject):
 
     def cancel(self):
         self.cancelled = True
-        for job in self.jobs:
-            if job["file_path"] not in self.results:
-                self.results[job["file_path"]] = False
+        for file, _ in self.jobs:
+            if file not in self.results:
+                self.results[file] = False
         self.finished.emit(self.results)
-        self.worker.uploader.browser.quit()
 
     def add_upload_album_job(self, album: AlbumTreeWidgetItem):
         if album.childCount() == 0:
@@ -191,16 +195,19 @@ class Uploader(QObject):
                 file = album.get("fileOutput")
                 if file in self.render_results and self.render_results[file]:
                     album.before_upload()
-                    metadata = {
-                        "title": album.get("videoTitleAlbum"),
-                        "description": album.get("videoDescriptionAlbum"),
-                        "tags": album.get("videoTagsAlbum"),
-                        "visibility": album.get("videoVisibilityAlbum"),
-                        "notify_subs": album.get("notifySubsAlbum")
-                        == SETTINGS_VALUES.CheckBox.CHECKED,
-                    }
-                    metadata["file_path"] = file
-                    self.jobs.append(metadata)
+                    privacy = album.get("videoDescriptionAlbum")
+                    notify_subs = (
+                        album.get("notifySubsAlbum") == SETTINGS_VALUES.CheckBox.CHECKED
+                    )
+                    metadata = YTMetadata(
+                        album.get("videoTitleAlbum"),
+                        album.get("videoDescriptionAlbum"),
+                        privacy,
+                        False,
+                        album.get("videoTagsAlbum"),
+                        publish_to_feed=notify_subs,
+                    )
+                    self.jobs.append((file, metadata))
         elif album.get("albumPlaylist") == SETTINGS_VALUES.AlbumPlaylist.MULTIPLE:
             for song in album.getChildren():
                 self.add_upload_song_job(song)
@@ -210,20 +217,20 @@ class Uploader(QObject):
             file = song.get("fileOutput")
             if file in self.render_results and self.render_results[file]:
                 song.before_upload()
-                metadata = {
-                    "title": song.get("videoTitle"),
-                    "description": song.get("videoDescription"),
-                    "tags": song.get("videoTags"),
-                    "playlist": song.get("playlistName").split("\n"),
-                    "visibility": song.get("videoVisibility"),
-                    "notify_subs": song.get("notifySubs")
-                    == SETTINGS_VALUES.CheckBox.CHECKED,
-                }
-                metadata["file_path"] = file
-                if any(job["file_path"] == file for job in self.jobs):
+                privacy = song.get("videoDescription")
+                notify_subs = song.get("notifySubs") == SETTINGS_VALUES.CheckBox.CHECKED
+                metadata = YTMetadata(
+                    song.get("videoTitle"),
+                    song.get("videoDescription"),
+                    privacy,
+                    False,
+                    song.get("videoTags"),
+                    publish_to_feed=notify_subs,
+                )
+                if any(job_file == file for job_file, _ in self.jobs):
                     logger.error(f"Ignoring duplicate job {file}")
                 else:
-                    self.jobs.append(metadata)
+                    self.jobs.append((file, metadata))
 
     def is_uploading(self):
         return self.uploading
@@ -238,7 +245,7 @@ class Uploader(QObject):
             logger.log(level, message)
 
     def upload(self):
-        self.results = {job["file_path"]: False for job in self.jobs}
+        self.results = {file: False for file, _ in self.jobs}
         if len(self.jobs) == 0:
             self.finished.emit(self.results)
             return

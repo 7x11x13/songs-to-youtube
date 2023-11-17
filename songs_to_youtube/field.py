@@ -67,13 +67,19 @@ def str_to_checkstate(s):
     return STR_TO_CHECKSTATE[s]
 
 
-def checkstate_to_str(state):
-    CHECKSTATE_TO_STR = {
-        Qt.Unchecked: SETTINGS_VALUES.CheckBox.UNCHECKED,
-        Qt.PartiallyChecked: SETTINGS_VALUES.MULTIPLE_VALUES,
-        Qt.Checked: SETTINGS_VALUES.CheckBox.CHECKED,
-    }
-    return CHECKSTATE_TO_STR[state]
+def checkstate_to_str(state: Qt.CheckState):
+    c = [
+        SETTINGS_VALUES.CheckBox.UNCHECKED,
+        SETTINGS_VALUES.MULTIPLE_VALUES,
+        SETTINGS_VALUES.CheckBox.CHECKED,
+    ]
+    try:
+        return c[state]
+    except TypeError:
+        try:
+            return c[state.value]
+        except AttributeError:
+            return c[(b"Unchecked", b"PartiallyChecked", b"Checked").index(state.name)]
 
 
 class InputField:
