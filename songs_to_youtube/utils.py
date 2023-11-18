@@ -1,21 +1,44 @@
 import logging
 import os
 import posixpath
+import shutil
 import sys
 
 from PySide6.QtCore import *
 from PySide6.QtUiTools import QUiLoader
 
-from const import *
+from songs_to_youtube.const import *
 
 logger = logging.getLogger(APPLICATION)
+
+
+# Cookies utils
+class YouTubeLogin:
+    @staticmethod
+    def get_cookie_path_from_username(username):
+        appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+        general_cookies_folder_path = posixpath.join(appdata_path, "cookies")
+        os.makedirs(general_cookies_folder_path, exist_ok=True)
+        return posixpath.join(general_cookies_folder_path, username)
+
+    @staticmethod
+    def get_all_usernames():
+        appdata_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+        general_cookies_folder_path = posixpath.join(appdata_path, "cookies")
+        os.makedirs(general_cookies_folder_path, exist_ok=True)
+        return next(os.walk(general_cookies_folder_path))[1]
+
+    @staticmethod
+    def remove_user_cookies(username):
+        cookie_folder = YouTubeLogin.get_cookie_path_from_username(username)
+        shutil.rmtree(cookie_folder)
+
 
 # File utils
 
 if os.name == "nt":
     import ctypes
     from ctypes import wintypes
-
 
     _GetShortPathNameW = ctypes.WinDLL(
         "kernel32", use_last_error=True

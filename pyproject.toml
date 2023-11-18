@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "songs-to-youtube"
+version = "0.12.0"
+description = "Application to upload songs to YouTube"
+authors = ["7x11x13 <x7x11x13@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+songs-to-youtube = "songs_to_youtube.main:main"
+
+[tool.poetry.dependencies]
+python = "^3.8, <3.13"
+mutagen = "^1.47.0"
+pathvalidate = "^3.2.0"
+psutil = "^5.9.6"
+pyside6 = "^6.6.0"
+youtube-up = "0.3.3"
+
+[tool.poetry.group.build]
+optional = true
+
+[tool.poetry.group.build.dependencies]
+pyinstaller = "^6.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

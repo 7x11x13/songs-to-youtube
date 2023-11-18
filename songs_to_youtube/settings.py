@@ -6,10 +6,9 @@ from PySide6.QtCore import *
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import *
 
-from const import *
-from field import *
-from utils import *
-from youtube_uploader_selenium import YouTubeLogin
+from songs_to_youtube.const import *
+from songs_to_youtube.field import *
+from songs_to_youtube.utils import *
 
 
 def get_settings():
@@ -85,7 +84,6 @@ class SettingCheckBox(QCheckBox):
 
 
 class CoverArtDisplay(QLabel):
-
     imageChanged = Signal(str)
 
     def __init__(self, *args):
@@ -178,7 +176,7 @@ class AddUserWindow(QDialog):
 
     def open_cookies(self):
         cookie_file = QFileDialog.getOpenFileName(
-            self, "Select cookies.json file", filter="Cookies (*.json)"
+            self, "Select cookies.txt or json file", filter="Cookies (*.txt *.json)"
         )[0]
         if cookie_file:
             self.ui.cookiesFile.setText(cookie_file)
@@ -188,7 +186,11 @@ class AddUserWindow(QDialog):
             self.ui.username.text()
         )
         os.makedirs(cookie_folder, exist_ok=True)
-        cookie_file = posixpath.join(cookie_folder, "youtube.com.json")
+        cookie_file = self.ui.cookiesFile.text()
+        if cookie_file.endswith("json"):
+            cookie_file = posixpath.join(cookie_folder, "youtube.com.json")
+        else:
+            cookie_file = posixpath.join(cookie_folder, "cookies.txt")
         shutil.copyfile(self.ui.cookiesFile.text(), cookie_file)
 
     def show(self):
@@ -196,7 +198,6 @@ class AddUserWindow(QDialog):
 
 
 class SettingsWindow(QDialog):
-
     settings_changed = Signal()
 
     SAVE_PRESET_TEXT = "Save preset"

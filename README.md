@@ -11,13 +11,13 @@ Convert audio files to videos and upload them to YouTube automatically.
 - Extracts other metadata which can be used in template strings for the video title/description etc.
 - Can concatenate songs to upload an album as a single video
 - Can upload an album as a playlist of multiple videos
-- Does not use YouTube API; can upload up to 50-100 videos per day
+- Does not use official YouTube API; can upload up to 50-100 videos per day
 - Does not re-encode audio before uploading
 
 ## Pre-installation
 - [FFmpeg](https://ffmpeg.org/download.html) is required to convert songs into videos
-- [Firefox](https://www.mozilla.org/firefox/new/) and [geckodriver](https://github.com/mozilla/geckodriver/releases) are required to upload to YouTube
-- Make sure FFmpeg and geckodriver are both in your PATH environment variable
+- [Firefox](https://www.mozilla.org/firefox/new/) and [geckodriver](https://github.com/mozilla/geckodriver/releases) (or Chrome and Chromedriver) are required to upload to YouTube
+- Make sure FFmpeg and geckodriver/chromedriver are both in your PATH environment variable
 - If you have a package manager you can install through that instead. e.g. with [Scoop](https://scoop.sh/):
 ```
 scoop install ffmpeg
@@ -26,28 +26,32 @@ scoop install geckodriver
 
 ## Installation
 
-There are two ways to install this program:
-
 ### PyInstaller binary
 
 Download the latest release for your platform [here](https://github.com/7x11x13/songs-to-youtube/releases), unzip the archive, and run the songs-to-youtube executable.
 
-### Run from source
-If you have issues running the exectuable, you can try running the program from the source code:
+### Install from PyPI
 
-1. Make sure you have Python version 3.8+ installed
+```bash
+$ pip install songs-to-youtube
+$ songs-to-youtube
+```
+
+### Run from source
+
+1. Have Python version 3.8-3.12 installed, and [poetry](https://python-poetry.org/)
 2. Download the source code
-3. Install required Python modules with `python3 -m pip install -r requirements.txt`
-4. Run the program with `python3 src/main.py`
+3. Install required Python modules with `poetry install`
+4. Run the program with `poetry run songs-to-youtube`
 
 ## Notes
+- New versions of FFmpeg might cause problems, version 4.4 is confirmed to work
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
-- The language of your YouTube might need to be English
 - You can drag and drop songs on the main window to add them to the queue. The order in which they are uploaded goes from top to bottom
 - You can also drag and drop images onto a song's current album art to change it
-- Make sure the output file extension stays  as .mkv
+- Make sure the output file extension stays as .mkv
 - The characters < and > will be replaced with fullwidth versions in titles and descriptions, as YouTube does not allow these symbols
-- Video titles and descriptions longer than YouTube allows will be truncated
+- Video titles and descriptions longer than YouTube allows will be truncated (100, and 5000 characters respectively)
 
 ### Template strings
 Write `~{key}` in any text field and it will be replaced with an appropriate value. If no value exists for that key, it will not be replaced. To see the available keys, right click on an album or song and select "View metadata."

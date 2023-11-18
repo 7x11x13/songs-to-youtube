@@ -1,23 +1,23 @@
 import atexit
 import glob
 import logging
-import posixpath
 import os
+import posixpath
 import shutil
 import sys
 
 from PySide6.QtGui import QIcon
+from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import *
 
-from const import *
-from field import *
-from log import *
-from progress_window import ProgressWindow
-from settings import *
-from song_settings_widget import SongSettingsWidget
-from song_tree_widget import SongTreeWidget
-from utils import *
-from youtube_uploader_selenium import YouTubeLogin
+from songs_to_youtube.const import *
+from songs_to_youtube.field import *
+from songs_to_youtube.log import *
+from songs_to_youtube.progress_window import ProgressWindow
+from songs_to_youtube.settings import *
+from songs_to_youtube.song_settings_widget import SongSettingsWidget
+from songs_to_youtube.song_tree_widget import SongTreeWidget
+from songs_to_youtube.utils import *
 
 logger = logging.getLogger(APPLICATION)
 
@@ -165,7 +165,10 @@ class MainWindow(QMainWindow):
         self.ui.cancelButton.clicked.connect(self.cancel)
 
 
-if __name__ == "__main__":
+def main():
+    # no idea why this is necessary but it is... otherwise
+    # future calls to QUiLoader completely freeze the app
+    _ = QUiLoader()
     addLoggingLevel("SUCCESS", 60, "success")
     # initialize default settings
     settings_path = get_settings().fileName()
@@ -180,7 +183,6 @@ if __name__ == "__main__":
             os.remove(file)
 
     atexit.register(clean_up)
-
     app = QApplication([])
     app.setWindowIcon(QIcon(APPLICATION_IMAGES[":/image/icon.ico"]))
     app.setOrganizationName(ORGANIZATION)
@@ -188,3 +190,7 @@ if __name__ == "__main__":
     widget = MainWindow()
     widget.show()
     sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
