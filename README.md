@@ -26,11 +26,16 @@ scoop install geckodriver
 
 ## Installation
 
-There are two ways to install this program:
-
 ### PyInstaller binary
 
 Download the latest release for your platform [here](https://github.com/7x11x13/songs-to-youtube/releases), unzip the archive, and run the songs-to-youtube executable.
+
+### Install from PyPI
+
+```bash
+$ pip install songs-to-youtube
+$ songs-to-youtube
+```
 
 ### Run from source
 
