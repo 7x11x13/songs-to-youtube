@@ -4,7 +4,7 @@
 
 Convert audio files to videos and upload them to YouTube automatically.
 
-![Example](/docs/example.png)
+![Example](https://github.com/7x11x13/songs-to-youtube/blob/master/docs/example.png?raw=true)
 
 ## Features
 - Extracts album covers from audio files
