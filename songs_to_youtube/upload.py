@@ -19,6 +19,14 @@ from songs_to_youtube.song_tree_widget_item import *
 logger = logging.getLogger(APPLICATION)
 
 
+def make_metadata_safe(metadata: YTMetadata):
+    metadata.title = metadata.title[:100]
+    metadata.description = metadata.description[:5000]
+    metadata.title = metadata.title.replace("<", "＜").replace(">", "＞")
+    metadata.description = metadata.description.replace("<", "＜").replace(">", "＞")
+    return metadata
+
+
 class JSONFileCookieJar(FileCookieJar):
     def _really_load(self, f, filename, ignore_discard, ignore_expires):
         now = time.time()
@@ -205,13 +213,15 @@ class Uploader(QObject):
                         if album.get("videoTagsAlbum")
                         else []
                     )
-                    metadata = YTMetadata(
-                        album.get("videoTitleAlbum"),
-                        album.get("videoDescriptionAlbum"),
-                        privacy,
-                        False,
-                        tags,
-                        publish_to_feed=notify_subs,
+                    metadata = make_metadata_safe(
+                        YTMetadata(
+                            album.get("videoTitleAlbum"),
+                            album.get("videoDescriptionAlbum"),
+                            privacy,
+                            False,
+                            tags,
+                            publish_to_feed=notify_subs,
+                        )
                     )
                     self.jobs.append((file, metadata))
         elif album.get("albumPlaylist") == SETTINGS_VALUES.AlbumPlaylist.MULTIPLE:
@@ -236,14 +246,16 @@ class Uploader(QObject):
                     )
                     for name in playlist_names
                 ]
-                metadata = YTMetadata(
-                    song.get("videoTitle"),
-                    song.get("videoDescription"),
-                    privacy,
-                    False,
-                    tags,
-                    playlists=playlists,
-                    publish_to_feed=notify_subs,
+                metadata = make_metadata_safe(
+                    YTMetadata(
+                        song.get("videoTitle"),
+                        song.get("videoDescription"),
+                        privacy,
+                        False,
+                        tags,
+                        playlists=playlists,
+                        publish_to_feed=notify_subs,
+                    )
                 )
                 if any(job_file == file for job_file, _ in self.jobs):
                     logger.error(f"Ignoring duplicate job {file}")
