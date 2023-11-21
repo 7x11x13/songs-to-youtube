@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import *
 
-from song_tree_widget_item import TreeWidgetItemData
+from songs_to_youtube.song_tree_widget_item import TreeWidgetItemData
 
 
 class MetadataTableWidget(QTableWidget):

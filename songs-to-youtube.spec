@@ -4,15 +4,14 @@
 block_cipher = None
 
 
-a = Analysis(['src/main.py'],
+a = Analysis(['songs_to_youtube/main.py'],
              pathex=['.'],
              binaries=[],
-             datas=[('src/ui/*.ui', 'ui'),
-                    ('src/config/*.ini', 'config'),
-                    ('src/commands/concat/*.command', 'commands/concat'),
-                    ('src/commands/render/*.command', 'commands/render'),
-                    ('src/image/*', 'image')],
-             hiddenimports=['PySide6.QtXml'],
+             datas=[('songs_to_youtube/ui/*.ui', 'ui'),
+                    ('songs_to_youtube/config/*.ini', 'config'),
+                    ('songs_to_youtube/commands/concat/*.command', 'commands/concat'),
+                    ('songs_to_youtube/commands/render/*.command', 'commands/render'),
+                    ('songs_to_youtube/image/*', 'image')],
              hookspath=[],
              hooksconfig={},
              runtime_hooks=[],
@@ -42,4 +41,4 @@ exe = EXE(pyz,
           target_arch=None,
           codesign_identity=None,
           entitlements_file=None,
-          icon='src/image/icon.ico')
+          icon='songs_to_youtube/image/icon.ico')

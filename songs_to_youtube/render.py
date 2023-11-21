@@ -10,13 +10,14 @@ from threading import Thread
 import psutil
 from PySide6.QtCore import *
 
-from const import *
-from field import SETTINGS_VALUES
-from song_tree_widget_item import *
+from songs_to_youtube.const import *
+from songs_to_youtube.field import SETTINGS_VALUES
+from songs_to_youtube.song_tree_widget_item import *
 
 logger = logging.getLogger(APPLICATION)
 
 PROCESSES = []
+
 
 # make sure to stop all the ffmpeg processes from running
 # if we close the application
@@ -35,7 +36,6 @@ atexit.register(clean_up)
 
 
 class ProcessHandler(QObject):
-
     stdout = Signal(str)
     stderr = Signal(str)
 
@@ -51,7 +51,6 @@ class ProcessHandler(QObject):
             queue.put((None, None))
 
     def run(self, command):
-
         if os.name == "nt":
             p = subprocess.Popen(
                 command,
@@ -204,7 +203,6 @@ class AlbumRenderHelper:
 
 
 class Renderer(QObject):
-
     # emit true on success, false on failure
     finished = Signal(dict)
 

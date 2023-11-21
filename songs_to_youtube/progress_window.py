@@ -3,8 +3,8 @@ import logging
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import *
 
-from const import *
-from utils import *
+from songs_to_youtube.const import *
+from songs_to_youtube.utils import *
 
 logger = logging.getLogger(APPLICATION)
 
@@ -24,7 +24,6 @@ class WorkerProgress(QWidget):
 
 class ProgressWindow(QWidget):
     def __init__(self, *args):
-
         self.workers = {}
 
         super().__init__(*args)

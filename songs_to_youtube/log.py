@@ -5,8 +5,8 @@ import traceback
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTextEdit
 
-from const import *
-from settings import *
+from songs_to_youtube.const import *
+from songs_to_youtube.settings import *
 
 
 def addLoggingLevel(levelName, levelNum, methodName=None):
@@ -76,7 +76,6 @@ class LogWidgetFormatter(logging.Formatter):
 
 
 class LogWidgetLogger(logging.Handler):
-
     COLORS = {
         "WARNING": QColor("orange"),
         "INFO": QColor("black"),

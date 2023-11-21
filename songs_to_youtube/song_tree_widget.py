@@ -4,13 +4,13 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from field import SETTINGS_VALUES
-from metadata_table_widget import MetadataTableWidget
-from render import Renderer
-from settings import *
-from song_tree_widget_item import *
-from upload import Uploader
-from utils import *
+from songs_to_youtube.field import SETTINGS_VALUES
+from songs_to_youtube.metadata_table_widget import MetadataTableWidget
+from songs_to_youtube.render import Renderer
+from songs_to_youtube.settings import *
+from songs_to_youtube.song_tree_widget_item import *
+from songs_to_youtube.upload import Uploader
+from songs_to_youtube.utils import *
 
 
 class SongTreeModel(QStandardItemModel):
