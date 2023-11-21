@@ -29,7 +29,7 @@ class Constant:
         "/html/body/ytcp-playlist-creation-dialog/ytcp-dialog/tp-yt-paper-dialog/div[3]/div/ytcp-button[2]"
     )
     PLAYLIST_VISIBILITY_DROPDOWN = (
-        "/html/body/ytcp-playlist-creation-dialog/ytcp-dialog/tp-yt-paper-dialog/div[2]/div/ytcp-playlist-metadata-editor/div/ytcp-playlist-metadata-visibility/div/ytcp-text-dropdown-trigger"
+        "/html/body/ytcp-playlist-creation-dialog/ytcp-dialog/tp-yt-paper-dialog/div[2]/div/ytcp-playlist-metadata-editor/div/div[3]/ytcp-playlist-metadata-visibility/div/ytcp-text-dropdown-trigger/ytcp-dropdown-trigger"
     )
     PLAYLIST_LABEL = "//label[./span/span[@class='label label-text style-scope ytcp-checkbox-group']]"
     TOOLTIP = "//ytcp-paper-tooltip"
