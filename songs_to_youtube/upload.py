@@ -47,7 +47,7 @@ class JSONFileCookieJar(FileCookieJar):
                 cookie["path"],
                 True,
                 cookie["secure"],
-                cookie["expires"],
+                cookie["expires"] or None,
                 False,
                 None,
                 None,
