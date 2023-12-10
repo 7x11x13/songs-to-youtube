@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "songs-to-youtube"
-version = "0.12.4"
+version = "0.12.5"
 description = "Application to upload songs to YouTube"
 authors = ["7x11x13 <x7x11x13@gmail.com>"]
 readme = "README.md"

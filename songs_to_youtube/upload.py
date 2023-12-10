@@ -245,6 +245,7 @@ class Uploader(QObject):
                         create_if_title_doesnt_exist=True,
                     )
                     for name in playlist_names
+                    if name
                 ]
                 metadata = make_metadata_safe(
                     YTMetadata(
