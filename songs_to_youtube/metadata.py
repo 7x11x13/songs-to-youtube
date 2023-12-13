@@ -29,9 +29,7 @@ class Metadata:
 
     def load_song(self, path):
         f = mutagen.File(path, easy=True)
-        if f.info:
-            for key, value in vars(f.info).items():
-                self.tags[key] = make_value_qt_safe(value)
+        logger.debug(f)
         if f.tags:
             logger.debug(f"Tags: {f.keys()}")
             for key, value in f.tags.items():
@@ -65,6 +63,9 @@ class Metadata:
             elif isinstance(f, mutagen.flac.FLAC):
                 for picture in f.pictures:
                     self.pictures.append(picture.data)
+        if f.info:
+            for key, value in vars(f.info).items():
+                self.tags[key] = make_value_qt_safe(value)
 
     def get_cover_art(self):
         # extract cover art if it exists

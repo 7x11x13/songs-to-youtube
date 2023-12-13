@@ -126,13 +126,13 @@ class TreeWidgetItemData:
 
     def get_duration_ms(self):
         if "length" in self.metadata.get_tags():
-            return float(self.metadata.get_tags()["length"]) * 1000
+            duration = float(self.metadata.get_tags()["length"]) * 1000
+            logger.debug(f"Duration (ms): {duration}")
+            return duration
         else:
-            logger.error(
-                "Could not find duration of file {}".format(self.dict["song_path"])
+            raise ValueError(
+                f"Could not find duration of file {self.dict['song_path']}"
             )
-            logger.debug(self.metadata.get_tags())
-            return 999999999
 
     def get_track_number(self):
         if "tracknumber" in self.metadata.get_tags():
