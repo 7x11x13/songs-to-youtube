@@ -35,6 +35,8 @@ class JSONFileCookieJar(FileCookieJar):
             rest = {}
             if cookie.get("httpOnly"):
                 rest["HTTPOnly"] = ""
+            if isinstance(cookie["secure"], str):
+                cookie["secure"] = cookie["secure"] == "TRUE"
             c = Cookie(
                 0,
                 cookie["name"],
@@ -68,14 +70,8 @@ class JSONFileCookieJar(FileCookieJar):
                 continue
             if not ignore_expires and cookie.is_expired(now):
                 continue
-            if cookie.secure:
-                secure = "TRUE"
-            else:
-                secure = "FALSE"
-            if domain.startswith("."):
-                initial_dot = "TRUE"
-            else:
-                initial_dot = "FALSE"
+            secure = cookie.secure
+            initial_dot = domain.startswith(".")
             if cookie.expires is not None:
                 expires = str(cookie.expires)
             else:
