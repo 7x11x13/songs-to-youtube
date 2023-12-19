@@ -1040,13 +1040,13 @@ h11 = ">=0.9.0,<1"
 
 [[package]]
 name = "youtube-up"
-version = "0.3.6"
+version = "0.3.7"
 description = "Upload videos to YouTube using the internal YouTube API"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "youtube_up-0.3.6-py3-none-any.whl", hash = "sha256:338d3542236921e2e5781ddb4138eea06cf37520005a2ddc82166696b2852147"},
-    {file = "youtube_up-0.3.6.tar.gz", hash = "sha256:fb4ba3b956ea19a95a899d081f5d6bc4d0c5df17a698947a8ed998b1cb5659f4"},
+    {file = "youtube_up-0.3.7-py3-none-any.whl", hash = "sha256:b730a92cb023fe4246122f018e266ef632fc51a5b55e2969cadded96a7afe9a1"},
+    {file = "youtube_up-0.3.7.tar.gz", hash = "sha256:82b803a0043b947358b1645a0c6e1329be29aa129595128bbea5e1d89171dd50"},
 ]
 
 [package.dependencies]
@@ -1135,4 +1135,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8, <3.13"
-content-hash = "9a1cccc47924ff35ccfaef86acce439087b027e01f69679a9b227d9d37ea88ea"
+content-hash = "69637628ddfed25f8b6e038831be62f5f63f89fbfa79686d78507f91bea7430f"
