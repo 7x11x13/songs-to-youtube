@@ -73,13 +73,25 @@ def checkstate_to_str(state: Qt.CheckState):
         SETTINGS_VALUES.MULTIPLE_VALUES,
         SETTINGS_VALUES.CheckBox.CHECKED,
     ]
-    try:
-        return c[state]
-    except TypeError:
-        try:
-            return c[state.value]
-        except AttributeError:
-            return c[(b"Unchecked", b"PartiallyChecked", b"Checked").index(state.name)]
+    return c[state.value]
+
+
+def int_to_checkstate_str(state: int):
+    c = [
+        SETTINGS_VALUES.CheckBox.UNCHECKED,
+        SETTINGS_VALUES.MULTIPLE_VALUES,
+        SETTINGS_VALUES.CheckBox.CHECKED,
+    ]
+    return c[state]
+
+
+def checkstate_to_int(state: Qt.CheckState):
+    c = [
+        Qt.CheckState.Unchecked,
+        Qt.CheckState.PartiallyChecked,
+        Qt.CheckState.Checked,
+    ]
+    return c.index(state)
 
 
 class InputField:
@@ -149,7 +161,7 @@ class InputField:
                 str_to_checkstate(text)
             ),
             "on_update": lambda widget, cb: widget.stateChanged.connect(
-                lambda state: cb(checkstate_to_str(state))
+                lambda state: cb(int_to_checkstate_str(state))
             ),
         },
         "CoverArtDisplay": {

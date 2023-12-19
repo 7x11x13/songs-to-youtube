@@ -80,7 +80,7 @@ class SettingCheckBox(QCheckBox):
             self.setCheckState(Qt.Checked)
         else:
             self.setChecked(not self.isChecked())
-        self.stateChanged.emit(self.checkState())
+        self.stateChanged.emit(checkstate_to_int(self.checkState()))
 
 
 class CoverArtDisplay(QLabel):
