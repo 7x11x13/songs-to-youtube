@@ -50,9 +50,9 @@ class SETTINGS_VALUES:
     }
 
     class CheckBox(str, Enum):
-        UNCHECKED = "PySide6.QtCore.Qt.CheckState.Unchecked"
-        PARTIALLY_CHECKED = "PySide6.QtCore.Qt.CheckState.PartiallyChecked"
-        CHECKED = "PySide6.QtCore.Qt.CheckState.Checked"
+        UNCHECKED = "UNCHECKED"
+        PARTIALLY_CHECKED = "PARTIALLY_CHECKED"
+        CHECKED = "CHECKED"
 
 
 def str_to_checkstate(s):
