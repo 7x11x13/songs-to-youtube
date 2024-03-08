@@ -45,7 +45,7 @@ $ songs-to-youtube
 4. Run the program with `poetry run songs-to-youtube`
 
 ## Notes
-- New versions of FFmpeg might cause problems, version 4.4 is confirmed to work
+- New versions of FFmpeg (6.1+) render a bit slower than older versions (5.1, 4.4)
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
 - You can drag and drop songs on the main window to add them to the queue. The order in which they are uploaded goes from top to bottom
 - You can also drag and drop images onto a song's current album art to change it
