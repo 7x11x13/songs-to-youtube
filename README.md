@@ -15,7 +15,7 @@ Convert audio files to videos and upload them to YouTube automatically.
 - Does not re-encode audio before uploading
 
 ## Pre-installation
-- [FFmpeg](https://ffmpeg.org/download.html) is required to convert songs into videos
+- [FFmpeg](https://ffmpeg.org/download.html) **version 6.1+** is required to convert songs into videos 
 - [Firefox](https://www.mozilla.org/firefox/new/) and [geckodriver](https://github.com/mozilla/geckodriver/releases) (or Chrome and Chromedriver) are required to upload to YouTube
 - Make sure FFmpeg and geckodriver/chromedriver are both in your PATH environment variable
 - If you have a package manager you can install through that instead. e.g. with [Scoop](https://scoop.sh/):
