@@ -125,6 +125,17 @@ class UploadWorker(QObject):
     on_progress = Signal(str, int)  # job name, percent done
     finished = Signal()
 
+    UPLOAD_STEP_MESSAGES = {
+        "start": "Starting upload",
+        "get_session_data": "Getting session data",
+        "get_upload_url": "Getting upload URL",
+        "upload_video": "Uploading video file",
+        "get_session_token": "Getting session token",
+        "create_video": "Creating video",
+        "upload_thumbnail": "Uploading thumbnail",
+        "finish": "Upload finished",
+    }
+
     def __init__(self, username, jobs):
         super().__init__()
         self.jobs = jobs
@@ -136,11 +147,16 @@ class UploadWorker(QObject):
             self.uploader = YTUploaderSession(cj)
             for file, metadata in self.jobs:
 
+                last_step = None
                 def callback(step, progress):
                     self.on_progress.emit(file, progress)
-                    # self.log_message.emit(step, logging.DEBUG)
+                    nonlocal last_step
+                    if step != last_step:
+                        last_step = step
+                        self.log_message.emit(self.UPLOAD_STEP_MESSAGES[step], logging.INFO)
 
                 try:
+                    self.log_message.emit(str(metadata), logging.DEBUG)
                     self.uploader.upload(file, metadata, callback)
                     self.upload_finished.emit(file, True)
                 except Exception:
