@@ -240,10 +240,12 @@ class Renderer(QObject):
 
         self.cancelled = False
 
-    def _worker_progress(self, worker, progress):
+    def _worker_progress(self, worker, progress: str):
         try:
             key, value = progress.strip().split("=")
             if key == "out_time_us":
+                if value.lower() == "n/a":
+                    value = "0"
                 current_time_ms = int(value) // 1000
                 total_time_ms = worker.get_duration_ms()
                 progress = max(
