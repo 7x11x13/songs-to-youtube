@@ -42,7 +42,6 @@ class ProgressWindow(QWidget):
         if worker_name not in self.workers:
             self.init_worker_progress(worker_name)
         worker = self.workers[worker_name]
-        logger.debug(f"{worker_name} - {progress}% done")
         worker.progress.setValue(progress)
 
     def worker_error(self, worker_name, error):
