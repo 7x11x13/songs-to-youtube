@@ -135,13 +135,13 @@ files = [
 
 [[package]]
 name = "certifi"
-version = "2024.2.2"
+version = "2024.6.2"
 description = "Python package for providing Mozilla's CA Bundle."
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "certifi-2024.2.2-py3-none-any.whl", hash = "sha256:dc383c07b76109f368f6106eee2b593b04a011ea4d55f652c6ca24a754d1cdd1"},
-    {file = "certifi-2024.2.2.tar.gz", hash = "sha256:0569859f95fc761b18b45ef421b1290a0f65f147e92a1e5eb3e635f9a5e4e66f"},
+    {file = "certifi-2024.6.2-py3-none-any.whl", hash = "sha256:ddc6c8ce995e6987e7faf5e3f1b02b302836a0e5d98ece18392cb1a36c72ad56"},
+    {file = "certifi-2024.6.2.tar.gz", hash = "sha256:3cd43f1c6fa7dedc5899d69d3ad0398fd018ad1a17fba83ddaf78aa46c747516"},
 ]
 
 [[package]]
@@ -1055,13 +1055,13 @@ h11 = ">=0.9.0,<1"
 
 [[package]]
 name = "youtube-up"
-version = "0.4.2"
+version = "0.4.3"
 description = "Upload videos to YouTube using the internal YouTube API"
 optional = false
 python-versions = "<4.0,>=3.7"
 files = [
-    {file = "youtube_up-0.4.2-py3-none-any.whl", hash = "sha256:97155dddcc05516670569efa99b705a5f73b414c74b474d12f360b795932b212"},
-    {file = "youtube_up-0.4.2.tar.gz", hash = "sha256:9a6994a9b7445ddd2fa35e6eb100139e44904f19787f0770397deda93e1353e2"},
+    {file = "youtube_up-0.4.3-py3-none-any.whl", hash = "sha256:29b2f2987e973c3496a97f77e097d3c2f9bdc91c081353c8ae614a4b937b8e84"},
+    {file = "youtube_up-0.4.3.tar.gz", hash = "sha256:28e0fa06d2c8c06a1115edf2e0131ae7335707b1714f0d7f1f3dcf8cf097be6e"},
 ]
 
 [package.dependencies]
@@ -1150,5 +1150,5 @@ cffi = ["cffi (>=1.11)"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.8, <3.12"
-content-hash = "c846e4bb12c3b6d605e6558db49a946c3cbec06f19d332c97f80061117db6295"
+python-versions = "^3.8, <3.13"
+content-hash = "f574c78f06f1bac79919d4139134d9991a681377c1f16449d26e2887b533e846"
