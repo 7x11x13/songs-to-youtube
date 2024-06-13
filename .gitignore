@@ -2,6 +2,7 @@ dist
 build
 env
 venv
+.venv
 *.log
 *.pkl
 __pycache__

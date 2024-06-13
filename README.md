@@ -44,6 +44,12 @@ $ songs-to-youtube
 3. Install required Python modules with `poetry install`
 4. Run the program with `poetry run songs-to-youtube`
 
+### Installing certificates
+
+On your first run you may get an error which says `Was not able to load https://youtube.com. Have you installed the certificate at {cert_path} ?`.
+If this happens you should follow the instructions at https://docs.mitmproxy.org/stable/concepts-certificates/#installing-the-mitmproxy-ca-certificate-manually
+to install the certificate at the given path.
+
 ## Notes
 - Before you upload any videos, you must sign in to a YouTube account (File > Settings > Add new user)
 - You can drag and drop songs on the main window to add them to the queue. The order in which they are uploaded goes from top to bottom
