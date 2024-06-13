@@ -11,3 +11,4 @@ audio
 pyvenv.cfg
 .qt_for_python
 .python-version
+*_ui.py

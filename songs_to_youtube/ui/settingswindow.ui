@@ -154,14 +154,7 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="SettingCheckBox" name="headlessBrowser">
-            <property name="text">
-             <string>Hide browser while uploading?</string>
-            </property>
-           </widget>
-          </item>
-          <item>
+<item>
            <widget class="QLabel" name="label_11">
             <property name="text">
              <string>Upload videos as:</string>
