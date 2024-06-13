@@ -39,7 +39,7 @@ $ songs-to-youtube
 
 ### Run from source
 
-1. Have Python version 3.8-3.12 installed, and [poetry](https://python-poetry.org/)
+1. Have Python version 3.10-3.11 installed, and [poetry](https://python-poetry.org/)
 2. Download the source code
 3. Install required Python modules with `poetry install`
 4. Run the program with `poetry run songs-to-youtube`
