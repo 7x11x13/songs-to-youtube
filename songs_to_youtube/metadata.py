@@ -41,6 +41,8 @@ class Metadata:
                 if isinstance(f.tags, mutagen.easyid3.EasyID3):
                     f = mutagen.File(path)
                 for key in f:
+                    if key.startswith("WOAF") or key.startswith("WAF"):
+                        self.tags["website"] = make_value_qt_safe(f[key])
                     if key.startswith("COM"):
                         # load comment data here since comment frame keys have
                         # language suffix we can't just register text key COMM
