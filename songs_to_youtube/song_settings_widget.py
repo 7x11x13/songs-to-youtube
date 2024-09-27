@@ -47,6 +47,12 @@ class SongSettingsWidget(QWidget):
         # resize UI when widget is resized
         self.findChild(QWidget, "songSettingsWindow").resize(event.size())
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_S and event.modifiers() == Qt.ControlModifier:
+            self.save_settings()
+        else:
+            super().keyPressEvent(event)
+    
     def connect_actions(self):
         cover_art_button = self.findChild(QPushButton, "coverArtButton")
         cover_art_button.clicked.connect(self.change_cover_art)
